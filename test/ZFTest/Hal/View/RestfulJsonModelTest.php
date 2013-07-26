@@ -5,12 +5,11 @@
 
 namespace ZFTest\Hal\View;
 
-use ZF\Hal\ApiProblem;
+use PHPUnit_Framework_TestCase as TestCase;
+use stdClass;
 use ZF\Hal\HalCollection;
 use ZF\Hal\HalResource;
 use ZF\Hal\View\RestfulJsonModel;
-use PHPUnit_Framework_TestCase as TestCase;
-use stdClass;
 
 /**
  * @subpackage UnitTest
@@ -49,35 +48,12 @@ class RestfulJsonModelTest extends TestCase
         );
     }
 
-    public function invalidApiProblemPayloads()
-    {
-        $payloads = $this->invalidPayloads();
-        $payloads['hal-collection'] = array(new HalCollection(array(), 'item/route'));
-        $payloads['hal-item'] = array(new HalResource(array(), 'id', 'route'));
-        return $payloads;
-    }
-
-    /**
-     * @dataProvider invalidApiProblemPayloads
-     */
-    public function testIsApiProblemReturnsFalseForInvalidValues($payload)
-    {
-        $this->model->setPayload($payload);
-        $this->assertFalse($this->model->isApiProblem());
-    }
-
-    public function testIsApiProblemReturnsTrueForApiProblemPayload()
-    {
-        $problem = new ApiProblem(401, 'Unauthorized');
-        $this->model->setPayload($problem);
-        $this->assertTrue($this->model->isApiProblem());
-    }
-
     public function invalidHalCollectionPayloads()
     {
         $payloads = $this->invalidPayloads();
-        $payloads['api-problem'] = array(new ApiProblem(401, 'unauthorized'));
-        $payloads['hal-item'] = array(new HalResource(array(), 'id', 'route'));
+        $payloads['exception'] = array(new \Exception);
+        $payloads['stdclass']  = array(new stdClass);
+        $payloads['hal-item']  = array(new HalResource(array(), 'id', 'route'));
         return $payloads;
     }
 
@@ -100,7 +76,8 @@ class RestfulJsonModelTest extends TestCase
     public function invalidHalResourcePayloads()
     {
         $payloads = $this->invalidPayloads();
-        $payloads['api-problem'] = array(new ApiProblem(401, 'unauthorized'));
+        $payloads['exception']      = array(new \Exception);
+        $payloads['stdclass']       = array(new stdClass);
         $payloads['hal-collection'] = array(new HalCollection(array(), 'item/route'));
         return $payloads;
     }

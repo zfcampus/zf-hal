@@ -15,6 +15,7 @@ use Zend\Paginator\Paginator;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use Zend\View\HelperPluginManager;
 use Zend\View\Renderer\JsonRenderer;
+use Zend\View\ViewEvent;
 
 /**
  * Handles rendering of the following:
@@ -26,21 +27,27 @@ use Zend\View\Renderer\JsonRenderer;
 class RestfulJsonRenderer extends JsonRenderer
 {
     /**
-     * @var ApiProblem
+     * @var ApiProblemRenderer
      */
-    protected $apiProblem;
-
-    /**
-     * Whether or not to render exception stack traces in API-Problem payloads
-     *
-     * @var bool
-     */
-    protected $displayExceptions = false;
+    protected $apiProblemRenderer;
 
     /**
      * @var HelperPluginManager
      */
     protected $helpers;
+
+    /**
+     * @var ViewEvent
+     */
+    protected $viewEvent;
+
+    /**
+     * @param ApiProblemRenderer $apiProblemRenderer 
+     */
+    public function __construct(ApiProblemRenderer $apiProblemRenderer)
+    {
+        $this->apiProblemRenderer = $apiProblemRenderer;
+    }
 
     /**
      * Set helper plugin manager instance.
@@ -58,6 +65,16 @@ class RestfulJsonRenderer extends JsonRenderer
     }
 
     /**
+     * @param  ViewEvent $event 
+     * @return self
+     */
+    public function setViewEvent(ViewEvent $event)
+    {
+        $this->viewEvent = $event;
+        return $this;
+    }
+
+    /**
      * Lazy-loads a helper plugin manager if none available.
      *
      * @return HelperPluginManager
@@ -71,33 +88,11 @@ class RestfulJsonRenderer extends JsonRenderer
     }
 
     /**
-     * Set display_exceptions flag
-     *
-     * @param  bool $flag
-     * @return RestfulJsonRenderer
+     * @return ViewEvent
      */
-    public function setDisplayExceptions($flag)
+    public function getViewEvent()
     {
-        $this->displayExceptions = (bool) $flag;
-        return $this;
-    }
-
-    /**
-     * Whether or not what was rendered represents an API problem
-     *
-     * @return bool
-     */
-    public function isApiProblem()
-    {
-        return (null !== $this->apiProblem);
-    }
-
-    /**
-     * @return null|ApiProblem
-     */
-    public function getApiProblem()
-    {
-        return $this->apiProblem;
+        return $this->viewEvent;
     }
 
     /**
@@ -115,14 +110,8 @@ class RestfulJsonRenderer extends JsonRenderer
      */
     public function render($nameOrModel, $values = null)
     {
-        $this->apiProblem = null;
-
         if (!$nameOrModel instanceof RestfulJsonModel) {
             return parent::render($nameOrModel, $values);
-        }
-
-        if ($nameOrModel->isApiProblem()) {
-            return $this->renderApiProblem($nameOrModel->getPayload());
         }
 
         if ($nameOrModel->isHalResource()) {
@@ -134,6 +123,7 @@ class RestfulJsonRenderer extends JsonRenderer
         if ($nameOrModel->isHalCollection()) {
             $helper  = $this->helpers->get('HalLinks');
             $payload = $helper->renderCollection($nameOrModel->getPayload());
+
             if ($payload instanceof ApiProblem) {
                 return $this->renderApiProblem($payload);
             }
@@ -141,23 +131,6 @@ class RestfulJsonRenderer extends JsonRenderer
         }
 
         return parent::render($nameOrModel, $values);
-    }
-
-    /**
-     * Render an API Problem representation
-     *
-     * Also sets the $apiProblem member to the passed object.
-     *
-     * @param  ApiProblem $apiProblem
-     * @return string
-     */
-    protected function renderApiProblem(ApiProblem $apiProblem)
-    {
-        $this->apiProblem   = $apiProblem;
-        if ($this->displayExceptions) {
-            $apiProblem->setDetailIncludesStackTrace(true);
-        }
-        return parent::render($apiProblem->toArray());
     }
 
     /**
@@ -172,5 +145,27 @@ class RestfulJsonRenderer extends JsonRenderer
         $helper->setServerUrlHelper($helpers->get('ServerUrl'));
         $helper->setUrlHelper($helpers->get('Url'));
         $helpers->setService('HalLinks', $helper);
+    }
+
+    /**
+     * Render an API-Problem result
+     *
+     * Creates an ApiProblemModel with the provided ApiProblem, and passes it
+     * on to the composed ApiProblemRenderer to render.
+     *
+     * If a ViewEvent is composed, it passes the ApiProblemModel to it so that
+     * the ApiProblemStrategy can be invoked when populating the response.
+     * 
+     * @param  ApiProblem $problem 
+     * @return string
+     */
+    protected function renderApiProblem(ApiProblem $problem)
+    {
+        $model = new ApiProblemModel($problem);
+        $event = $this->getViewEvent();
+        if ($event) {
+            $event->setModel($model);
+        }
+        return $this->apiProblemRenderer->render($model);
     }
 }

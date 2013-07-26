@@ -11,6 +11,7 @@ use ZF\Hal\HalResource;
 use ZF\Hal\Link;
 use ZF\Hal\MetadataMap;
 use ZF\Hal\Plugin\HalLinks;
+use ZF\Hal\View\ApiProblemRenderer;
 use ZF\Hal\View\RestfulJsonModel;
 use ZF\Hal\View\RestfulJsonRenderer;
 use ZFTest\Hal\TestAsset;
@@ -32,7 +33,7 @@ class RestfulJsonRendererTest extends TestCase
 {
     public function setUp()
     {
-        $this->renderer = new RestfulJsonRenderer();
+        $this->renderer = new RestfulJsonRenderer(new ApiProblemRenderer());
     }
 
     public function assertIsHalResource($resource)
@@ -343,12 +344,6 @@ class RestfulJsonRendererTest extends TestCase
         $this->assertEquals(409, $test->httpStatus);
         $this->assertObjectHasAttribute('detail', $test);
         $this->assertEquals('Invalid page provided', $test->detail);
-
-        $this->assertTrue($this->renderer->isApiProblem());
-        $problem = $this->renderer->getApiProblem();
-        $this->assertInstanceof('ZF\Hal\ApiProblem', $problem);
-        $problem = $problem->toArray();
-        $this->assertEquals(409, $problem['httpStatus']);
     }
 
     public function testRendersAttributesAsPartOfNonPaginatedHalCollection()

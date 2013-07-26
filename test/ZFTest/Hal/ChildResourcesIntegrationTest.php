@@ -9,6 +9,7 @@ use ZF\Hal\HalCollection;
 use ZF\Hal\HalResource;
 use ZF\Hal\Link;
 use ZF\Hal\Plugin\HalLinks;
+use ZF\Hal\View\ApiProblemRenderer;
 use ZF\Hal\View\RestfulJsonModel;
 use ZF\Hal\View\RestfulJsonRenderer;
 use PHPUnit_Framework_TestCase as TestCase;
@@ -62,7 +63,8 @@ class ChildResourcesIntegrationTest extends TestCase
         if (!$this->helpers) {
             $this->setupHelpers();
         }
-        $this->renderer = $renderer = new RestfulJsonRenderer();
+        $apiProblemRenderer = new ApiProblemRenderer();
+        $this->renderer = $renderer = new RestfulJsonRenderer($apiProblemRenderer);
         $renderer->setHelperPluginManager($this->helpers);
     }
 

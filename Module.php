@@ -102,10 +102,11 @@ class Module
                 return new View\ApiProblemStrategy($renderer);
             },
             'ZF\Rest\JsonRenderer' => function ($services) {
-                $helpers  = $services->get('ViewHelperManager');
-                $config   = $services->get('Config');
+                $helpers            = $services->get('ViewHelperManager');
+                $apiProblemRenderer = $services->get('ZF\Rest\ApiProblemRenderer');
+                $config             = $services->get('Config');
 
-                $renderer = new View\RestfulJsonRenderer();
+                $renderer = new View\RestfulJsonRenderer($apiProblemRenderer);
                 $renderer->setHelperPluginManager($helpers);
 
                 return $renderer;
@@ -227,14 +228,10 @@ class Module
         $view                = $services->get('View');
         $events              = $view->getEventManager();
 
-        if ($result instanceof View\RestfulJsonModel) {
-            $strategy = $services->get('ZF\Rest\RestfulJsonStrategy');
-        } else {
-            $strategy = $services->get('ZF\Rest\ApiProblemStrategy');
-        }
-
         // register at high priority, to "beat" normal json strategy registered
         // via view manager
         $events->attach($strategy, 200);
+        $events->attach($services->get('ZF\Rest\ApiProblemStrategy'), 200);
+        $events->attach($services->get('ZF\Rest\RestfulJsonStrategy'), 200);
     }
 }

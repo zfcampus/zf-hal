@@ -8,6 +8,7 @@ namespace ZFTest\Hal\View;
 use ZF\Hal\HalCollection;
 use ZF\Hal\HalResource;
 use ZF\Hal\Link;
+use ZF\Hal\View\ApiProblemRenderer;
 use ZF\Hal\View\RestfulJsonModel;
 use ZF\Hal\View\RestfulJsonRenderer;
 use ZF\Hal\View\RestfulJsonStrategy;
@@ -27,7 +28,7 @@ class RestfulJsonStrategyTest extends TestCase
         $this->event    = new ViewEvent;
         $this->event->setResponse($this->response);
 
-        $this->renderer = new RestfulJsonRenderer;
+        $this->renderer = new RestfulJsonRenderer(new ApiProblemRenderer());
         $this->strategy = new RestfulJsonStrategy($this->renderer);
     }
 

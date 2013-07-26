@@ -57,12 +57,6 @@ class ApiProblemStrategy extends JsonStrategy
      */
     public function injectResponse(ViewEvent $e)
     {
-        $renderer = $e->getRenderer();
-        if ($renderer !== $this->renderer) {
-            // Discovered renderer is not ours; do nothing
-            return;
-        }
-
         $result   = $e->getResult();
         if (!is_string($result)) {
             // We don't have a string, and thus, no JSON

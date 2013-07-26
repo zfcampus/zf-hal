@@ -42,6 +42,7 @@ class RestfulJsonStrategy extends JsonStrategy
         }
 
         // JsonModel found
+        $this->renderer->setViewEvent($e);
         return $this->renderer;
     }
 

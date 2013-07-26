@@ -60,13 +60,6 @@ class ApiProblemStrategyTest extends TestCase
         $this->assertSame($this->renderer, $this->strategy->selectRenderer($this->event));
     }
 
-    public function testInjectResponseDoesNotSetContentTypeHeaderIfRendererDoesNotMatch()
-    {
-        $this->strategy->injectResponse($this->event);
-        $headers = $this->response->getHeaders();
-        $this->assertFalse($headers->has('Content-Type'));
-    }
-
     public function testInjectResponseDoesNotSetContentTypeHeaderIfResultIsNotString()
     {
         $this->event->setRenderer($this->renderer);
