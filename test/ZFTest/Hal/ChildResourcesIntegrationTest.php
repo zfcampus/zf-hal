@@ -5,13 +5,6 @@
 
 namespace ZFTest\Hal;
 
-use ZF\Hal\HalCollection;
-use ZF\Hal\HalResource;
-use ZF\Hal\Link;
-use ZF\Hal\Plugin\HalLinks;
-use ZF\Hal\View\ApiProblemRenderer;
-use ZF\Hal\View\RestfulJsonModel;
-use ZF\Hal\View\RestfulJsonRenderer;
 use PHPUnit_Framework_TestCase as TestCase;
 use Zend\Http\Request;
 use Zend\Mvc\Controller\PluginManager as ControllerPluginManager;
@@ -19,6 +12,13 @@ use Zend\Mvc\Router\Http\TreeRouteStack;
 use Zend\View\HelperPluginManager;
 use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use Zend\View\Helper\Url as UrlHelper;
+use ZF\ApiProblem\View\ApiProblemRenderer;
+use ZF\Hal\HalCollection;
+use ZF\Hal\HalResource;
+use ZF\Hal\Link;
+use ZF\Hal\Plugin\HalLinks;
+use ZF\Hal\View\RestfulJsonModel;
+use ZF\Hal\View\RestfulJsonRenderer;
 
 /**
  * @subpackage UnitTest
@@ -63,8 +63,7 @@ class ChildResourcesIntegrationTest extends TestCase
         if (!$this->helpers) {
             $this->setupHelpers();
         }
-        $apiProblemRenderer = new ApiProblemRenderer();
-        $this->renderer = $renderer = new RestfulJsonRenderer($apiProblemRenderer);
+        $this->renderer = $renderer = new RestfulJsonRenderer(new ApiProblemRenderer());
         $renderer->setHelperPluginManager($this->helpers);
     }
 

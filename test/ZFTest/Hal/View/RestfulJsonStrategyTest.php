@@ -5,17 +5,17 @@
 
 namespace ZFTest\Hal\View;
 
-use ZF\Hal\HalCollection;
-use ZF\Hal\HalResource;
-use ZF\Hal\Link;
-use ZF\Hal\View\ApiProblemRenderer;
-use ZF\Hal\View\RestfulJsonModel;
-use ZF\Hal\View\RestfulJsonRenderer;
-use ZF\Hal\View\RestfulJsonStrategy;
 use PHPUnit_Framework_TestCase as TestCase;
 use Zend\Http\Response;
 use Zend\View\Renderer\JsonRenderer;
 use Zend\View\ViewEvent;
+use ZF\ApiProblem\View\ApiProblemRenderer;
+use ZF\Hal\HalCollection;
+use ZF\Hal\HalResource;
+use ZF\Hal\Link;
+use ZF\Hal\View\RestfulJsonModel;
+use ZF\Hal\View\RestfulJsonRenderer;
+use ZF\Hal\View\RestfulJsonStrategy;
 
 /**
  * @subpackage UnitTest

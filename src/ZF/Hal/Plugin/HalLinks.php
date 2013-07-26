@@ -6,15 +6,6 @@
 namespace ZF\Hal\Plugin;
 
 use ArrayObject;
-use ZF\Hal\ApiProblem;
-use ZF\Hal\Exception;
-use ZF\Hal\HalCollection;
-use ZF\Hal\HalResource;
-use ZF\Hal\Link;
-use ZF\Hal\LinkCollection;
-use ZF\Hal\LinkCollectionAwareInterface;
-use ZF\Hal\Metadata;
-use ZF\Hal\MetadataMap;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
@@ -27,6 +18,15 @@ use Zend\Stdlib\Hydrator\HydratorPluginManager;
 use Zend\View\Helper\AbstractHelper;
 use Zend\View\Helper\ServerUrl;
 use Zend\View\Helper\Url;
+use ZF\ApiProblem\ApiProblem;
+use ZF\Hal\Exception;
+use ZF\Hal\HalCollection;
+use ZF\Hal\HalResource;
+use ZF\Hal\Link;
+use ZF\Hal\LinkCollection;
+use ZF\Hal\LinkCollectionAwareInterface;
+use ZF\Hal\Metadata;
+use ZF\Hal\MetadataMap;
 
 /**
  * Generate links for use with HAL payloads

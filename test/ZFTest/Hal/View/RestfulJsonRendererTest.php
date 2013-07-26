@@ -5,16 +5,6 @@
 
 namespace ZFTest\Hal\View;
 
-use ZF\Hal\ApiProblem;
-use ZF\Hal\HalCollection;
-use ZF\Hal\HalResource;
-use ZF\Hal\Link;
-use ZF\Hal\MetadataMap;
-use ZF\Hal\Plugin\HalLinks;
-use ZF\Hal\View\ApiProblemRenderer;
-use ZF\Hal\View\RestfulJsonModel;
-use ZF\Hal\View\RestfulJsonRenderer;
-use ZFTest\Hal\TestAsset;
 use PHPUnit_Framework_TestCase as TestCase;
 use ReflectionObject;
 use Zend\Mvc\Router\Http\Segment;
@@ -25,6 +15,16 @@ use Zend\Stdlib\Hydrator;
 use Zend\View\HelperPluginManager;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
+use ZF\ApiProblem\ApiProblem;
+use ZF\ApiProblem\View\ApiProblemRenderer;
+use ZF\Hal\HalCollection;
+use ZF\Hal\HalResource;
+use ZF\Hal\Link;
+use ZF\Hal\MetadataMap;
+use ZF\Hal\Plugin\HalLinks;
+use ZF\Hal\View\RestfulJsonModel;
+use ZF\Hal\View\RestfulJsonRenderer;
+use ZFTest\Hal\TestAsset;
 
 /**
  * @subpackage UnitTest

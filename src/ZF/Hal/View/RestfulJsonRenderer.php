@@ -5,17 +5,19 @@
 
 namespace ZF\Hal\View;
 
-use ZF\Hal\ApiProblem;
-use ZF\Hal\HalCollection;
-use ZF\Hal\HalResource;
-use ZF\Hal\Link;
-use ZF\Hal\LinkCollection;
-use ZF\Hal\Plugin\HalLinks;
 use Zend\Paginator\Paginator;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use Zend\View\HelperPluginManager;
 use Zend\View\Renderer\JsonRenderer;
 use Zend\View\ViewEvent;
+use ZF\ApiProblem\ApiProblem;
+use ZF\ApiProblem\View\ApiProblemModel;
+use ZF\ApiProblem\View\ApiProblemRenderer;
+use ZF\Hal\HalCollection;
+use ZF\Hal\HalResource;
+use ZF\Hal\Link;
+use ZF\Hal\LinkCollection;
+use ZF\Hal\Plugin\HalLinks;
 
 /**
  * Handles rendering of the following:
@@ -99,7 +101,7 @@ class RestfulJsonRenderer extends JsonRenderer
      * Render a view model
      *
      * If the view model is a RestfulJsonRenderer, determines if it represents
-     * an ApiProblem, HalCollection, or HalResource, and, if so, creates a custom
+     * a HalCollection or HalResource, and, if so, creates a custom
      * representation appropriate to the type.
      *
      * If not, it passes control to the parent to render.
