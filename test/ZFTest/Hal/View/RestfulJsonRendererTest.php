@@ -11,6 +11,7 @@ use ZF\Hal\HalResource;
 use ZF\Hal\Link;
 use ZF\Hal\MetadataMap;
 use ZF\Hal\Plugin\HalLinks;
+use ZF\Hal\View\ApiProblemRenderer;
 use ZF\Hal\View\RestfulJsonModel;
 use ZF\Hal\View\RestfulJsonRenderer;
 use ZFTest\Hal\TestAsset;
@@ -32,7 +33,7 @@ class RestfulJsonRendererTest extends TestCase
 {
     public function setUp()
     {
-        $this->renderer = new RestfulJsonRenderer();
+        $this->renderer = new RestfulJsonRenderer(new ApiProblemRenderer());
     }
 
     public function assertIsHalResource($resource)
@@ -86,21 +87,6 @@ class RestfulJsonRendererTest extends TestCase
         $payload = $this->renderer->render($model);
         $expected = json_encode(array('foo' => 'bar'));
         $this->assertEquals($expected, $payload);
-    }
-
-    public function testRendersApiProblemCorrectly()
-    {
-        $apiProblem = new ApiProblem(401, 'login error', 'http://status.dev/errors.md', 'Unauthorized');
-        $model      = new RestfulJsonModel();
-        $model->setPayload($apiProblem);
-        $test = $this->renderer->render($model);
-        $expected = array(
-            'httpStatus'  => 401,
-            'describedBy' => 'http://status.dev/errors.md',
-            'title'       => 'Unauthorized',
-            'detail'      => 'login error',
-        );
-        $this->assertEquals($expected, json_decode($test, true));
     }
 
     public function setUpHelpers()
@@ -358,24 +344,6 @@ class RestfulJsonRendererTest extends TestCase
         $this->assertEquals(409, $test->httpStatus);
         $this->assertObjectHasAttribute('detail', $test);
         $this->assertEquals('Invalid page provided', $test->detail);
-
-        $this->assertTrue($this->renderer->isApiProblem());
-        $problem = $this->renderer->getApiProblem();
-        $this->assertInstanceof('ZF\Hal\ApiProblem', $problem);
-        $problem = $problem->toArray();
-        $this->assertEquals(409, $problem['httpStatus']);
-    }
-
-    public function testCanHintToApiProblemToRenderStackTrace()
-    {
-        $exception  = new \Exception('exception message', 500);
-        $apiProblem = new ApiProblem(500, $exception);
-        $model      = new RestfulJsonModel();
-        $model->setPayload($apiProblem);
-        $this->renderer->setDisplayExceptions(true);
-        $test = $this->renderer->render($model);
-        $test = json_decode($test, true);
-        $this->assertContains($exception->getMessage() . "\n" . $exception->getTraceAsString(), $test['detail']);
     }
 
     public function testRendersAttributesAsPartOfNonPaginatedHalCollection()

@@ -5,7 +5,6 @@
 
 namespace ZF\Hal\View;
 
-use ZF\Hal\ApiProblem;
 use Zend\View\Strategy\JsonStrategy;
 use Zend\View\ViewEvent;
 
@@ -16,8 +15,6 @@ use Zend\View\ViewEvent;
  * This will give the following content types:
  *
  * - application/hal+json for a result that contains HAL-compliant links
- * - application/api-problem+json for a result that contains a Problem
- *   API-formatted response
  * - application/json for all other responses
  */
 class RestfulJsonStrategy extends JsonStrategy
@@ -45,6 +42,7 @@ class RestfulJsonStrategy extends JsonStrategy
         }
 
         // JsonModel found
+        $this->renderer->setViewEvent($e);
         return $this->renderer;
     }
 
@@ -74,15 +72,7 @@ class RestfulJsonStrategy extends JsonStrategy
         $contentType = $this->contentType;
         $response    = $e->getResponse();
 
-        if ($this->renderer->isApiProblem()) {
-            $contentType = 'application/api-problem+json';
-            $statusCode  = $this->getStatusCodeFromApiProblem($this->renderer->getApiProblem());
-            $response->setStatusCode($statusCode);
-        } elseif ($model instanceof RestfulJsonModel && $model->isApiProblem()) {
-            $contentType = 'application/api-problem+json';
-            $statusCode  = $this->getStatusCodeFromApiProblem($model->getPayload());
-            $response->setStatusCode($statusCode);
-        } elseif ($model instanceof RestfulJsonModel
+        if ($model instanceof RestfulJsonModel
             && ($model->isHalCollection() || $model->isHalResource())
         ) {
             $contentType = 'application/hal+json';
@@ -92,22 +82,5 @@ class RestfulJsonStrategy extends JsonStrategy
         $response->setContent($result);
         $headers = $response->getHeaders();
         $headers->addHeaderLine('content-type', $contentType);
-    }
-
-    /**
-     * Retrieve the HTTP status from an ApiProblem object
-     *
-     * Ensures that the status falls within the acceptable range (100 - 599).
-     *
-     * @param  ApiProblem $problem
-     * @return int
-     */
-    protected function getStatusCodeFromApiProblem(ApiProblem $problem)
-    {
-        $status = $problem->httpStatus;
-        if ($status < 100 || $status >= 600) {
-            return 500;
-        }
-        return $status;
     }
 }

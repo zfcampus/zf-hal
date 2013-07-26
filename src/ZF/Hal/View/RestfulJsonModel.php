@@ -5,7 +5,6 @@
 
 namespace ZF\Hal\View;
 
-use ZF\Hal\ApiProblem;
 use ZF\Hal\HalCollection;
 use ZF\Hal\HalResource;
 use Zend\View\Model\JsonModel;
@@ -16,17 +15,6 @@ use Zend\View\Model\JsonModel;
  */
 class RestfulJsonModel extends JsonModel
 {
-    /**
-     * Does the payload represent an API-Problem?
-     *
-     * @return bool
-     */
-    public function isApiProblem()
-    {
-        $payload = $this->getPayload();
-        return ($payload instanceof ApiProblem);
-    }
-
     /**
      * Does the payload represent a HAL collection?
      *
