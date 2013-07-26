@@ -164,7 +164,7 @@ class ApiProblemTest extends TestCase
 
     public function testUsesTitleFromExceptionWhenProvided()
     {
-        $exception  = new Exception\CreationException('exception message', 401);
+        $exception  = new Exception\DomainException('exception message', 401);
         $exception->setTitle('problem title');
         $apiProblem = new ApiProblem('401', $exception);
         $payload    = $apiProblem->toArray();
@@ -174,7 +174,7 @@ class ApiProblemTest extends TestCase
 
     public function testUsesDescribedByFromExceptionWhenProvided()
     {
-        $exception  = new Exception\CreationException('exception message', 401);
+        $exception  = new Exception\DomainException('exception message', 401);
         $exception->setDescribedBy('http://example.com/api/help/401');
         $apiProblem = new ApiProblem('401', $exception);
         $payload    = $apiProblem->toArray();
@@ -184,7 +184,7 @@ class ApiProblemTest extends TestCase
 
     public function testUsesAdditionalDetailsFromExceptionWhenProvided()
     {
-        $exception  = new Exception\CreationException('exception message', 401);
+        $exception  = new Exception\DomainException('exception message', 401);
         $exception->setAdditionalDetails(array('foo' => 'bar'));
         $apiProblem = new ApiProblem('401', $exception);
         $payload    = $apiProblem->toArray();

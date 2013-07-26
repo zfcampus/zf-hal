@@ -86,7 +86,7 @@ class HalLinksTest extends TestCase
         $event->setRouter($router);
         $router->setRequestUri(new Http('http://localhost.localdomain/resource'));
 
-        $controller = $this->controller = $this->getMock('ZF\Rest\ResourceController');
+        $controller = $this->controller = $this->getMock('Zend\Mvc\Controller\AbstractRestfulController');
         $controller->expects($this->any())
             ->method('getEvent')
             ->will($this->returnValue($event));
