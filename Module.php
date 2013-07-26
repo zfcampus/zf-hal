@@ -3,7 +3,7 @@
  * @license   http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause
  */
 
-namespace ZF\Rest;
+namespace ZF\Hal;
 
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use Zend\Stdlib\Hydrator\HydratorPluginManager;
@@ -52,10 +52,10 @@ class Module
                 }
 
                 $filter = null;
-                if (isset($config['zf-rest'])
-                    && isset($config['zf-rest']['accept_filter'])
+                if (isset($config['zf-hal'])
+                    && isset($config['zf-hal']['accept_filter'])
                 ) {
-                    $filter = $config['zf-rest']['accept_filter'];
+                    $filter = $config['zf-hal']['accept_filter'];
                 }
 
                 return new Listener\ApiProblemListener($filter);
@@ -73,11 +73,11 @@ class Module
                 }
 
                 $map = array();
-                if (isset($config['zf-rest'])
-                    && isset($config['zf-rest']['metadata_map'])
-                    && is_array($config['zf-rest']['metadata_map'])
+                if (isset($config['zf-hal'])
+                    && isset($config['zf-hal']['metadata_map'])
+                    && is_array($config['zf-hal']['metadata_map'])
                 ) {
-                    $map = $config['zf-rest']['metadata_map'];
+                    $map = $config['zf-hal']['metadata_map'];
                 }
 
                 return new MetadataMap($map, $hydrators);
@@ -146,10 +146,10 @@ class Module
                 $helper->setServerUrlHelper($serverUrlHelper);
                 $helper->setUrlHelper($urlHelper);
 
-                if (isset($config['zf-rest'])
-                    && isset($config['zf-rest']['renderer'])
+                if (isset($config['zf-hal'])
+                    && isset($config['zf-hal']['renderer'])
                 ) {
-                    $config = $config['zf-rest']['renderer'];
+                    $config = $config['zf-hal']['renderer'];
 
                     if (isset($config['default_hydrator'])) {
                         $hydratorServiceName = $config['default_hydrator'];
@@ -193,12 +193,6 @@ class Module
         $services = $app->getServiceManager();
         $events   = $app->getEventManager();
         $events->attach('render', array($this, 'onRender'), 100);
-        $sharedEvents = $events->getSharedManager();
-        $sharedEvents->attach('ZF\Rest\ResourceController', 'dispatch', function($e) use ($services) {
-            $eventManager = $e->getApplication()->getEventManager();
-            $eventManager->attach($services->get('ZF\Rest\ApiProblemListener'));
-        }, 300);
-        $sharedEvents->attachAggregate($services->get('ZF\Rest\ResourceParametersListener'));
     }
 
     /**

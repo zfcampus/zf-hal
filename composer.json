@@ -1,15 +1,16 @@
 {
-    "name": "zfcampus/zf-rest",
-    "description": "ZF2 Module providing structure for RESTful resources",
+    "name": "zfcampus/zf-hal",
+    "description": "ZF2 Module providing Hypermedia Application Language assets and rendering",
     "type": "library",
     "license": "BSD-2-Clause",
     "keywords": [
         "zf2",
         "zend",
         "module",
-        "rest"
+        "rest",
+        "hal"
     ],
-    "homepage": "https://bitbucket.org/zendframework/zfrest",
+    "homepage": "https://bitbucket.org/zendframework/zfhal",
     "repositories": [
         {
             "type": "composer",
@@ -36,7 +37,7 @@
     },
     "autoload": {
         "psr-0": {
-            "ZF\\Rest\\": "src/ZF/",
+            "ZF\\Hal\\": "src/ZF/",
             "ZFTest\\": "test/"
         },
         "classmap": [

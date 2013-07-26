@@ -4,22 +4,9 @@
  */
 
 return array(
-    'zf-rest' => array(
+    'zf-hal' => array(
         'renderer'         => array(),
         'resources'        => array(),
-        'controller_class' => 'ZF\Rest\ResourceController',
-    ),
-
-    'service_manager' => array(
-        'invokables' => array(
-            'ZF\Rest\ResourceParametersListener' => 'ZF\Rest\Listener\ResourceParametersListener',
-        ),
-    ),
-
-    'controllers' => array(
-        'abstract_factories' => array(
-            'ZF\Rest\Factory\ResourceControllerFactory'
-        )
     ),
 
     'view_manager' => array(
