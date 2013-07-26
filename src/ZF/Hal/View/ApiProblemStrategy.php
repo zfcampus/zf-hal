@@ -21,7 +21,7 @@ use Zend\View\ViewEvent;
 class ApiProblemStrategy extends JsonStrategy
 {
     /**
-     * @param ApiProblemRenderer $renderer 
+     * @param ApiProblemRenderer $renderer
      */
     public function __construct(ApiProblemRenderer $renderer)
     {

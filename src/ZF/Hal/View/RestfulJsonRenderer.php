@@ -42,7 +42,7 @@ class RestfulJsonRenderer extends JsonRenderer
     protected $viewEvent;
 
     /**
-     * @param ApiProblemRenderer $apiProblemRenderer 
+     * @param ApiProblemRenderer $apiProblemRenderer
      */
     public function __construct(ApiProblemRenderer $apiProblemRenderer)
     {
@@ -65,7 +65,7 @@ class RestfulJsonRenderer extends JsonRenderer
     }
 
     /**
-     * @param  ViewEvent $event 
+     * @param  ViewEvent $event
      * @return self
      */
     public function setViewEvent(ViewEvent $event)
@@ -155,8 +155,8 @@ class RestfulJsonRenderer extends JsonRenderer
      *
      * If a ViewEvent is composed, it passes the ApiProblemModel to it so that
      * the ApiProblemStrategy can be invoked when populating the response.
-     * 
-     * @param  ApiProblem $problem 
+     *
+     * @param  ApiProblem $problem
      * @return string
      */
     protected function renderApiProblem(ApiProblem $problem)
