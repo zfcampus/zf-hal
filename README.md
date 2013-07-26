@@ -1,10 +1,8 @@
-ZFRest: ZF2 Module for JSON REST Services
-=========================================
+ZFHal: ZF2 Module for Hypermedia Application Layer representations
+==================================================================
 
-This module provides structure and code for quickly implementing RESTful APIs
-that use JSON as a transport.
-
-It allows you to create RESTful JSON APIs that use the following standards:
+This module provides data structures for Hypermedia Application Language, as
+well as the ability to render them to JSON.
 
 - [HAL](http://tools.ietf.org/html/draft-kelly-json-hal-03), used for creating
   hypermedia links
