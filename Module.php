@@ -82,8 +82,7 @@ class Module
 
                 return new MetadataMap($map, $hydrators);
             },
-            'ZF\Rest\JsonRenderer' => function ($services) {
-                $helpers  = $services->get('ViewHelperManager');
+            'ZF\Rest\ApiProblemRenderer' => function ($services) {
                 $config   = $services->get('Config');
 
                 $displayExceptions = false;
@@ -93,9 +92,21 @@ class Module
                     $displayExceptions = (bool) $config['view_manager']['display_exceptions'];
                 }
 
+                $renderer = new View\ApiProblemRenderer();
+                $renderer->setDisplayExceptions($displayExceptions);
+
+                return $renderer;
+            },
+            'ZF\Rest\ApiProblemStrategy' => function ($services) {
+                $renderer = $services->get('ZF\Rest\ApiProblemRenderer');
+                return new View\ApiProblemStrategy($renderer);
+            },
+            'ZF\Rest\JsonRenderer' => function ($services) {
+                $helpers  = $services->get('ViewHelperManager');
+                $config   = $services->get('Config');
+
                 $renderer = new View\RestfulJsonRenderer();
                 $renderer->setHelperPluginManager($helpers);
-                $renderer->setDisplayExceptions($displayExceptions);
 
                 return $renderer;
             },
@@ -205,18 +216,25 @@ class Module
     public function onRender($e)
     {
         $result = $e->getResult();
-        if (!$result instanceof View\RestfulJsonModel) {
+        if (!$result instanceof View\RestfulJsonModel
+            && !$result instanceof View\ApiProblemModel
+        ) {
             return;
         }
 
         $app                 = $e->getTarget();
         $services            = $app->getServiceManager();
         $view                = $services->get('View');
-        $restfulJsonStrategy = $services->get('ZF\Rest\RestfulJsonStrategy');
         $events              = $view->getEventManager();
+
+        if ($result instanceof View\RestfulJsonModel) {
+            $strategy = $services->get('ZF\Rest\RestfulJsonStrategy');
+        } else {
+            $strategy = $services->get('ZF\Rest\ApiProblemStrategy');
+        }
 
         // register at high priority, to "beat" normal json strategy registered
         // via view manager
-        $events->attach($restfulJsonStrategy, 200);
+        $events->attach($strategy, 200);
     }
 }

@@ -5,21 +5,22 @@
 
 namespace ZFTest\Hal\View;
 
-use ZF\Hal\HalCollection;
-use ZF\Hal\HalResource;
-use ZF\Hal\Link;
+use ZF\Hal\ApiProblem;
+use ZF\Hal\View\ApiProblemModel;
+use ZF\Hal\View\ApiProblemRenderer;
+use ZF\Hal\View\ApiProblemStrategy;
 use ZF\Hal\View\RestfulJsonModel;
-use ZF\Hal\View\RestfulJsonRenderer;
-use ZF\Hal\View\RestfulJsonStrategy;
 use PHPUnit_Framework_TestCase as TestCase;
 use Zend\Http\Response;
+use Zend\View\Model\JsonModel;
+use Zend\View\Model\ViewModel;
 use Zend\View\Renderer\JsonRenderer;
 use Zend\View\ViewEvent;
 
 /**
  * @subpackage UnitTest
  */
-class RestfulJsonStrategyTest extends TestCase
+class ApiProblemStrategyTest extends TestCase
 {
     public function setUp()
     {
@@ -27,18 +28,34 @@ class RestfulJsonStrategyTest extends TestCase
         $this->event    = new ViewEvent;
         $this->event->setResponse($this->response);
 
-        $this->renderer = new RestfulJsonRenderer;
-        $this->strategy = new RestfulJsonStrategy($this->renderer);
+        $this->renderer = new ApiProblemRenderer;
+        $this->strategy = new ApiProblemStrategy($this->renderer);
     }
 
-    public function testSelectRendererReturnsNullIfModelIsNotARestfulJsonModel()
+    public function invalidViewModels()
     {
+        return array(
+            'null'    => array(null),
+            'generic' => array(new ViewModel()),
+            'json'    => array(new JsonModel()),
+            'hal'     => array(new RestfulJsonModel()),
+        );
+    }
+
+    /**
+     * @dataProvider invalidViewModels
+     */
+    public function testSelectRendererReturnsNullIfModelIsNotAnApiProblemModel($model)
+    {
+        if (null !== $model) {
+            $this->event->setModel($model);
+        }
         $this->assertNull($this->strategy->selectRenderer($this->event));
     }
 
-    public function testSelectRendererReturnsRendererIfModelIsARestfulJsonModel()
+    public function testSelectRendererReturnsRendererIfModelIsAnApiProblemModel()
     {
-        $model = new RestfulJsonModel();
+        $model = new ApiProblemModel();
         $this->event->setModel($model);
         $this->assertSame($this->renderer, $this->strategy->selectRenderer($this->event));
     }
@@ -59,43 +76,10 @@ class RestfulJsonStrategyTest extends TestCase
         $this->assertFalse($headers->has('Content-Type'));
     }
 
-    public function testInjectResponseSetsContentTypeHeaderToDefaultIfNotHalModel()
+    public function testInjectResponseSetsContentTypeHeaderToApiProblemForApiProblemModel()
     {
-        $this->event->setRenderer($this->renderer);
-        $this->event->setResult('{"foo":"bar"}');
-        $this->strategy->injectResponse($this->event);
-        $headers = $this->response->getHeaders();
-        $this->assertTrue($headers->has('Content-Type'));
-        $header = $headers->get('Content-Type');
-        $this->assertEquals('application/json', $header->getFieldValue());
-    }
-
-    public function halObjects()
-    {
-        $resource = new HalResource(array(
-            'foo' => 'bar',
-        ), 'identifier', 'route');
-        $link = new Link('self');
-        $link->setRoute('resource/route')->setRouteParams(array('id' => 'identifier'));
-        $resource->getLinks()->add($link);
-
-        $collection = new HalCollection(array($resource));
-        $collection->setCollectionRoute('collection/route');
-        $collection->setResourceRoute('resource/route');
-
-        return array(
-            'resource'   => array($resource),
-            'collection' => array($collection),
-        );
-    }
-
-    /**
-     * @dataProvider halObjects
-     */
-    public function testInjectResponseSetsContentTypeHeaderToHalForHalModel($hal)
-    {
-        $model = new RestfulJsonModel(array('payload' => $hal));
-
+        $problem = new ApiProblem(500, 'whatever', 'foo', 'bar');
+        $model   = new ApiProblemModel($problem);
         $this->event->setModel($model);
         $this->event->setRenderer($this->renderer);
         $this->event->setResult('{"foo":"bar"}');
@@ -103,6 +87,32 @@ class RestfulJsonStrategyTest extends TestCase
         $headers = $this->response->getHeaders();
         $this->assertTrue($headers->has('Content-Type'));
         $header = $headers->get('Content-Type');
-        $this->assertEquals('application/hal+json', $header->getFieldValue());
+        $this->assertEquals('application/api-problem+json', $header->getFieldValue());
+    }
+
+    public function invalidStatusCodes()
+    {
+        return array(
+            array(0),
+            array(1),
+            array(99),
+            array(600),
+            array(10081),
+        );
+    }
+
+    /**
+     * @dataProvider invalidStatusCodes
+     */
+    public function testUsesStatusCode500ForAnyStatusCodesAbove599OrBelow100($status)
+    {
+        $problem = new ApiProblem($status, 'whatever');
+        $model   = new ApiProblemModel($problem);
+        $this->event->setModel($model);
+        $this->event->setRenderer($this->renderer);
+        $this->event->setResult('{"foo":"bar"}');
+        $this->strategy->injectResponse($this->event);
+
+        $this->assertEquals(500, $this->response->getStatusCode());
     }
 }

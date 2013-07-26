@@ -88,21 +88,6 @@ class RestfulJsonRendererTest extends TestCase
         $this->assertEquals($expected, $payload);
     }
 
-    public function testRendersApiProblemCorrectly()
-    {
-        $apiProblem = new ApiProblem(401, 'login error', 'http://status.dev/errors.md', 'Unauthorized');
-        $model      = new RestfulJsonModel();
-        $model->setPayload($apiProblem);
-        $test = $this->renderer->render($model);
-        $expected = array(
-            'httpStatus'  => 401,
-            'describedBy' => 'http://status.dev/errors.md',
-            'title'       => 'Unauthorized',
-            'detail'      => 'login error',
-        );
-        $this->assertEquals($expected, json_decode($test, true));
-    }
-
     public function setUpHelpers()
     {
         // need to setup routes
@@ -364,18 +349,6 @@ class RestfulJsonRendererTest extends TestCase
         $this->assertInstanceof('ZF\Hal\ApiProblem', $problem);
         $problem = $problem->toArray();
         $this->assertEquals(409, $problem['httpStatus']);
-    }
-
-    public function testCanHintToApiProblemToRenderStackTrace()
-    {
-        $exception  = new \Exception('exception message', 500);
-        $apiProblem = new ApiProblem(500, $exception);
-        $model      = new RestfulJsonModel();
-        $model->setPayload($apiProblem);
-        $this->renderer->setDisplayExceptions(true);
-        $test = $this->renderer->render($model);
-        $test = json_decode($test, true);
-        $this->assertContains($exception->getMessage() . "\n" . $exception->getTraceAsString(), $test['detail']);
     }
 
     public function testRendersAttributesAsPartOfNonPaginatedHalCollection()

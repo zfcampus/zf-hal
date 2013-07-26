@@ -6,9 +6,9 @@
 namespace ZF\Hal\Listener;
 
 use ZF\Hal\ApiProblem;
-use ZF\Hal\View\RestfulJsonModel;
+use ZF\Hal\View\ApiProblemModel;
 use Zend\EventManager\EventManagerInterface;
-use Zend\EventManager\ListenerAggregateInterface;
+use Zend\EventManager\AbstractListenerAggregate;
 use Zend\Http\Request as HttpRequest;
 use Zend\Mvc\MvcEvent;
 use Zend\View\Model\ModelInterface;
@@ -21,19 +21,14 @@ use Zend\View\Model\ModelInterface;
  * If the MvcEvent represents an error, then its view model and result are
  * replaced with a RestfulJsonModel containing an API-Problem payload.
  */
-class ApiProblemListener implements ListenerAggregateInterface
+class ApiProblemListener extends AbstractListenerAggregate
 {
     /**
      * Default values to match in Accept header
      *
      * @var string
      */
-    protected static $acceptFilter = 'application/hal+json,application/api-problem+json,application/json';
-
-    /**
-     * @var \Zend\Stdlib\CallbackHandler[]
-     */
-    protected $listeners = array();
+    protected static $acceptFilter = 'application/json';
 
     /**
      * Constructor
@@ -55,18 +50,6 @@ class ApiProblemListener implements ListenerAggregateInterface
     public function attach(EventManagerInterface $events)
     {
         $this->listeners[] = $events->attach(MvcEvent::EVENT_RENDER, __CLASS__ . '::onRender', 1000);
-    }
-
-    /**
-     * @param EventManagerInterface $events
-     */
-    public function detach(EventManagerInterface $events)
-    {
-        foreach ($this->listeners as $index => $listener) {
-            if ($events->detach($listener)) {
-                unset($this->listeners[$index]);
-            }
-        }
     }
 
     /**
@@ -106,9 +89,9 @@ class ApiProblemListener implements ListenerAggregateInterface
             return;
         }
 
-        // Marshall the information we need for the API-Problem response
-        $httpStatus       = $e->getResponse()->getStatusCode();
-        $exception        = $model->getVariable('exception');
+        // Marshal the information we need for the API-Problem response
+        $httpStatus = $e->getResponse()->getStatusCode();
+        $exception  = $model->getVariable('exception');
 
         if ($exception instanceof \Exception) {
             $apiProblem = new ApiProblem($httpStatus, $exception);
@@ -118,8 +101,7 @@ class ApiProblemListener implements ListenerAggregateInterface
 
         // Create a new model with the API-Problem payload, and reset
         // the result and view model in the event using it.
-        $model = new RestfulJsonModel(array('payload' => $apiProblem));
-        $model->setTerminal(true);
+        $model = new ApiProblemModel($apiProblem);
         $e->setResult($model);
         $e->setViewModel($model);
     }
