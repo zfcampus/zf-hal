@@ -38,14 +38,14 @@ class Module
     /**
      * Retrieve Service Manager configuration
      *
-     * Defines ZF\Rest\RestfulJsonStrategy service factory.
+     * Defines ZF\Hal\RestfulJsonStrategy service factory.
      *
      * @return array
      */
     public function getServiceConfig()
     {
         return array('factories' => array(
-            'ZF\Rest\MetadataMap' => function ($services) {
+            'ZF\Hal\MetadataMap' => function ($services) {
                 $config = array();
                 if ($services->has('config')) {
                     $config = $services->get('config');
@@ -67,9 +67,9 @@ class Module
 
                 return new MetadataMap($map, $hydrators);
             },
-            'ZF\Rest\JsonRenderer' => function ($services) {
+            'ZF\Hal\JsonRenderer' => function ($services) {
                 $helpers            = $services->get('ViewHelperManager');
-                $apiProblemRenderer = $services->get('ZF\Rest\ApiProblemRenderer');
+                $apiProblemRenderer = $services->get('ZF\ApiProblem\ApiProblemRenderer');
                 $config             = $services->get('Config');
 
                 $renderer = new View\RestfulJsonRenderer($apiProblemRenderer);
@@ -77,8 +77,8 @@ class Module
 
                 return $renderer;
             },
-            'ZF\Rest\RestfulJsonStrategy' => function ($services) {
-                $renderer = $services->get('ZF\Rest\JsonRenderer');
+            'ZF\Hal\RestfulJsonStrategy' => function ($services) {
+                $renderer = $services->get('ZF\Hal\JsonRenderer');
                 return new View\RestfulJsonStrategy($renderer);
             },
         ));
@@ -116,7 +116,7 @@ class Module
 
                 $services        = $helpers->getServiceLocator();
                 $config          = $services->get('Config');
-                $metadataMap     = $services->get('ZF\Rest\MetadataMap');
+                $metadataMap     = $services->get('ZF\Hal\MetadataMap');
                 $hydrators       = $metadataMap->getHydratorManager();
 
                 $helper          = new Plugin\HalLinks($hydrators);
@@ -194,6 +194,6 @@ class Module
 
         // register at high priority, to "beat" normal json strategy registered
         // via view manager
-        $events->attach($services->get('ZF\Rest\RestfulJsonStrategy'), 200);
+        $events->attach($services->get('ZF\Hal\RestfulJsonStrategy'), 200);
     }
 }
