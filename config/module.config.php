@@ -6,6 +6,5 @@
 return array(
     'zf-hal' => array(
         'renderer'         => array(),
-        'resources'        => array(),
     ),
 );
