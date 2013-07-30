@@ -80,7 +80,7 @@ class ModuleTest extends TestCase
         $services->setService('Config', ArrayUtils::merge($config, $options));
 
         $helpers = $services->get('ViewHelperManager');
-        $plugin  = $helpers->get('HalLinks');
+        $plugin  = $helpers->get('Hal');
         $this->assertAttributeInstanceOf('Zend\Stdlib\Hydrator\ObjectProperty', 'defaultHydrator', $plugin);
     }
 
@@ -105,7 +105,7 @@ class ModuleTest extends TestCase
         $services->setService('Config', ArrayUtils::merge($config, $options));
 
         $helpers = $services->get('ViewHelperManager');
-        $plugin  = $helpers->get('HalLinks');
+        $plugin  = $helpers->get('Hal');
 
         $r             = new ReflectionObject($plugin);
         $hydratorsProp = $r->getProperty('hydratorMap');

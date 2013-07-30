@@ -3,7 +3,7 @@
  * @license   http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause
  */
 
-namespace ZF\Hal;
+namespace ZF\Hal\Link;
 
 interface LinkCollectionAwareInterface
 {

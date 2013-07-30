@@ -5,13 +5,13 @@
 
 namespace ZFTest\Hal;
 
-use ZF\Hal\HalCollection;
-use ZF\Hal\Link;
-use ZF\Hal\LinkCollection;
+use ZF\Hal\Collection;
+use ZF\Hal\Link\Link;
+use ZF\Hal\Link\LinkCollection;
 use PHPUnit_Framework_TestCase as TestCase;
 use stdClass;
 
-class HalCollectionTest extends TestCase
+class CollectionTest extends TestCase
 {
     public function invalidCollections()
     {
@@ -34,12 +34,12 @@ class HalCollectionTest extends TestCase
     public function testConstructorRaisesExceptionForNonTraversableCollection($collection)
     {
         $this->setExpectedException('ZF\Hal\Exception\InvalidCollectionException');
-        $hal = new HalCollection($collection, 'collection/route', 'item/route');
+        $hal = new Collection($collection, 'collection/route', 'item/route');
     }
 
     public function testPropertiesAreAccessibleFollowingConstruction()
     {
-        $hal = new HalCollection(array(), 'item/route', array('version' => 1), array('query' => 'format=json'));
+        $hal = new Collection(array(), 'item/route', array('version' => 1), array('query' => 'format=json'));
         $this->assertEquals(array(), $hal->collection);
         $this->assertEquals('item/route', $hal->resourceRoute);
         $this->assertEquals(array('version' => 1), $hal->resourceRouteParams);
@@ -48,52 +48,52 @@ class HalCollectionTest extends TestCase
 
     public function testDefaultPageIsOne()
     {
-        $hal = new HalCollection(array(), 'item/route');
+        $hal = new Collection(array(), 'item/route');
         $this->assertEquals(1, $hal->page);
     }
 
     public function testPageIsMutable()
     {
-        $hal = new HalCollection(array(), 'item/route');
+        $hal = new Collection(array(), 'item/route');
         $hal->setPage(5);
         $this->assertEquals(5, $hal->page);
     }
 
     public function testDefaultPageSizeIsThirty()
     {
-        $hal = new HalCollection(array(), 'item/route');
+        $hal = new Collection(array(), 'item/route');
         $this->assertEquals(30, $hal->pageSize);
     }
 
     public function testPageSizeIsMutable()
     {
-        $hal = new HalCollection(array(), 'item/route');
+        $hal = new Collection(array(), 'item/route');
         $hal->setPageSize(3);
         $this->assertEquals(3, $hal->pageSize);
     }
 
     public function testDefaultCollectionNameIsItems()
     {
-        $hal = new HalCollection(array(), 'item/route');
+        $hal = new Collection(array(), 'item/route');
         $this->assertEquals('items', $hal->collectionName);
     }
 
     public function testCollectionNameIsMutable()
     {
-        $hal = new HalCollection(array(), 'item/route');
+        $hal = new Collection(array(), 'item/route');
         $hal->setCollectionName('records');
         $this->assertEquals('records', $hal->collectionName);
     }
 
     public function testDefaultAttributesAreEmpty()
     {
-        $hal = new HalCollection(array(), 'item/route');
+        $hal = new Collection(array(), 'item/route');
         $this->assertEquals(array(), $hal->attributes);
     }
 
     public function testAttributesAreMutable()
     {
-        $hal = new HalCollection(array(), 'item/route');
+        $hal = new Collection(array(), 'item/route');
         $attributes = array(
             'count' => 1376,
             'order' => 'desc',
@@ -104,13 +104,13 @@ class HalCollectionTest extends TestCase
 
     public function testComposesLinkCollectionByDefault()
     {
-        $hal = new HalCollection(array(), 'item/route');
-        $this->assertInstanceOf('ZF\Hal\LinkCollection', $hal->getLinks());
+        $hal = new Collection(array(), 'item/route');
+        $this->assertInstanceOf('ZF\Hal\Link\LinkCollection', $hal->getLinks());
     }
 
     public function testLinkCollectionMayBeInjected()
     {
-        $hal   = new HalCollection(array(), 'item/route');
+        $hal   = new Collection(array(), 'item/route');
         $links = new LinkCollection();
         $hal->setLinks($links);
         $this->assertSame($links, $hal->getLinks());
@@ -121,7 +121,7 @@ class HalCollectionTest extends TestCase
         $links = new LinkCollection();
         $links->add(new Link('describedby'));
         $links->add(new Link('orders'));
-        $hal   = new HalCollection(array(), 'item/route');
+        $hal   = new Collection(array(), 'item/route');
         $hal->setResourceLinks($links);
         $this->assertSame($links, $hal->getResourceLinks());
         $this->assertSame($links, $hal->resourceLinks);

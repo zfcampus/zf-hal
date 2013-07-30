@@ -3,12 +3,13 @@
  * @copyright Copyright (c) 2013 Matthew Weier O'Phinney
  */
 
-namespace ZF\Hal;
+namespace ZF\Hal\Link;
 
 use Traversable;
 use Zend\Stdlib\ArrayUtils;
 use Zend\Uri\Exception as UriException;
 use Zend\Uri\UriFactory;
+use ZF\Hal\Exception;
 
 /**
  * Object describing a link relation

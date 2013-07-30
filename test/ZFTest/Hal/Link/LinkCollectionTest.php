@@ -3,10 +3,10 @@
  * @license   http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause
  */
 
-namespace ZFTest\Hal;
+namespace ZFTest\Hal\Link;
 
-use ZF\Hal\Link;
-use ZF\Hal\LinkCollection;
+use ZF\Hal\Link\Link;
+use ZF\Hal\Link\LinkCollection;
 use PHPUnit_Framework_TestCase as TestCase;
 
 class LinkCollectionTest extends TestCase
@@ -76,7 +76,7 @@ class LinkCollectionTest extends TestCase
         $this->assertEquals(2, $this->links->count());
         $i = 0;
         foreach ($this->links as $link) {
-            $this->assertInstanceOf('ZF\Hal\Link', $link);
+            $this->assertInstanceOf('ZF\Hal\Link\Link', $link);
             $i += 1;
         }
         $this->assertEquals(2, $i);

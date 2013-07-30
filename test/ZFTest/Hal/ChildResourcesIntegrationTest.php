@@ -13,12 +13,12 @@ use Zend\View\HelperPluginManager;
 use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use Zend\View\Helper\Url as UrlHelper;
 use ZF\ApiProblem\View\ApiProblemRenderer;
-use ZF\Hal\HalCollection;
-use ZF\Hal\HalResource;
-use ZF\Hal\Link;
-use ZF\Hal\Plugin\HalLinks;
-use ZF\Hal\View\RestfulJsonModel;
-use ZF\Hal\View\RestfulJsonRenderer;
+use ZF\Hal\Collection;
+use ZF\Hal\Resource;
+use ZF\Hal\Link\Link;
+use ZF\Hal\Plugin\Hal as HalHelper;
+use ZF\Hal\View\HalJsonModel;
+use ZF\Hal\View\HalJsonRenderer;
 
 /**
  * @subpackage UnitTest
@@ -45,17 +45,17 @@ class ChildResourcesIntegrationTest extends TestCase
         $serverUrlHelper->setScheme('http');
         $serverUrlHelper->setHost('localhost.localdomain');
 
-        $linksHelper = new HalLinks();
+        $linksHelper = new HalHelper();
         $linksHelper->setUrlHelper($urlHelper);
         $linksHelper->setServerUrlHelper($serverUrlHelper);
 
         $this->helpers = $helpers = new HelperPluginManager();
         $helpers->setService('url', $urlHelper);
         $helpers->setService('serverUrl', $serverUrlHelper);
-        $helpers->setService('halLinks', $linksHelper);
+        $helpers->setService('hal', $linksHelper);
 
         $this->plugins = $plugins = new ControllerPluginManager();
-        $plugins->setService('halLinks', $linksHelper);
+        $plugins->setService('hal', $linksHelper);
     }
 
     public function setupRenderer()
@@ -63,7 +63,7 @@ class ChildResourcesIntegrationTest extends TestCase
         if (!$this->helpers) {
             $this->setupHelpers();
         }
-        $this->renderer = $renderer = new RestfulJsonRenderer(new ApiProblemRenderer());
+        $this->renderer = $renderer = new HalJsonRenderer(new ApiProblemRenderer());
         $renderer->setHelperPluginManager($this->helpers);
     }
 
@@ -102,7 +102,7 @@ class ChildResourcesIntegrationTest extends TestCase
             'id'   => 'anakin',
             'name' => 'Anakin Skywalker',
         );
-        $resource = new HalResource($this->parent, 'anakin');
+        $resource = new Resource($this->parent, 'anakin');
 
         $link = new Link('self');
         $link->setRoute('parent');
@@ -118,7 +118,7 @@ class ChildResourcesIntegrationTest extends TestCase
             'id'   => $id,
             'name' => $name,
         );
-        $resource = new HalResource($this->child, $id);
+        $resource = new Resource($this->child, $id);
 
         $link = new Link('self');
         $link->setRoute('parent/child');
@@ -138,7 +138,7 @@ class ChildResourcesIntegrationTest extends TestCase
         foreach ($children as $info) {
             $collection[] = call_user_func_array(array($this, 'setUpChildResource'), $info);
         }
-        $collection = new HalCollection($this->collection);
+        $collection = new Collection($this->collection);
         $collection->setCollectionRoute('parent/child');
         $collection->setResourceRoute('parent/child');
         $collection->setPage(1);
@@ -166,7 +166,7 @@ class ChildResourcesIntegrationTest extends TestCase
         $this->helpers->get('url')->setRouteMatch($matches);
 
         $parent = $this->setUpParentResource();
-        $model  = new RestfulJsonModel();
+        $model  = new HalJsonModel();
         $model->setPayload($parent);
 
         $json = $this->renderer->render($model);
@@ -192,7 +192,7 @@ class ChildResourcesIntegrationTest extends TestCase
         $this->helpers->get('url')->setRouteMatch($matches);
 
         $child = $this->setUpChildResource('luke', 'Luke Skywalker');
-        $model = new RestfulJsonModel();
+        $model = new HalJsonModel();
         $model->setPayload($child);
 
         $json = $this->renderer->render($model);
@@ -218,7 +218,7 @@ class ChildResourcesIntegrationTest extends TestCase
         $this->helpers->get('url')->setRouteMatch($matches);
 
         $collection = $this->setUpChildCollection();
-        $model = new RestfulJsonModel();
+        $model = new HalJsonModel();
         $model->setPayload($collection);
 
         $json = $this->renderer->render($model);
@@ -287,7 +287,7 @@ class ChildResourcesIntegrationTest extends TestCase
         $this->helpers->get('url')->setRouteMatch($matches);
 
         $child = $this->setUpChildResource('luke', 'Luke Skywalker');
-        $model = new RestfulJsonModel();
+        $model = new HalJsonModel();
         $model->setPayload($child);
 
         $json = $this->renderer->render($model);
@@ -315,7 +315,7 @@ class ChildResourcesIntegrationTest extends TestCase
         $this->helpers->get('url')->setRouteMatch($matches);
 
         $collection = $this->setUpChildCollection();
-        $model = new RestfulJsonModel();
+        $model = new HalJsonModel();
         $model->setPayload($collection);
 
         $json = $this->renderer->render($model);
