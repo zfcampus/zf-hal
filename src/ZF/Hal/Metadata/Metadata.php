@@ -122,6 +122,14 @@ class Metadata
                 continue;
             }
 
+            // Strip "name" from route_name and resource_route_name keys (and 
+            // continue honoring simply "route" and "resource_route")
+            if (strstr($key, 'route')
+                && 'name' == substr($key, -4)
+            ) {
+                $key = substr($key, 0, strlen($key) - 4);
+            }
+
             $method = 'set' . $key;
             if (method_exists($this, $method)) {
                 $this->$method($value);

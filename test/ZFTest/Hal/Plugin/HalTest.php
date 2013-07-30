@@ -210,8 +210,8 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap(array(
             'ZFTest\Hal\Plugin\TestAsset\Resource' => array(
-                'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
-                'route'    => 'hostname/resource',
+                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route_name' => 'hostname/resource',
             ),
             'ZFTest\Hal\Plugin\TestAsset\EmbeddedResource' => array(
                 'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
@@ -256,9 +256,9 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap(array(
             'ZFTest\Hal\Plugin\TestAsset\Collection' => array(
-                'is_collection'  => true,
-                'route'          => 'hostname/contacts',
-                'resource_route' => 'hostname/embedded',
+                'is_collection'       => true,
+                'route_name'          => 'hostname/contacts',
+                'resource_route_name' => 'hostname/embedded',
             ),
         ));
 
@@ -311,8 +311,8 @@ class HalTest extends TestCase
                 'resource_route' => 'hostname/embedded',
             ),
             'ZFTest\Hal\Plugin\TestAsset\Resource' => array(
-                'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
-                'route'    => 'hostname/resource',
+                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route_name' => 'hostname/resource',
             ),
         ));
 
@@ -438,8 +438,8 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap(array(
             'ZFTest\Hal\Plugin\TestAsset\ResourceWithProtectedProperties' => array(
-                'hydrator' => 'ArraySerializable',
-                'route'    => 'hostname/resource',
+                'hydrator'   => 'ArraySerializable',
+                'route_name' => 'hostname/resource',
             ),
         ));
 
@@ -474,9 +474,9 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap(array(
             'ZFTest\Hal\Plugin\TestAsset\Resource' => array(
-                'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
-                'route'    => 'hostname/resource',
-                'links'    => array(
+                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route_name' => 'hostname/resource',
+                'links'      => array(
                     array(
                         'rel' => 'describedby',
                         'url' => 'http://example.com/api/help/resource',
@@ -522,10 +522,10 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap(array(
             'ZFTest\Hal\Plugin\TestAsset\Collection' => array(
-                'is_collection'  => true,
-                'route'          => 'hostname/contacts',
-                'resource_route' => 'hostname/embedded',
-                'links'          => array(
+                'is_collection'       => true,
+                'route_name'          => 'hostname/contacts',
+                'resource_route_name' => 'hostname/embedded',
+                'links'               => array(
                     array(
                         'rel' => 'describedby',
                         'url' => 'http://example.com/api/help/collection',

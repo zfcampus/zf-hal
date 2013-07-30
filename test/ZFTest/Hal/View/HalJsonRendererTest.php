@@ -20,7 +20,6 @@ use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Collection;
 use ZF\Hal\Resource;
 use ZF\Hal\Link\Link;
-use ZF\Hal\Metadata\MetadataMap;
 use ZF\Hal\Plugin\Hal as HalHelper;
 use ZF\Hal\View\HalJsonModel;
 use ZF\Hal\View\HalJsonRenderer;
