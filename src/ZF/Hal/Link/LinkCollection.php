@@ -3,11 +3,12 @@
  * @license   http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause
  */
 
-namespace ZF\Hal;
+namespace ZF\Hal\Link;
 
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use ZF\Hal\Exception;
 
 /**
  * Object describing a collection of link relations

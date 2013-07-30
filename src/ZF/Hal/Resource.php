@@ -5,12 +5,12 @@
 
 namespace ZF\Hal;
 
-class HalResource implements LinkCollectionAwareInterface
+class Resource implements Link\LinkCollectionAwareInterface
 {
     protected $id;
 
     /**
-     * @var LinkCollection
+     * @var Link\LinkCollection
      */
     protected $links;
 
@@ -57,10 +57,10 @@ class HalResource implements LinkCollectionAwareInterface
     /**
      * Set link collection
      *
-     * @param  LinkCollection $links
+     * @param  Link\LinkCollection $links
      * @return self
      */
-    public function setLinks(LinkCollection $links)
+    public function setLinks(Link\LinkCollection $links)
     {
         $this->links = $links;
         return $this;
@@ -69,12 +69,12 @@ class HalResource implements LinkCollectionAwareInterface
     /**
      * Get link collection
      *
-     * @return LinkCollection
+     * @return Link\LinkCollection
      */
     public function getLinks()
     {
-        if (!$this->links instanceof LinkCollection) {
-            $this->setLinks(new LinkCollection());
+        if (!$this->links instanceof Link\LinkCollection) {
+            $this->setLinks(new Link\LinkCollection());
         }
         return $this->links;
     }

@@ -38,7 +38,7 @@ class Module
     /**
      * Retrieve Service Manager configuration
      *
-     * Defines ZF\Hal\RestfulJsonStrategy service factory.
+     * Defines ZF\Hal\JsonStrategy service factory.
      *
      * @return array
      */
@@ -65,21 +65,21 @@ class Module
                     $map = $config['zf-hal']['metadata_map'];
                 }
 
-                return new MetadataMap($map, $hydrators);
+                return new Metadata\MetadataMap($map, $hydrators);
             },
             'ZF\Hal\JsonRenderer' => function ($services) {
                 $helpers            = $services->get('ViewHelperManager');
                 $apiProblemRenderer = $services->get('ZF\ApiProblem\ApiProblemRenderer');
                 $config             = $services->get('Config');
 
-                $renderer = new View\RestfulJsonRenderer($apiProblemRenderer);
+                $renderer = new View\HalJsonRenderer($apiProblemRenderer);
                 $renderer->setHelperPluginManager($helpers);
 
                 return $renderer;
             },
-            'ZF\Hal\RestfulJsonStrategy' => function ($services) {
+            'ZF\Hal\JsonStrategy' => function ($services) {
                 $renderer = $services->get('ZF\Hal\JsonRenderer');
-                return new View\RestfulJsonStrategy($renderer);
+                return new View\HalJsonStrategy($renderer);
             },
         ));
     }
@@ -87,30 +87,30 @@ class Module
     /**
      * Define factories for controller plugins
      *
-     * Defines the "HalLinks" plugin.
+     * Defines the "Hal" plugin.
      *
      * @return array
      */
     public function getControllerPluginConfig()
     {
         return array('factories' => array(
-            'HalLinks' => function ($plugins) {
+            'Hal' => function ($plugins) {
                 $services = $plugins->getServiceLocator();
                 $helpers  = $services->get('ViewHelperManager');
-                return $helpers->get('HalLinks');
+                return $helpers->get('Hal');
             },
         ));
     }
 
     /**
-     * Defines the "HalLinks" view helper
+     * Defines the "Hal" view helper
      *
      * @return array
      */
     public function getViewHelperConfig()
     {
         return array('factories' => array(
-            'HalLinks' => function ($helpers) {
+            'Hal' => function ($helpers) {
                 $serverUrlHelper = $helpers->get('ServerUrl');
                 $urlHelper       = $helpers->get('Url');
 
@@ -119,7 +119,7 @@ class Module
                 $metadataMap     = $services->get('ZF\Hal\MetadataMap');
                 $hydrators       = $metadataMap->getHydratorManager();
 
-                $helper          = new Plugin\HalLinks($hydrators);
+                $helper          = new Plugin\Hal($hydrators);
                 $helper->setMetadataMap($metadataMap);
                 $helper->setServerUrlHelper($serverUrlHelper);
                 $helper->setUrlHelper($urlHelper);
@@ -183,7 +183,7 @@ class Module
     public function onRender($e)
     {
         $result = $e->getResult();
-        if (!$result instanceof View\RestfulJsonModel) {
+        if (!$result instanceof View\HalJsonModel) {
             return;
         }
 
@@ -194,6 +194,6 @@ class Module
 
         // register at high priority, to "beat" normal json strategy registered
         // via view manager
-        $events->attach($services->get('ZF\Hal\RestfulJsonStrategy'), 200);
+        $events->attach($services->get('ZF\Hal\JsonStrategy'), 200);
     }
 }

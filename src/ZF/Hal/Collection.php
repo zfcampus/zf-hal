@@ -11,7 +11,7 @@ use Zend\Stdlib\ArrayUtils;
 /**
  * Model a collection for use with HAL payloads
  */
-class HalCollection implements LinkCollectionAwareInterface
+class Collection implements Link\LinkCollectionAwareInterface
 {
     /**
      * Additional attributes to render with resource
@@ -56,7 +56,7 @@ class HalCollection implements LinkCollectionAwareInterface
     protected $identifierName = 'id';
 
     /**
-     * @var LinkCollection
+     * @var Link\LinkCollection
      */
     protected $links;
 
@@ -75,7 +75,7 @@ class HalCollection implements LinkCollectionAwareInterface
     protected $pageSize = 30;
 
     /**
-     * @var LinkCollection
+     * @var Link\LinkCollection
      */
     protected $resourceLinks;
 
@@ -172,7 +172,7 @@ class HalCollection implements LinkCollectionAwareInterface
      * Set additional attributes to render as part of resource
      *
      * @param  array $attributes
-     * @return HalCollection
+     * @return self
      */
     public function setAttributes(array $attributes)
     {
@@ -184,7 +184,7 @@ class HalCollection implements LinkCollectionAwareInterface
      * Set the collection name (for use within the _embedded object)
      *
      * @param  string $name
-     * @return HalCollection
+     * @return self
      */
     public function setCollectionName($name)
     {
@@ -196,7 +196,7 @@ class HalCollection implements LinkCollectionAwareInterface
      * Set the collection route; used for generating pagination links
      *
      * @param  string $route
-     * @return HalCollection
+     * @return self
      */
     public function setCollectionRoute($route)
     {
@@ -208,7 +208,7 @@ class HalCollection implements LinkCollectionAwareInterface
      * Set options to use with the collection route; used for generating pagination links
      *
      * @param  array|Traversable $options
-     * @return HalCollection
+     * @return self
      * @throws Exception\InvalidArgumentException
      */
     public function setCollectionRouteOptions($options)
@@ -231,7 +231,7 @@ class HalCollection implements LinkCollectionAwareInterface
      * Set parameters/substitutions to use with the collection route; used for generating pagination links
      *
      * @param  array|Traversable $params
-     * @return HalCollection
+     * @return self
      * @throws Exception\InvalidArgumentException
      */
     public function setCollectionRouteParams($params)
@@ -265,10 +265,10 @@ class HalCollection implements LinkCollectionAwareInterface
     /**
      * Set link collection
      *
-     * @param  LinkCollection $links
+     * @param  Link\LinkCollection $links
      * @return self
      */
-    public function setLinks(LinkCollection $links)
+    public function setLinks(Link\LinkCollection $links)
     {
         $this->links = $links;
         return $this;
@@ -278,7 +278,7 @@ class HalCollection implements LinkCollectionAwareInterface
      * Set current page
      *
      * @param  int $page
-     * @return HalCollection
+     * @return self
      * @throws Exception\InvalidArgumentException for non-positive and/or non-integer values
      */
     public function setPage($page)
@@ -306,7 +306,7 @@ class HalCollection implements LinkCollectionAwareInterface
      * Set page size
      *
      * @param  int $size
-     * @return HalCollection
+     * @return self
      * @throws Exception\InvalidArgumentException for non-positive and/or non-integer values
      */
     public function setPageSize($size)
@@ -333,10 +333,10 @@ class HalCollection implements LinkCollectionAwareInterface
     /**
      * Set default set of links to use for resources
      *
-     * @param  LinkCollection $links
+     * @param  Link\LinkCollection $links
      * @return self
      */
-    public function setResourceLinks(LinkCollection $links)
+    public function setResourceLinks(Link\LinkCollection $links)
     {
         $this->resourceLinks = $links;
         return $this;
@@ -346,7 +346,7 @@ class HalCollection implements LinkCollectionAwareInterface
      * Set the resource route
      *
      * @param  string $route
-     * @return HalCollection
+     * @return self
      */
     public function setResourceRoute($route)
     {
@@ -358,7 +358,7 @@ class HalCollection implements LinkCollectionAwareInterface
      * Set options to use with the resource route
      *
      * @param  array|Traversable $options
-     * @return HalCollection
+     * @return self
      * @throws Exception\InvalidArgumentException
      */
     public function setResourceRouteOptions($options)
@@ -381,7 +381,7 @@ class HalCollection implements LinkCollectionAwareInterface
      * Set parameters/substitutions to use with the resource route
      *
      * @param  array|Traversable $params
-     * @return HalCollection
+     * @return self
      * @throws Exception\InvalidArgumentException
      */
     public function setResourceRouteParams($params)
@@ -403,12 +403,12 @@ class HalCollection implements LinkCollectionAwareInterface
     /**
      * Get link collection
      *
-     * @return LinkCollection
+     * @return Link\LinkCollection
      */
     public function getLinks()
     {
-        if (!$this->links instanceof LinkCollection) {
-            $this->setLinks(new LinkCollection());
+        if (!$this->links instanceof Link\LinkCollection) {
+            $this->setLinks(new Link\LinkCollection());
         }
         return $this->links;
     }
@@ -416,7 +416,7 @@ class HalCollection implements LinkCollectionAwareInterface
     /**
      * Retrieve default resource links, if any
      *
-     * @return null|LinkCollection
+     * @return null|Link\LinkCollection
      */
     public function getResourceLinks()
     {

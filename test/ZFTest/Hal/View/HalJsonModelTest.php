@@ -7,18 +7,18 @@ namespace ZFTest\Hal\View;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use stdClass;
-use ZF\Hal\HalCollection;
-use ZF\Hal\HalResource;
-use ZF\Hal\View\RestfulJsonModel;
+use ZF\Hal\Collection;
+use ZF\Hal\Resource;
+use ZF\Hal\View\HalJsonModel;
 
 /**
  * @subpackage UnitTest
  */
-class RestfulJsonModelTest extends TestCase
+class HalJsonModelTest extends TestCase
 {
     public function setUp()
     {
-        $this->model = new RestfulJsonModel;
+        $this->model = new HalJsonModel;
     }
 
     public function testPayloadIsNullByDefault()
@@ -48,53 +48,53 @@ class RestfulJsonModelTest extends TestCase
         );
     }
 
-    public function invalidHalCollectionPayloads()
+    public function invalidCollectionPayloads()
     {
         $payloads = $this->invalidPayloads();
         $payloads['exception'] = array(new \Exception);
         $payloads['stdclass']  = array(new stdClass);
-        $payloads['hal-item']  = array(new HalResource(array(), 'id', 'route'));
+        $payloads['hal-item']  = array(new Resource(array(), 'id', 'route'));
         return $payloads;
     }
 
     /**
-     * @dataProvider invalidHalCollectionPayloads
+     * @dataProvider invalidCollectionPayloads
      */
-    public function testIsHalCollectionReturnsFalseForInvalidValues($payload)
+    public function testIsCollectionReturnsFalseForInvalidValues($payload)
     {
         $this->model->setPayload($payload);
-        $this->assertFalse($this->model->isHalCollection());
+        $this->assertFalse($this->model->isCollection());
     }
 
-    public function testIsHalCollectionReturnsTrueForHalCollectionPayload()
+    public function testIsCollectionReturnsTrueForCollectionPayload()
     {
-        $collection = new HalCollection(array(), 'item/route');
+        $collection = new Collection(array(), 'item/route');
         $this->model->setPayload($collection);
-        $this->assertTrue($this->model->isHalCollection());
+        $this->assertTrue($this->model->isCollection());
     }
 
-    public function invalidHalResourcePayloads()
+    public function invalidResourcePayloads()
     {
         $payloads = $this->invalidPayloads();
         $payloads['exception']      = array(new \Exception);
         $payloads['stdclass']       = array(new stdClass);
-        $payloads['hal-collection'] = array(new HalCollection(array(), 'item/route'));
+        $payloads['hal-collection'] = array(new Collection(array(), 'item/route'));
         return $payloads;
     }
 
     /**
-     * @dataProvider invalidHalResourcePayloads
+     * @dataProvider invalidResourcePayloads
      */
-    public function testIsHalResourceReturnsFalseForInvalidValues($payload)
+    public function testIsResourceReturnsFalseForInvalidValues($payload)
     {
         $this->model->setPayload($payload);
-        $this->assertFalse($this->model->isHalResource());
+        $this->assertFalse($this->model->isResource());
     }
 
-    public function testIsHalResourceReturnsTrueForHalResourcePayload()
+    public function testIsResourceReturnsTrueForResourcePayload()
     {
-        $item = new HalResource(array(), 'id', 'route');
+        $item = new Resource(array(), 'id', 'route');
         $this->model->setPayload($item);
-        $this->assertTrue($this->model->isHalResource());
+        $this->assertTrue($this->model->isResource());
     }
 }

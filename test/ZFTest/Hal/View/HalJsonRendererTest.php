@@ -17,26 +17,26 @@ use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\View\ApiProblemRenderer;
-use ZF\Hal\HalCollection;
-use ZF\Hal\HalResource;
-use ZF\Hal\Link;
-use ZF\Hal\MetadataMap;
-use ZF\Hal\Plugin\HalLinks;
-use ZF\Hal\View\RestfulJsonModel;
-use ZF\Hal\View\RestfulJsonRenderer;
+use ZF\Hal\Collection;
+use ZF\Hal\Resource;
+use ZF\Hal\Link\Link;
+use ZF\Hal\Metadata\MetadataMap;
+use ZF\Hal\Plugin\Hal as HalHelper;
+use ZF\Hal\View\HalJsonModel;
+use ZF\Hal\View\HalJsonRenderer;
 use ZFTest\Hal\TestAsset;
 
 /**
  * @subpackage UnitTest
  */
-class RestfulJsonRendererTest extends TestCase
+class HalJsonRendererTest extends TestCase
 {
     public function setUp()
     {
-        $this->renderer = new RestfulJsonRenderer(new ApiProblemRenderer());
+        $this->renderer = new HalJsonRenderer(new ApiProblemRenderer());
     }
 
-    public function assertIsHalResource($resource)
+    public function assertIsResource($resource)
     {
         $this->assertInstanceOf('stdClass', $resource, 'Invalid HAL resource; not an object');
         $this->assertObjectHasAttribute('_links', $resource, 'Invalid HAL resource; does not contain links');
@@ -44,9 +44,9 @@ class RestfulJsonRendererTest extends TestCase
         $this->assertInstanceOf('stdClass', $links, 'Invalid HAL resource; links are not an object');
     }
 
-    public function assertHalResourceHasRelationalLink($relation, $resource)
+    public function assertResourceHasRelationalLink($relation, $resource)
     {
-        $this->assertIsHalResource($resource);
+        $this->assertIsResource($resource);
         $links = $resource->_links;
         $this->assertObjectHasAttribute($relation, $links, sprintf('HAL links do not contain relation "%s"', $relation));
         $link = $links->{$relation};
@@ -55,7 +55,7 @@ class RestfulJsonRendererTest extends TestCase
 
     public function assertRelationalLinkContains($match, $relation, $resource)
     {
-        $this->assertHalResourceHasRelationalLink($relation, $resource);
+        $this->assertResourceHasRelationalLink($relation, $resource);
         $link = $resource->_links->{$relation};
         $this->assertObjectHasAttribute('href', $link, sprintf('%s relational link does not have an href attribute; received %s', $relation, var_export($link, 1)));
         $href = $link->href;
@@ -64,14 +64,14 @@ class RestfulJsonRendererTest extends TestCase
 
     public function assertRelationalLinkEquals($match, $relation, $resource)
     {
-        $this->assertHalResourceHasRelationalLink($relation, $resource);
+        $this->assertResourceHasRelationalLink($relation, $resource);
         $link = $resource->_links->{$relation};
         $this->assertObjectHasAttribute('href', $link, sprintf('%s relational link does not have an href attribute; received %s', $relation, var_export($link, 1)));
         $href = $link->href;
         $this->assertEquals($match, $href);
     }
 
-    public function nonRestfulJsonModels()
+    public function nonHalJsonModels()
     {
         return array(
             'view-model' => array(new ViewModel(array('foo' => 'bar'))),
@@ -80,9 +80,9 @@ class RestfulJsonRendererTest extends TestCase
     }
 
     /**
-     * @dataProvider nonRestfulJsonModels
+     * @dataProvider nonHalJsonModels
      */
-    public function testPassesNonRestfulJsonModelToParentToRender($model)
+    public function testPassesNonHalJsonModelToParentToRender($model)
     {
         $payload = $this->renderer->render($model);
         $expected = json_encode(array('foo' => 'bar'));
@@ -103,19 +103,19 @@ class RestfulJsonRendererTest extends TestCase
         $url->setRouter($router);
         $serverUrl->setScheme('http');
         $serverUrl->setHost('localhost.localdomain');
-        $halLinks  = new HalLinks();
+        $halLinks  = new HalHelper();
         $halLinks->setServerUrlHelper($serverUrl);
         $halLinks->setUrlHelper($url);
-        $helpers->setService('HalLinks', $halLinks);
+        $helpers->setService('Hal', $halLinks);
 
         $this->renderer->setHelperPluginManager($helpers);
     }
 
-    public function testRendersHalResourceWithAssociatedLinks()
+    public function testRendersResourceWithAssociatedLinks()
     {
         $this->setUpHelpers();
 
-        $item = new HalResource(array(
+        $item = new Resource(array(
             'foo' => 'bar',
             'id'  => 'identifier',
         ), 'identifier');
@@ -124,7 +124,7 @@ class RestfulJsonRendererTest extends TestCase
         $self->setRoute('resource')->setRouteParams(array('id' => 'identifier'));
         $links->add($self);
 
-        $model = new RestfulJsonModel(array('payload' => $item));
+        $model = new HalJsonModel(array('payload' => $item));
         $test  = $this->renderer->render($model);
         $test  = json_decode($test);
 
@@ -133,7 +133,7 @@ class RestfulJsonRendererTest extends TestCase
         $this->assertEquals('bar', $test->foo);
     }
 
-    public function testCanRenderStdclassHalResource()
+    public function testCanRenderStdclassResource()
     {
         $this->setUpHelpers();
 
@@ -142,13 +142,13 @@ class RestfulJsonRendererTest extends TestCase
             'id'  => 'identifier',
         );
 
-        $item  = new HalResource($item, 'identifier', 'resource');
+        $item  = new Resource($item, 'identifier', 'resource');
         $links = $item->getLinks();
         $self  = new Link('self');
         $self->setRoute('resource')->setRouteParams(array('id' => 'identifier'));
         $links->add($self);
 
-        $model = new RestfulJsonModel(array('payload' => $item));
+        $model = new HalJsonModel(array('payload' => $item));
         $test  = $this->renderer->render($model);
         $test  = json_decode($test);
 
@@ -157,22 +157,22 @@ class RestfulJsonRendererTest extends TestCase
         $this->assertEquals('bar', $test->foo);
     }
 
-    public function testCanSerializeHydratableHalResource()
+    public function testCanSerializeHydratableResource()
     {
         $this->setUpHelpers();
-        $this->helpers->get('HalLinks')->addHydrator(
+        $this->helpers->get('Hal')->addHydrator(
             'ZFTest\Hal\TestAsset\ArraySerializable',
             new Hydrator\ArraySerializable()
         );
 
         $item  = new TestAsset\ArraySerializable();
-        $item  = new HalResource(new TestAsset\ArraySerializable(), 'identifier', 'resource');
+        $item  = new Resource(new TestAsset\ArraySerializable(), 'identifier', 'resource');
         $links = $item->getLinks();
         $self  = new Link('self');
         $self->setRoute('resource')->setRouteParams(array('id' => 'identifier'));
         $links->add($self);
 
-        $model = new RestfulJsonModel(array('payload' => $item));
+        $model = new HalJsonModel(array('payload' => $item));
         $test  = $this->renderer->render($model);
         $test  = json_decode($test);
 
@@ -184,18 +184,18 @@ class RestfulJsonRendererTest extends TestCase
     public function testUsesDefaultHydratorIfAvailable()
     {
         $this->setUpHelpers();
-        $this->helpers->get('HalLinks')->setDefaultHydrator(
+        $this->helpers->get('Hal')->setDefaultHydrator(
             new Hydrator\ArraySerializable()
         );
 
         $item  = new TestAsset\ArraySerializable();
-        $item  = new HalResource(new TestAsset\ArraySerializable(), 'identifier', 'resource');
+        $item  = new Resource(new TestAsset\ArraySerializable(), 'identifier', 'resource');
         $links = $item->getLinks();
         $self  = new Link('self');
         $self->setRoute('resource')->setRouteParams(array('id' => 'identifier'));
         $links->add($self);
 
-        $model = new RestfulJsonModel(array('payload' => $item));
+        $model = new HalJsonModel(array('payload' => $item));
         $test  = $this->renderer->render($model);
         $test  = json_decode($test);
 
@@ -204,7 +204,7 @@ class RestfulJsonRendererTest extends TestCase
         $this->assertEquals('bar', $test->foo);
     }
 
-    public function testCanRenderNonPaginatedHalCollection()
+    public function testCanRenderNonPaginatedCollection()
     {
         $this->setUpHelpers();
 
@@ -217,7 +217,7 @@ class RestfulJsonRendererTest extends TestCase
 
         }
 
-        $collection = new HalCollection($items);
+        $collection = new Collection($items);
         $collection->setCollectionRoute('resource');
         $collection->setResourceRoute('resource');
         $links = $collection->getLinks();
@@ -225,7 +225,7 @@ class RestfulJsonRendererTest extends TestCase
         $self->setRoute('resource');
         $links->add($self);
 
-        $model      = new RestfulJsonModel(array('payload' => $collection));
+        $model      = new HalJsonModel(array('payload' => $collection));
         $test       = $this->renderer->render($model);
         $test       = json_decode($test);
 
@@ -248,7 +248,7 @@ class RestfulJsonRendererTest extends TestCase
         }
     }
 
-    public function testCanRenderPaginatedHalCollection()
+    public function testCanRenderPaginatedCollection()
     {
         $this->setUpHelpers();
 
@@ -263,7 +263,7 @@ class RestfulJsonRendererTest extends TestCase
         $adapter   = new ArrayAdapter($items);
         $paginator = new Paginator($adapter);
 
-        $collection = new HalCollection($paginator);
+        $collection = new Collection($paginator);
         $collection->setPageSize(5);
         $collection->setPage(3);
         $collection->setCollectionRoute('resource');
@@ -273,7 +273,7 @@ class RestfulJsonRendererTest extends TestCase
         $self->setRoute('resource');
         $links->add($self);
 
-        $model      = new RestfulJsonModel(array('payload' => $collection));
+        $model      = new HalJsonModel(array('payload' => $collection));
         $test       = $this->renderer->render($model);
         $test       = json_decode($test);
 
@@ -327,7 +327,7 @@ class RestfulJsonRendererTest extends TestCase
         $adapter   = new ArrayAdapter($items);
         $paginator = new Paginator($adapter);
 
-        $collection = new HalCollection($paginator, 'resource');
+        $collection = new Collection($paginator, 'resource');
         $collection->setPageSize(5);
 
         // Using reflection object so we can force a negative page number if desired
@@ -336,7 +336,7 @@ class RestfulJsonRendererTest extends TestCase
         $p->setAccessible(true);
         $p->setValue($collection, $page);
 
-        $model      = new RestfulJsonModel(array('payload' => $collection));
+        $model      = new HalJsonModel(array('payload' => $collection));
         $test       = $this->renderer->render($model);
         $test       = json_decode($test);
 
@@ -346,7 +346,7 @@ class RestfulJsonRendererTest extends TestCase
         $this->assertEquals('Invalid page provided', $test->detail);
     }
 
-    public function testRendersAttributesAsPartOfNonPaginatedHalCollection()
+    public function testRendersAttributesAsPartOfNonPaginatedCollection()
     {
         $this->setUpHelpers();
 
@@ -364,10 +364,10 @@ class RestfulJsonRendererTest extends TestCase
 
         }
 
-        $collection = new HalCollection($items, 'resource');
+        $collection = new Collection($items, 'resource');
         $collection->setAttributes($attributes);
 
-        $model      = new RestfulJsonModel(array('payload' => $collection));
+        $model      = new HalJsonModel(array('payload' => $collection));
         $test       = $this->renderer->render($model);
         $test       = json_decode($test);
 
@@ -398,7 +398,7 @@ class RestfulJsonRendererTest extends TestCase
         $adapter   = new ArrayAdapter($items);
         $paginator = new Paginator($adapter);
 
-        $collection = new HalCollection($paginator);
+        $collection = new Collection($paginator);
         $collection->setPageSize(5);
         $collection->setPage(3);
         $collection->setAttributes($attributes);
@@ -409,7 +409,7 @@ class RestfulJsonRendererTest extends TestCase
         $self->setRoute('resource');
         $links->add($self);
 
-        $model      = new RestfulJsonModel(array('payload' => $collection));
+        $model      = new HalJsonModel(array('payload' => $collection));
         $test       = $this->renderer->render($model);
         $test       = json_decode($test);
 
@@ -420,12 +420,12 @@ class RestfulJsonRendererTest extends TestCase
         $this->assertEquals('foo', $test->type);
     }
 
-    public function testCanRenderNestedHalResourcesAsEmbeddedResources()
+    public function testCanRenderNestedResourcesAsEmbeddedResources()
     {
         $this->setUpHelpers();
         $this->router->addRoute('user', new Segment('/user[/:id]'));
 
-        $child = new HalResource(array(
+        $child = new Resource(array(
             'id'     => 'matthew',
             'name'   => 'matthew',
             'github' => 'weierophinney',
@@ -434,7 +434,7 @@ class RestfulJsonRendererTest extends TestCase
         $link->setRoute('user')->setRouteParams(array('id' => 'matthew'));
         $child->getLinks()->add($link);
 
-        $item = new HalResource(array(
+        $item = new Resource(array(
             'foo'  => 'bar',
             'id'   => 'identifier',
             'user' => $child,
@@ -443,7 +443,7 @@ class RestfulJsonRendererTest extends TestCase
         $link->setRoute('resource')->setRouteParams(array('id' => 'identifier'));
         $item->getLinks()->add($link);
 
-        $model = new RestfulJsonModel(array('payload' => $item));
+        $model = new HalJsonModel(array('payload' => $item));
         $test  = $this->renderer->render($model);
         $test  = json_decode($test);
 
@@ -465,7 +465,7 @@ class RestfulJsonRendererTest extends TestCase
         $this->setUpHelpers();
         $this->router->addRoute('user', new Segment('/user[/:id]'));
 
-        $child = new HalResource(array(
+        $child = new Resource(array(
             'id'     => 'matthew',
             'name'   => 'matthew',
             'github' => 'weierophinney',
@@ -483,7 +483,7 @@ class RestfulJsonRendererTest extends TestCase
 
         }
 
-        $collection = new HalCollection($items);
+        $collection = new Collection($items);
         $collection->setCollectionRoute('resource');
         $collection->setResourceRoute('resource');
         $links = $collection->getLinks();
@@ -491,7 +491,7 @@ class RestfulJsonRendererTest extends TestCase
         $self->setRoute('resource');
         $links->add($self);
 
-        $model = new RestfulJsonModel(array('payload' => $collection));
+        $model = new HalJsonModel(array('payload' => $collection));
         $test  = $this->renderer->render($model);
         $test  = json_decode($test);
 
@@ -516,7 +516,7 @@ class RestfulJsonRendererTest extends TestCase
         $this->setUpHelpers();
         $this->router->addRoute('user', new Segment('/user[/:id]'));
 
-        $child = new HalResource(array(
+        $child = new Resource(array(
             'id'     => 'matthew',
             'name'   => 'matthew',
             'github' => 'weierophinney',
@@ -536,7 +536,7 @@ class RestfulJsonRendererTest extends TestCase
         $adapter   = new ArrayAdapter($items);
         $paginator = new Paginator($adapter);
 
-        $collection = new HalCollection($paginator);
+        $collection = new Collection($paginator);
         $collection->setPageSize(5);
         $collection->setPage(1);
         $collection->setCollectionRoute('resource');
@@ -546,7 +546,7 @@ class RestfulJsonRendererTest extends TestCase
         $self->setRoute('resource');
         $links->add($self);
 
-        $model      = new RestfulJsonModel(array('payload' => $collection));
+        $model      = new HalJsonModel(array('payload' => $collection));
         $test       = $this->renderer->render($model);
         $test       = json_decode($test);
 
@@ -570,7 +570,7 @@ class RestfulJsonRendererTest extends TestCase
     {
         $this->setUpHelpers();
 
-        $this->helpers->get('HalLinks')->getEventManager()->attach('getIdFromResource', function ($e) {
+        $this->helpers->get('Hal')->getEventManager()->attach('getIdFromResource', function ($e) {
             $resource = $e->getParam('resource');
 
             if (!is_array($resource)) {
@@ -593,7 +593,7 @@ class RestfulJsonRendererTest extends TestCase
             $items[]      = $item;
         }
 
-        $collection = new HalCollection($items);
+        $collection = new Collection($items);
         $collection->setCollectionRoute('resource');
         $collection->setResourceRoute('resource');
         $links = $collection->getLinks();
@@ -601,7 +601,7 @@ class RestfulJsonRendererTest extends TestCase
         $self->setRoute('resource');
         $links->add($self);
 
-        $model      = new RestfulJsonModel(array('payload' => $collection));
+        $model      = new HalJsonModel(array('payload' => $collection));
         $test       = $this->renderer->render($model);
         $test       = json_decode($test);
 

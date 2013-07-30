@@ -10,17 +10,17 @@ use Zend\Http\Response;
 use Zend\View\Renderer\JsonRenderer;
 use Zend\View\ViewEvent;
 use ZF\ApiProblem\View\ApiProblemRenderer;
-use ZF\Hal\HalCollection;
-use ZF\Hal\HalResource;
-use ZF\Hal\Link;
-use ZF\Hal\View\RestfulJsonModel;
-use ZF\Hal\View\RestfulJsonRenderer;
-use ZF\Hal\View\RestfulJsonStrategy;
+use ZF\Hal\Collection;
+use ZF\Hal\Resource;
+use ZF\Hal\Link\Link;
+use ZF\Hal\View\HalJsonModel;
+use ZF\Hal\View\HalJsonRenderer;
+use ZF\Hal\View\HalJsonStrategy;
 
 /**
  * @subpackage UnitTest
  */
-class RestfulJsonStrategyTest extends TestCase
+class HalJsonStrategyTest extends TestCase
 {
     public function setUp()
     {
@@ -28,18 +28,18 @@ class RestfulJsonStrategyTest extends TestCase
         $this->event    = new ViewEvent;
         $this->event->setResponse($this->response);
 
-        $this->renderer = new RestfulJsonRenderer(new ApiProblemRenderer());
-        $this->strategy = new RestfulJsonStrategy($this->renderer);
+        $this->renderer = new HalJsonRenderer(new ApiProblemRenderer());
+        $this->strategy = new HalJsonStrategy($this->renderer);
     }
 
-    public function testSelectRendererReturnsNullIfModelIsNotARestfulJsonModel()
+    public function testSelectRendererReturnsNullIfModelIsNotAHalJsonModel()
     {
         $this->assertNull($this->strategy->selectRenderer($this->event));
     }
 
-    public function testSelectRendererReturnsRendererIfModelIsARestfulJsonModel()
+    public function testSelectRendererReturnsRendererIfModelIsAHalJsonModel()
     {
-        $model = new RestfulJsonModel();
+        $model = new HalJsonModel();
         $this->event->setModel($model);
         $this->assertSame($this->renderer, $this->strategy->selectRenderer($this->event));
     }
@@ -73,14 +73,14 @@ class RestfulJsonStrategyTest extends TestCase
 
     public function halObjects()
     {
-        $resource = new HalResource(array(
+        $resource = new Resource(array(
             'foo' => 'bar',
         ), 'identifier', 'route');
         $link = new Link('self');
         $link->setRoute('resource/route')->setRouteParams(array('id' => 'identifier'));
         $resource->getLinks()->add($link);
 
-        $collection = new HalCollection(array($resource));
+        $collection = new Collection(array($resource));
         $collection->setCollectionRoute('collection/route');
         $collection->setResourceRoute('resource/route');
 
@@ -95,7 +95,7 @@ class RestfulJsonStrategyTest extends TestCase
      */
     public function testInjectResponseSetsContentTypeHeaderToHalForHalModel($hal)
     {
-        $model = new RestfulJsonModel(array('payload' => $hal));
+        $model = new HalJsonModel(array('payload' => $hal));
 
         $this->event->setModel($model);
         $this->event->setRenderer($this->renderer);

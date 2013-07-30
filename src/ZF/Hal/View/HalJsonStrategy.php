@@ -9,7 +9,7 @@ use Zend\View\Strategy\JsonStrategy;
 use Zend\View\ViewEvent;
 
 /**
- * Extension of the JSON strategy to handle the RestfulJsonModel and provide
+ * Extension of the JSON strategy to handle the HalJsonModel and provide
  * a Content-Type header appropriate to the response it describes.
  *
  * This will give the following content types:
@@ -17,26 +17,26 @@ use Zend\View\ViewEvent;
  * - application/hal+json for a result that contains HAL-compliant links
  * - application/json for all other responses
  */
-class RestfulJsonStrategy extends JsonStrategy
+class HalJsonStrategy extends JsonStrategy
 {
     protected $contentType = 'application/json';
 
-    public function __construct(RestfulJsonRenderer $renderer)
+    public function __construct(HalJsonRenderer $renderer)
     {
         $this->renderer = $renderer;
     }
 
     /**
-     * Detect if we should use the RestfulJsonRenderer based on model type.
+     * Detect if we should use the HalJsonRenderer based on model type.
      *
      * @param  ViewEvent $e
-     * @return null|RestfulJsonRenderer
+     * @return null|HalJsonRenderer
      */
     public function selectRenderer(ViewEvent $e)
     {
         $model = $e->getModel();
 
-        if (!$model instanceof RestfulJsonModel) {
+        if (!$model instanceof HalJsonModel) {
             // unrecognized model; do nothing
             return;
         }
@@ -72,8 +72,8 @@ class RestfulJsonStrategy extends JsonStrategy
         $contentType = $this->contentType;
         $response    = $e->getResponse();
 
-        if ($model instanceof RestfulJsonModel
-            && ($model->isHalCollection() || $model->isHalResource())
+        if ($model instanceof HalJsonModel
+            && ($model->isCollection() || $model->isResource())
         ) {
             $contentType = 'application/hal+json';
         }

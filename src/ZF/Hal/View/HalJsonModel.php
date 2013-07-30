@@ -5,25 +5,25 @@
 
 namespace ZF\Hal\View;
 
-use ZF\Hal\HalCollection;
-use ZF\Hal\HalResource;
+use ZF\Hal\Collection;
+use ZF\Hal\Resource;
 use Zend\View\Model\JsonModel;
 
 /**
  * Simple extension to facilitate the specialized JsonStrategy and JsonRenderer
  * in this Module.
  */
-class RestfulJsonModel extends JsonModel
+class HalJsonModel extends JsonModel
 {
     /**
      * Does the payload represent a HAL collection?
      *
      * @return bool
      */
-    public function isHalCollection()
+    public function isCollection()
     {
         $payload = $this->getPayload();
-        return ($payload instanceof HalCollection);
+        return ($payload instanceof Collection);
     }
 
     /**
@@ -31,10 +31,10 @@ class RestfulJsonModel extends JsonModel
      *
      * @return bool
      */
-    public function isHalResource()
+    public function isResource()
     {
         $payload = $this->getPayload();
-        return ($payload instanceof HalResource);
+        return ($payload instanceof Resource);
     }
 
     /**
@@ -43,7 +43,7 @@ class RestfulJsonModel extends JsonModel
      * This is the value to represent in the response.
      *
      * @param  mixed $payload
-     * @return RestfulJsonModel
+     * @return self
      */
     public function setPayload($payload)
     {

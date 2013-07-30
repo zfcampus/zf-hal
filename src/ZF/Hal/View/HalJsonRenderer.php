@@ -13,11 +13,11 @@ use Zend\View\ViewEvent;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\View\ApiProblemModel;
 use ZF\ApiProblem\View\ApiProblemRenderer;
-use ZF\Hal\HalCollection;
-use ZF\Hal\HalResource;
-use ZF\Hal\Link;
-use ZF\Hal\LinkCollection;
-use ZF\Hal\Plugin\HalLinks;
+use ZF\Hal\Collection;
+use ZF\Hal\Resource;
+use ZF\Hal\Link\Link;
+use ZF\Hal\Link\LinkCollection;
+use ZF\Hal\Plugin\Hal as HalPlugin;
 
 /**
  * Handles rendering of the following:
@@ -26,7 +26,7 @@ use ZF\Hal\Plugin\HalLinks;
  * - HAL collections
  * - HAL resources
  */
-class RestfulJsonRenderer extends JsonRenderer
+class HalJsonRenderer extends JsonRenderer
 {
     /**
      * @var ApiProblemRenderer
@@ -54,14 +54,14 @@ class RestfulJsonRenderer extends JsonRenderer
     /**
      * Set helper plugin manager instance.
      *
-     * Also ensures that the 'HalLinks' helper is present.
+     * Also ensures that the 'Hal' helper is present.
      *
      * @param  HelperPluginManager $helpers
      */
     public function setHelperPluginManager(HelperPluginManager $helpers)
     {
-        if (!$helpers->has('HalLinks')) {
-            $this->injectHalLinksHelper($helpers);
+        if (!$helpers->has('Hal')) {
+            $this->injectHalHelper($helpers);
         }
         $this->helpers = $helpers;
     }
@@ -100,8 +100,8 @@ class RestfulJsonRenderer extends JsonRenderer
     /**
      * Render a view model
      *
-     * If the view model is a RestfulJsonRenderer, determines if it represents
-     * a HalCollection or HalResource, and, if so, creates a custom
+     * If the view model is a HalJsonRenderer, determines if it represents
+     * a Collection or Resource, and, if so, creates a custom
      * representation appropriate to the type.
      *
      * If not, it passes control to the parent to render.
@@ -112,18 +112,18 @@ class RestfulJsonRenderer extends JsonRenderer
      */
     public function render($nameOrModel, $values = null)
     {
-        if (!$nameOrModel instanceof RestfulJsonModel) {
+        if (!$nameOrModel instanceof HalJsonModel) {
             return parent::render($nameOrModel, $values);
         }
 
-        if ($nameOrModel->isHalResource()) {
-            $helper  = $this->helpers->get('HalLinks');
+        if ($nameOrModel->isResource()) {
+            $helper  = $this->helpers->get('Hal');
             $payload = $helper->renderResource($nameOrModel->getPayload());
             return parent::render($payload);
         }
 
-        if ($nameOrModel->isHalCollection()) {
-            $helper  = $this->helpers->get('HalLinks');
+        if ($nameOrModel->isCollection()) {
+            $helper  = $this->helpers->get('Hal');
             $payload = $helper->renderCollection($nameOrModel->getPayload());
 
             if ($payload instanceof ApiProblem) {
@@ -136,17 +136,17 @@ class RestfulJsonRenderer extends JsonRenderer
     }
 
     /**
-     * Inject the helper manager with the HalLinks helper
+     * Inject the helper manager with the Hal helper
      *
      * @param  HelperPluginManager $helpers
      */
-    protected function injectHalLinksHelper(HelperPluginManager $helpers)
+    protected function injectHalHelper(HelperPluginManager $helpers)
     {
-        $helper = new HalLinks();
+        $helper = new HalHelper();
         $helper->setView($this);
         $helper->setServerUrlHelper($helpers->get('ServerUrl'));
         $helper->setUrlHelper($helpers->get('Url'));
-        $helpers->setService('HalLinks', $helper);
+        $helpers->setService('Hal', $helper);
     }
 
     /**

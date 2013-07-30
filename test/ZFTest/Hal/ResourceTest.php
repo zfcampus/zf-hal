@@ -5,12 +5,12 @@
 
 namespace ZFTest\Hal;
 
-use ZF\Hal\HalResource;
-use ZF\Hal\LinkCollection;
+use ZF\Hal\Resource;
+use ZF\Hal\Link\LinkCollection;
 use PHPUnit_Framework_TestCase as TestCase;
 use stdClass;
 
-class HalResourceTest extends TestCase
+class ResourceTest extends TestCase
 {
     public function invalidResources()
     {
@@ -32,13 +32,13 @@ class HalResourceTest extends TestCase
     public function testConstructorRaisesExceptionForNonObjectNonArrayResource($resource)
     {
         $this->setExpectedException('ZF\Hal\Exception\InvalidResourceException');
-        $hal = new HalResource($resource, 'id');
+        $hal = new Resource($resource, 'id');
     }
 
     public function testPropertiesAreAccessibleAfterConstruction()
     {
         $resource = new stdClass;
-        $hal      = new HalResource($resource, 'id');
+        $hal      = new Resource($resource, 'id');
         $this->assertSame($resource, $hal->resource);
         $this->assertEquals('id', $hal->id);
     }
@@ -46,14 +46,14 @@ class HalResourceTest extends TestCase
     public function testComposesLinkCollectionByDefault()
     {
         $resource = new stdClass;
-        $hal      = new HalResource($resource, 'id', 'route', array('foo' => 'bar'));
-        $this->assertInstanceOf('ZF\Hal\LinkCollection', $hal->getLinks());
+        $hal      = new Resource($resource, 'id', 'route', array('foo' => 'bar'));
+        $this->assertInstanceOf('ZF\Hal\Link\LinkCollection', $hal->getLinks());
     }
 
     public function testLinkCollectionMayBeInjected()
     {
         $resource = new stdClass;
-        $hal      = new HalResource($resource, 'id', 'route', array('foo' => 'bar'));
+        $hal      = new Resource($resource, 'id', 'route', array('foo' => 'bar'));
         $links    = new LinkCollection();
         $hal->setLinks($links);
         $this->assertSame($links, $hal->getLinks());

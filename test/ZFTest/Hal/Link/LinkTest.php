@@ -3,9 +3,9 @@
  * @license   http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause
  */
 
-namespace ZFTest\Hal;
+namespace ZFTest\Hal\Link;
 
-use ZF\Hal\Link;
+use ZF\Hal\Link\Link;
 use PHPUnit_Framework_TestCase as TestCase;
 
 class LinkTest extends TestCase
@@ -149,7 +149,7 @@ class LinkTest extends TestCase
             'rel' => $rel,
             'url' => $url,
         ));
-        $this->assertInstanceOf('ZF\Hal\Link', $link);
+        $this->assertInstanceOf('ZF\Hal\Link\Link', $link);
         $this->assertEquals($rel, $link->getRelation());
         $this->assertEquals($url, $link->getUrl());
     }
@@ -172,7 +172,7 @@ class LinkTest extends TestCase
             ),
         ));
 
-        $this->assertInstanceOf('ZF\Hal\Link', $link);
+        $this->assertInstanceOf('ZF\Hal\Link\Link', $link);
         $this->assertEquals('describedby', $link->getRelation());
         $this->assertEquals($route, $link->getRoute());
         $this->assertEquals($params, $link->getRouteParams());
