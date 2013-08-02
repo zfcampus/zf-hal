@@ -97,4 +97,10 @@ class HalJsonModelTest extends TestCase
         $this->model->setPayload($item);
         $this->assertTrue($this->model->isResource());
     }
+
+    public function testSettingTheResultVariableSetsThePayload()
+    {
+        $this->model->setVariable('result', 'foo');
+        $this->assertEquals('foo', $this->model->getPayload());
+    }
 }
