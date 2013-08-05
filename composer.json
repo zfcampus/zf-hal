@@ -21,23 +21,24 @@
             "url": "https://packages.zendframework.com"
         }
     ],
+    "minimum-stability": "dev",
     "require": {
         "php": ">=5.3.3",
         "zfcampus/zf-api-problem": "dev-master",
-        "zendframework/zend-eventmanager": ">=2.2.0",
-        "zendframework/zend-json": ">=2.2.0",
-        "zendframework/zend-mvc": ">=2.2.0",
-        "zendframework/zend-paginator": ">=2.2.0",
-        "zendframework/zend-uri": ">=2.2.0",
-        "zendframework/zend-view": ">=2.2.0",
-        "zendframework/zend-stdlib": ">=2.2.0"
+        "zendframework/zend-eventmanager": ">=2.3.0dev",
+        "zendframework/zend-json": ">=2.3.0dev",
+        "zendframework/zend-mvc": ">=2.3.0dev",
+        "zendframework/zend-paginator": ">=2.3.0dev",
+        "zendframework/zend-uri": ">=2.3.0dev",
+        "zendframework/zend-view": ">=2.3.0dev",
+        "zendframework/zend-stdlib": ">=2.3.0dev"
     },
     "require-dev": {
         "phpunit/PHPUnit": "3.7.*",
-        "zendframework/zend-console": ">=2.2.0",
-        "zendframework/zend-http": ">=2.2.0",
-        "zendframework/zend-loader": ">=2.2.0",
-        "zendframework/zend-servicemanager": ">=2.2.0"
+        "zendframework/zend-console": ">=2.3.0dev",
+        "zendframework/zend-http": ">=2.3.0dev",
+        "zendframework/zend-loader": ">=2.3.0dev",
+        "zendframework/zend-servicemanager": ">=2.3.0dev"
     },
     "autoload": {
         "psr-0": {
