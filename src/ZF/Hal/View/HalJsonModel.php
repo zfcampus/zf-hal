@@ -16,6 +16,11 @@ use Zend\View\Model\JsonModel;
 class HalJsonModel extends JsonModel
 {
     /**
+     * @var bool
+     */
+    protected $terminate = true;
+
+    /**
      * Does the payload represent a HAL collection?
      *
      * @return bool

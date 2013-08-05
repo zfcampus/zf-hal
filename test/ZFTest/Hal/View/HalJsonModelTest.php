@@ -97,4 +97,9 @@ class HalJsonModelTest extends TestCase
         $this->model->setPayload($item);
         $this->assertTrue($this->model->isResource());
     }
+
+    public function testIsTerminalByDefault()
+    {
+        $this->assertTrue($this->model->terminate());
+    }
 }
