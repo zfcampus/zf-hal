@@ -43,6 +43,7 @@ return array(
             'HalJson' => array(
                 'ZF\Hal\View\HalJsonModel' => array(
                     'application/json',
+                    'application/*+json',
                 ),
             ),
         ),
