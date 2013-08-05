@@ -60,21 +60,4 @@ class HalJsonModel extends JsonModel
     {
         return $this->getVariable('payload');
     }
-
-    /**
-     * Override ViewModel::setVariable
-     *
-     * Overrides to allow the variable "result" to also set the payload.
-     * 
-     * @param  string $name 
-     * @param  mixed $value 
-     * @return self
-     */
-    public function setVariable($name, $value)
-    {
-        if ('result' == $name) {
-            $this->setPayload($value);
-        }
-        return parent::setVariable($name, $value);
-    }
 }

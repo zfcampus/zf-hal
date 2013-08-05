@@ -37,4 +37,14 @@ return array(
             // repeat as needed for each resource/collection type
         ),
     ),
+    // Creates a "HalJson" selector for zfcampus/zf-content-negotiation
+    'zf-content-negotiation' => array(
+        'selectors' => array(
+            'HalJson' => array(
+                'ZF\Hal\View\HalJsonModel' => array(
+                    'application/json',
+                ),
+            ),
+        ),
+    ),
 );
