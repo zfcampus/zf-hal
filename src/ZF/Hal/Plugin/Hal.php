@@ -421,7 +421,7 @@ class Hal extends AbstractHelper implements
      * Create a URL from a Link
      *
      * @param  Link $linkDefinition
-     * @return string
+     * @return array
      * @throws Exception\DomainException if Link is incomplete
      */
     public function fromLink(Link $linkDefinition)
@@ -439,12 +439,19 @@ class Hal extends AbstractHelper implements
             );
         }
 
+        $reuseMatchedParams = true;
+        $options = $linkDefinition->getRouteOptions();
+        if (isset($options['reuse_matched_params'])) {
+            $reuseMatchedParams = (bool) $options['reuse_matched_params'];
+            unset($options['reuse_matched_params']);
+        }
+
         $path = call_user_func(
             $this->urlHelper,
             $linkDefinition->getRoute(),
             $linkDefinition->getRouteParams(),
-            $linkDefinition->getRouteOptions(),
-            true
+            $options,
+            $reuseMatchedParams
         );
 
         if (substr($path, 0, 4) == 'http') {
