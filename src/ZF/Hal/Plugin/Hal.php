@@ -795,6 +795,10 @@ class Hal extends AbstractHelper implements
 
             $resource = $eventParams['resource'];
 
+            if (is_object($resource) && $metadataMap->has($resource)) {
+                $resource = $this->createResourceFromMetadata($resource, $metadataMap->get($resource));
+            }
+
             if ($resource instanceof Resource) {
                 $collection[] = $this->renderResource($resource);
                 continue;
