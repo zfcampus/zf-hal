@@ -48,7 +48,7 @@ class Parser implements IteratorAggregate
             }
             if (is_array($embedData)) {
                 foreach ($embedData as $index => $embedResource) {
-                    $embedData[] = static::fromStdclass($embedResource);
+                    $embedData[$index] = static::fromStdclass($embedResource);
                 }
                 $resource->{$relation} = $embedData;
                 continue;
