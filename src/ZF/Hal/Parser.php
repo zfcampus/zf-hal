@@ -5,6 +5,7 @@
 
 namespace ZF\Hal;
 
+use ArrayIterator;
 use IteratorAggregate;
 use OutOfRangeException;
 use stdClass;
@@ -82,7 +83,7 @@ class Parser implements IteratorAggregate
 
     public function getIterator()
     {
-        return ArrayIterator($this->data);
+        return new ArrayIterator($this->data);
     }
 
     protected static function createLinksFromData(array $linkData)
