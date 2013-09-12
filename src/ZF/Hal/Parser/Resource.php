@@ -182,9 +182,10 @@ class Resource implements
         $embedded = $this->embedded;
         $data     = $this->resource;
 
-        $halProperties = array(
-            '_links' => $links,
-        );
+        $halProperties = array();
+        if (!empty($links)) {
+            $halProperties['_links'] = $links;
+        }
         if (!empty($embedded)) {
             $halProperties['_embedded'] = $embedded;
         }
