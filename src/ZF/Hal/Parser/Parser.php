@@ -12,7 +12,7 @@ use ZF\Hal\Link;
 /**
  * Class for parsing HAL structures into an object graph of Resources
  */
-class Parser implements IteratorAggregate
+class Parser
 {
     /**
      * Parse JSON into resources
