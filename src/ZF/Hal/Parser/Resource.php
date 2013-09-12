@@ -94,7 +94,7 @@ class Resource implements
      */
     public function __toString()
     {
-        return json_encode($this);
+        return json_encode($this, JSON_PRETTY_PRINT|JSON_NUMERIC_CHECK|JSON_UNESCAPED_SLASHES);
     }
 
     /**
