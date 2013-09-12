@@ -20,6 +20,8 @@ use ZF\Hal\Link;
  * links.
  *
  * You may also grab all properties at once (via getData())
+ *
+ * Inspired by https://github.com/blongden/hal
  */
 class Resource implements 
     IteratorAggregate,

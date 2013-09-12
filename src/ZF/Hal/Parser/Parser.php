@@ -11,6 +11,8 @@ use ZF\Hal\Link;
 
 /**
  * Class for parsing HAL structures into an object graph of Resources
+ *
+ * Inspired by https://github.com/blongden/hal
  */
 class Parser
 {
