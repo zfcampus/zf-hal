@@ -5,25 +5,33 @@
 
 namespace ZF\Hal;
 
-use ArrayIterator;
-use IteratorAggregate;
-use OutOfRangeException;
 use stdClass;
+use ZF\Hal\Exception;
+use ZF\Hal\Link;
 
+/**
+ * Class for parsing HAL structures into an object graph of Resources
+ */
 class Parser implements IteratorAggregate
 {
-    protected $uri;
-
-    protected $links;
-
-    protected $data;
-
+    /**
+     * Parse JSON into resources
+     * 
+     * @param  mixed $text 
+     * @return Resource
+     */
     public static function fromJson($text)
     {
         $data = json_decode($text, false);
         return static::fromStdclass($data);
     }
 
+    /**
+     * Parse stdClass objects into resources
+     * 
+     * @param  stdClass $resource 
+     * @return Resource
+     */
     public static function fromStdclass(stdClass $resource)
     {
         if (!isset($resource->_links)) {
@@ -44,48 +52,29 @@ class Parser implements IteratorAggregate
 
         foreach ($embedded as $relation => $embedData) {
             if (is_object($embedData)) {
-                $resource->{$relation} = static::fromStdclass($embedData);
+                $embedded[$relation] = static::fromStdclass($embedData);
                 continue;
             }
             if (is_array($embedData)) {
                 foreach ($embedData as $index => $embedResource) {
                     $embedData[$index] = static::fromStdclass($embedResource);
                 }
-                $resource->{$relation} = $embedData;
+                $embedded[$relation] = $embedData;
                 continue;
             }
 
             // @todo trigger an error indicating an invalid value was present
         }
 
-        return new static((array) $resource, $links);
+        return new Resource((array) $resource, $links, $embedded);
     }
 
-    public function __construct(array $data = array(), Link\LinkCollection $links = null)
-    {
-        if (null === $links) {
-            $links = new Link\LinkCollection();
-        }
-        $this->data  = $data;
-        $this->links = $links;
-    }
-
-    public function __get($name)
-    {
-        if (!array_key_exists($name, $this->data)) {
-            throw new OutOfRangeException(sprintf(
-                'The value "%s" does not exist in the resource',
-                $name
-            ));
-        }
-        return $this->data[$name];
-    }
-
-    public function getIterator()
-    {
-        return new ArrayIterator($this->data);
-    }
-
+    /**
+     * Create a Lin\LinkCollection from links in a resource being parsed
+     * 
+     * @param  array $linkData 
+     * @return Link\LinkCollection
+     */
     protected static function createLinksFromData(array $linkData)
     {
         $links = new Link\LinkCollection();
