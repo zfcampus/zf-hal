@@ -241,7 +241,7 @@ class Link
             );
         }
 
-        $this->url = $uri->toString();
+        $this->url = $url;
         return $this;
     }
 
