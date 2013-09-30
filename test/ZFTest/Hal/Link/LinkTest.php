@@ -178,4 +178,26 @@ class LinkTest extends TestCase
         $this->assertEquals($params, $link->getRouteParams());
         $this->assertEquals($options, $link->getRouteOptions());
     }
+
+    public function testFactoryCanGenerateLinkWithArbitraryProperties()
+    {
+        $rel = 'describedby';
+        $url = 'http://example.org/api/foo?version=2';
+        $link = Link::factory(array(
+            'rel'   => $rel,
+            'url'   => $url,
+            'props' => array(
+                'version' => 2,
+                'latest'  => true,
+            )
+        ));
+
+        $this->assertInstanceOf('ZF\Hal\Link\Link', $link);
+        $this->assertEquals('describedby', $link->getRelation());
+        $props = $link->getProps();
+        $this->assertEquals(array(
+            'version' => 2,
+            'latest'  => true,
+        ), $props);
+    }
 }
