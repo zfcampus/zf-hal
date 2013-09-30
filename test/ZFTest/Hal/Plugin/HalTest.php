@@ -640,4 +640,23 @@ class HalTest extends TestCase
         );
         $this->assertEquals($expected, $result);
     }
+
+    public function testFromLinkShouldComposeAnyPropertiesInLink()
+    {
+        $link = Link::factory(array(
+            'rel'   => 'resource',
+            'url'   => 'http://api.example.com/foo?version=2',
+            'props' => array(
+                'version' => 2,
+                'latest'  => true,
+            ),
+        ));
+        $result = $this->plugin->fromLink($link);
+        $expected = array(
+            'href'    => 'http://api.example.com/foo?version=2',
+            'version' => 2,
+            'latest'  => true,
+        );
+        $this->assertEquals($expected, $result);
+    }
 }

@@ -433,10 +433,12 @@ class Hal extends AbstractHelper implements
             ));
         }
 
+        $representation = $linkDefinition->getProps();
+
         if ($linkDefinition->hasUrl()) {
-            return array(
+            return array_merge($representation, array(
                 'href' => $linkDefinition->getUrl(),
-            );
+            ));
         }
 
         $reuseMatchedParams = true;
@@ -455,14 +457,14 @@ class Hal extends AbstractHelper implements
         );
 
         if (substr($path, 0, 4) == 'http') {
-            return array(
+            return array_merge($representation, array(
                 'href' => $path,
-            );
+            ));
         }
 
-        return array(
+        return array_merge($representation, array(
             'href' => call_user_func($this->serverUrlHelper, $path),
-        );
+        ));
     }
 
     /**
