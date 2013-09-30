@@ -120,8 +120,8 @@ class Link
      * Set any additional, arbitrary properties to include in the link object
      *
      * "href" will be ignored.
-     * 
-     * @param  array $props 
+     *
+     * @param  array $props
      * @return self
      */
     public function setProps(array $props)
@@ -246,7 +246,7 @@ class Link
 
     /**
      * Get additional properties to include in Link representation
-     * 
+     *
      * @return array
      */
     public function getProps()
