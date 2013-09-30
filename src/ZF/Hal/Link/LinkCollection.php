@@ -8,7 +8,7 @@ namespace ZF\Hal\Link;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
-use ZF\Hal\Exception;
+use ZF\ApiProblem\Exception;
 
 /**
  * Object describing a collection of link relations

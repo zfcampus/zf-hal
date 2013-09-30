@@ -79,7 +79,7 @@ class LinkTest extends TestCase
         $link = new Link('describedby');
         $link->setRoute('api/docs');
 
-        $this->setExpectedException('ZF\Hal\Exception\DomainException');
+        $this->setExpectedException('ZF\ApiProblem\Exception\DomainException');
         $link->setUrl('http://example.com/api/docs.html');
     }
 
@@ -88,7 +88,7 @@ class LinkTest extends TestCase
         $link = new Link('describedby');
         $link->setUrl('http://example.com/api/docs.html');
 
-        $this->setExpectedException('ZF\Hal\Exception\DomainException');
+        $this->setExpectedException('ZF\ApiProblem\Exception\DomainException');
         $link->setRoute('api/docs');
     }
 

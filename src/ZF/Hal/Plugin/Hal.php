@@ -19,6 +19,7 @@ use Zend\View\Helper\AbstractHelper;
 use Zend\View\Helper\ServerUrl;
 use Zend\View\Helper\Url;
 use ZF\ApiProblem\ApiProblem;
+use ZF\ApiProblem\Exception\DomainException;
 use ZF\Hal\Exception;
 use ZF\Hal\Collection;
 use ZF\Hal\Resource;
@@ -427,7 +428,7 @@ class Hal extends AbstractHelper implements
     public function fromLink(Link $linkDefinition)
     {
         if (!$linkDefinition->isComplete()) {
-            throw new Exception\DomainException(sprintf(
+            throw new DomainException(sprintf(
                 'Link from resource provided to %s was incomplete; must contain a URL or a route',
                 __METHOD__
             ));
@@ -482,7 +483,7 @@ class Hal extends AbstractHelper implements
                 continue;
             }
             if (!is_array($linkDefinition)) {
-                throw new Exception\DomainException(sprintf(
+                throw new DomainException(sprintf(
                     'Link object for relation "%s" in resource was malformed; cannot generate link',
                     $rel
                 ));
@@ -491,7 +492,7 @@ class Hal extends AbstractHelper implements
             $aggregate = array();
             foreach ($linkDefinition as $subLink) {
                 if (!$subLink instanceof Link) {
-                    throw new Exception\DomainException(sprintf(
+                    throw new DomainException(sprintf(
                         'Link object aggregated for relation "%s" in resource was malformed; cannot generate link',
                         $rel
                     ));

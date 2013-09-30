@@ -9,6 +9,7 @@ use Traversable;
 use Zend\Stdlib\ArrayUtils;
 use Zend\Uri\Exception as UriException;
 use Zend\Uri\UriFactory;
+use ZF\ApiProblem\Exception\DomainException;
 use ZF\Hal\Exception;
 
 /**
@@ -146,7 +147,7 @@ class Link
     public function setRoute($route, $params = null, $options = null)
     {
         if ($this->hasUrl()) {
-            throw new Exception\DomainException(sprintf(
+            throw new DomainException(sprintf(
                 '%s already has a URL set; cannot set route',
                 __CLASS__
             ));
@@ -219,7 +220,7 @@ class Link
     public function setUrl($url)
     {
         if ($this->hasRoute()) {
-            throw new Exception\DomainException(sprintf(
+            throw new DomainException(sprintf(
                 '%s already has a route set; cannot set URL',
                 __CLASS__
             ));
