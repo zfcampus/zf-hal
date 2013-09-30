@@ -640,9 +640,26 @@ class Hal extends AbstractHelper implements
     {
         $self = new Link('self');
         $self->setRoute($route);
+
+        $routeParams  = array();
+        $routeOptions = array();
         if ($resource instanceof Resource) {
-            $self->setRouteParams(array($identifier => $resource->id));
+            $routeParams = array(
+                $identifier => $resource->id,
+            );
         }
+        if ($resource instanceof Collection) {
+            $routeParams  = $resource->collectionRouteParams;
+            $routeOptions = $resource->collectionRouteOptions;
+        }
+
+        if (!empty($routeParams)) {
+            $self->setRouteParams($routeParams);
+        }
+        if (!empty($routeOptions)) {
+            $self->setRouteOptions($routeOptions);
+        }
+
         $resource->getLinks()->add($self, true);
     }
 

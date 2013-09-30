@@ -659,4 +659,23 @@ class HalTest extends TestCase
         );
         $this->assertEquals($expected, $result);
     }
+
+    public function testCreateCollectionShouldUseCollectionRouteMetadataWhenInjectingSelfLink()
+    {
+        $collection = new Collection(array('foo' => 'bar'));
+        $collection->setCollectionRoute('hostname/resource');
+        $collection->setCollectionRouteOptions(array(
+            'query' => array(
+                'version' => 2,
+            ),
+        ));
+        $result = $this->plugin->createCollection($collection);
+        $links  = $result->getLinks();
+        $self   = $links->get('self');
+        $this->assertEquals(array(
+            'query' => array(
+                'version' => 2,
+            ),
+        ), $self->getRouteOptions());
+    }
 }
