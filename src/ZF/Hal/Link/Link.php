@@ -17,6 +17,11 @@ use ZF\Hal\Exception;
 class Link
 {
     /**
+     * @var array
+     */
+    protected $props = array();
+
+    /**
      * @var string
      */
     protected $relation;
@@ -69,6 +74,12 @@ class Link
         }
         $link = new static($spec['rel']);
 
+        if (isset($spec['props'])
+            && is_array($spec['props'])
+        ) {
+            $link->setProps($spec['props']);
+        }
+
         if (isset($spec['url'])) {
             $link->setUrl($spec['url']);
             return $link;
@@ -103,6 +114,23 @@ class Link
         }
 
         return $link;
+    }
+
+    /**
+     * Set any additional, arbitrary properties to include in the link object
+     *
+     * "href" will be ignored.
+     *
+     * @param  array $props
+     * @return self
+     */
+    public function setProps(array $props)
+    {
+        if (isset($props['href'])) {
+            unset($props['href']);
+        }
+        $this->props = $props;
+        return $this;
     }
 
     /**
@@ -214,6 +242,16 @@ class Link
 
         $this->url = $uri->toString();
         return $this;
+    }
+
+    /**
+     * Get additional properties to include in Link representation
+     *
+     * @return array
+     */
+    public function getProps()
+    {
+        return $this->props;
     }
 
     /**

@@ -122,7 +122,7 @@ class Metadata
                 continue;
             }
 
-            // Strip "name" from route_name and resource_route_name keys (and 
+            // Strip "name" from route_name and resource_route_name keys (and
             // continue honoring simply "route" and "resource_route")
             if (strstr($key, 'route')
                 && 'name' == substr($key, -4)
