@@ -1,5 +1,5 @@
-ZFHal: ZF2 Module for Hypermedia Application Layer representations
-==================================================================
+HAL: ZF2 Module for Hypermedia Application Layer representations
+================================================================
 
 This module provides data structures for Hypermedia Application Language, as
 well as the ability to render them to JSON.
