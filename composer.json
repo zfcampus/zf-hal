@@ -2,7 +2,7 @@
     "name": "zfcampus/zf-hal",
     "description": "ZF2 Module providing Hypermedia Application Language assets and rendering",
     "type": "library",
-    "license": "BSD-2-Clause",
+    "license": "BSD-3-Clause",
     "keywords": [
         "zf2",
         "zend",
@@ -10,9 +10,15 @@
         "rest",
         "hal"
     ],
+    "homepage": "http://apigility.org/",
+    "support": {
+        "email": "apigility-users@zend.com",
+        "irc": "irc://irc.freenode.net/apigility",
+        "source": "https://github.com/zfcampus/zf-hal",
+        "issues": "https://github.com/zfcampus/zf-hal/issues"
+    },
     "repositories": [
-        { "type": "composer", "url": "https://packages.zendframework.com" },
-        { "type": "composer", "url": "http://packages-zfcampus.rhcloud.com" }
+        { "type": "composer", "url": "https://packages.zendframework.com" }
     ],
     "minimum-stability": "dev",
     "require": {
