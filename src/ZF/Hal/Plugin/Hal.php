@@ -49,6 +49,10 @@ class Hal extends AbstractHelper implements
      */
     protected $defaultHydrator;
 
+
+    protected $renderEmbeddedResources = true;
+
+
     /**
      * @var EventManagerInterface
      */
@@ -250,6 +254,17 @@ class Hal extends AbstractHelper implements
         return $this;
     }
 
+    public function setRenderEmbeddedResources($value)
+    {
+        $this->renderEmbeddedResources = $value;
+        return $this;
+    }
+
+    public function getRenderEmbeddedResources()
+    {
+        return $this->renderEmbeddedResources;
+    }
+
     /**
      * Retrieve a hydrator for a given resource
      *
@@ -353,15 +368,15 @@ class Hal extends AbstractHelper implements
         $resource = $halResource->resource;
         $id       = $halResource->id;
         $links    = $this->fromResource($halResource);
+        $metadataMap = $this->getMetadataMap();
 
         if (!is_array($resource)) {
             $resource = $this->convertResourceToArray($resource);
         }
 
-        $metadataMap = $this->getMetadataMap();
         foreach ($resource as $key => $value) {
             if (is_object($value) && $metadataMap->has($value)) {
-                $value = $this->createResourceFromMetadata($value, $metadataMap->get($value));
+                $value = $this->createResourceFromMetadata($value, $metadataMap->get($value), $this->getRenderEmbeddedResources());
             }
 
             if ($value instanceof Resource) {
@@ -523,7 +538,7 @@ class Hal extends AbstractHelper implements
      * @param  Metadata $metadata
      * @return Resource|Collection
      */
-    public function createResourceFromMetadata($object, Metadata $metadata)
+    public function createResourceFromMetadata($object, Metadata $metadata, $renderEmbeddedResources = true)
     {
         if ($metadata->isCollection()) {
             return $this->createCollectionFromMetadata($object, $metadata);
@@ -551,6 +566,8 @@ class Hal extends AbstractHelper implements
             ));
         }
         $id = $data[$identiferName];
+
+        if (!$renderEmbeddedResources) $data = array();
 
         $resource = new Resource($data, $id);
         $links    = $resource->getLinks();
