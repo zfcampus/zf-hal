@@ -247,6 +247,52 @@ class HalTest extends TestCase
         $this->assertRelationalLinkContains('/embedded_custom/baz', 'self', $second);
     }
 
+    public function testMetadataMapLooksForParentClasses()
+    {
+        $object = new TestAsset\Resource('foo', 'Foo');
+        $object->first_child  = new TestAsset\EmbeddedProxyResource('bar', 'Bar');
+        $object->second_child = new TestAsset\EmbeddedProxyResourceWithCustomIdentifier('baz', 'Baz');
+        $resource = new Resource($object, 'foo');
+        $self = new Link('self');
+        $self->setRoute('hostname/resource', array('id' => 'foo'));
+        $resource->getLinks()->add($self);
+
+        $metadata = new MetadataMap(array(
+            'ZFTest\Hal\Plugin\TestAsset\Resource' => array(
+                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route_name' => 'hostname/resource',
+            ),
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedResource' => array(
+                'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route'    => 'hostname/embedded',
+            ),
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedResourceWithCustomIdentifier' => array(
+                'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route'           => 'hostname/embedded_custom',
+                'identifier_name' => 'custom_id',
+            ),
+        ));
+
+        $this->plugin->setMetadataMap($metadata);
+
+        $rendered = $this->plugin->renderResource($resource);
+        $this->assertRelationalLinkContains('/resource/foo', 'self', $rendered);
+
+        $this->assertArrayHasKey('_embedded', $rendered);
+        $embed = $rendered['_embedded'];
+        $this->assertEquals(2, count($embed));
+        $this->assertArrayHasKey('first_child', $embed);
+        $this->assertArrayHasKey('second_child', $embed);
+
+        $first = $embed['first_child'];
+        $this->assertInternalType('array', $first);
+        $this->assertRelationalLinkContains('/embedded/bar', 'self', $first);
+
+        $second = $embed['second_child'];
+        $this->assertInternalType('array', $second);
+        $this->assertRelationalLinkContains('/embedded_custom/baz', 'self', $second);
+    }
+
     public function testRendersEmbeddedCollectionsInsideResourcesBasedOnMetadataMap()
     {
         $collection = new TestAsset\Collection(
