@@ -104,9 +104,20 @@ class MetadataMap
     public function has($class)
     {
         if (is_object($class)) {
-            $class = get_class($class);
+            $className = get_class($class);
+        } else {
+            $className = $class;
         }
-        return array_key_exists($class, $this->map);
+
+        if (array_key_exists($className, $this->map)) {
+            return true;
+        }
+
+        if (get_parent_class($className)) {
+            return $this->has(get_parent_class($className));
+        }
+
+        return false;
     }
 
     /**
@@ -118,8 +129,19 @@ class MetadataMap
     public function get($class)
     {
         if (is_object($class)) {
-            $class = get_class($class);
+            $className = get_class($class);
+        } else {
+            $className = $class;
         }
-        return $this->map[$class];
+
+        if (isset($this->map[$className])) {
+            return $this->map[$className];
+        }
+
+        if (get_parent_class($className)) {
+            return $this->get(get_parent_class($className));
+        }
+
+        return false;
     }
 }
