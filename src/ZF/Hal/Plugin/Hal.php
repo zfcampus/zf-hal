@@ -49,9 +49,12 @@ class Hal extends AbstractHelper implements
      */
     protected $defaultHydrator;
 
-
+    /**
+     * Boolean to render embedded resources or just include _embedded data
+     *
+     * @var boolean
+     */
     protected $renderEmbeddedResources = true;
-
 
     /**
      * @var EventManagerInterface
@@ -254,12 +257,22 @@ class Hal extends AbstractHelper implements
         return $this;
     }
 
+    /**
+     * Set boolean to render embedded resources or just include _embedded data
+     *
+     * @var boolean
+     */
     public function setRenderEmbeddedResources($value)
     {
         $this->renderEmbeddedResources = $value;
         return $this;
     }
 
+    /**
+     * Get boolean to render embedded resources or just include _embedded data
+     *
+     * @return boolean
+     */
     public function getRenderEmbeddedResources()
     {
         return $this->renderEmbeddedResources;
