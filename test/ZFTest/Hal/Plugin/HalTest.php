@@ -398,6 +398,66 @@ class HalTest extends TestCase
         }
     }
 
+    public function testDoesNotRenderEmbeddedResourcesInsideCollectionsBasedOnMetadataMapAndRenderEmbeddedResourcesAsFalse()
+    {
+
+        $resource = new TestAsset\Resource('spock', 'Spock');
+        $resource->first_child  = new TestAsset\EmbeddedResource('bar', 'Bar');
+        $resource->second_child = new TestAsset\EmbeddedResourceWithCustomIdentifier('baz', 'Baz');
+
+        $metadata = new MetadataMap(array(
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedResource' => array(
+                'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route'    => 'hostname/embedded',
+            ),
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedResourceWithCustomIdentifier' => array(
+                'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route'           => 'hostname/embedded_custom',
+                'identifier_name' => 'custom_id',
+            ),
+
+            'ZFTest\Hal\Plugin\TestAsset\Collection' => array(
+                'is_collection'  => true,
+                'route'          => 'hostname/contacts',
+                'resource_route' => 'hostname/embedded',
+            ),
+            'ZFTest\Hal\Plugin\TestAsset\Resource' => array(
+                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route_name' => 'hostname/resource',
+            ),
+        ));
+
+        $this->plugin->setMetadataMap($metadata);
+        $this->plugin->setRenderEmbeddedResources(false);
+
+        $collection = new Collection(array($resource), 'hostname/resource');
+        $self = new Link('self');
+        $self->setRoute('hostname/resource');
+        $collection->getLinks()->add($self);
+        $collection->setCollectionName('resources');
+
+        $rendered = $this->plugin->renderCollection($collection);
+
+        $this->assertRelationalLinkContains('/resource', 'self', $rendered);
+
+        $this->assertArrayHasKey('_embedded', $rendered);
+        $embed = $rendered['_embedded'];
+        $this->assertArrayHasKey('resources', $embed);
+        $resources = $embed['resources'];
+        $this->assertInternalType('array', $resources);
+        $this->assertEquals(1, count($resources));
+
+        $resource = array_shift($resources);
+        $this->assertInternalType('array', $resource);
+        $this->assertArrayHasKey('_embedded', $resource);
+        $this->assertInternalType('array', $resource['_embedded']);
+
+        foreach ($resource['_embedded']['first_child'] as $contact) {
+            $this->assertInternalType('array', $contact);
+            $this->assertArrayNotHasKey('id', $contact);
+        }
+    }
+
     public function testWillNotAllowInjectingASelfRelationMultipleTimes()
     {
         $resource = new Resource(array(

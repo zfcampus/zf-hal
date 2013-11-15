@@ -146,6 +146,14 @@ class Module
                         $helper->setDefaultHydrator($hydrator);
                     }
 
+                    if (isset($config['render_embedded_resources'])) {
+                        $helper->setRenderEmbeddedResources($config['render_embedded_resources']);
+                    }
+
+                    if (isset($config['render_collections'])) {
+                        $helper->setRenderCollections($config['render_collections']);
+                    }
+
                     if (isset($config['hydrators']) && is_array($config['hydrators'])) {
                         $hydratorMap = $config['hydrators'];
                         foreach ($hydratorMap as $class => $hydratorServiceName) {
