@@ -50,6 +50,20 @@ class Hal extends AbstractHelper implements
     protected $defaultHydrator;
 
     /**
+     * Boolean to render embedded resources or just include _embedded data
+     *
+     * @var boolean
+     */
+    protected $renderEmbeddedResources = true;
+
+    /**
+     * Boolean to render collections or just return their _embedded data
+     *
+     * @var boolean
+     */
+    protected $renderCollections = true;
+
+    /**
      * @var EventManagerInterface
      */
     protected $events;
@@ -251,6 +265,48 @@ class Hal extends AbstractHelper implements
     }
 
     /**
+     * Set boolean to render embedded resources or just include _embedded data
+     *
+     * @var boolean
+     */
+    public function setRenderEmbeddedResources($value)
+    {
+        $this->renderEmbeddedResources = $value;
+        return $this;
+    }
+
+    /**
+     * Get boolean to render embedded resources or just include _embedded data
+     *
+     * @return boolean
+     */
+    public function getRenderEmbeddedResources()
+    {
+        return $this->renderEmbeddedResources;
+    }
+
+    /**
+     * Set boolean to render embedded resources or just include _embedded data
+     *
+     * @var boolean
+     */
+    public function setRenderCollections($value)
+    {
+        $this->renderCollections = $value;
+        return $this;
+    }
+
+    /**
+     * Get boolean to render embedded resources or just include _embedded data
+     *
+     * @return boolean
+     */
+    public function getRenderCollections()
+    {
+        return $this->renderCollections;
+    }
+
+    /**
      * Retrieve a hydrator for a given resource
      *
      * If the resource has a mapped hydrator, returns that hydrator. If not, and
@@ -347,21 +403,23 @@ class Hal extends AbstractHelper implements
      * @param  Resource $halResource
      * @return array
      */
-    public function renderResource(Resource $halResource)
+    public function renderResource(Resource $halResource, $renderResource = true)
     {
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('resource' => $halResource));
         $resource = $halResource->resource;
         $id       = $halResource->id;
         $links    = $this->fromResource($halResource);
+        $metadataMap = $this->getMetadataMap();
 
         if (!is_array($resource)) {
             $resource = $this->convertResourceToArray($resource);
         }
 
-        $metadataMap = $this->getMetadataMap();
+        if (!$renderResource) $resource = array();
+
         foreach ($resource as $key => $value) {
             if (is_object($value) && $metadataMap->has($value)) {
-                $value = $this->createResourceFromMetadata($value, $metadataMap->get($value));
+                $value = $this->createResourceFromMetadata($value, $metadataMap->get($value), $this->getRenderEmbeddedResources());
             }
 
             if ($value instanceof Resource) {
@@ -523,7 +581,7 @@ class Hal extends AbstractHelper implements
      * @param  Metadata $metadata
      * @return Resource|Collection
      */
-    public function createResourceFromMetadata($object, Metadata $metadata)
+    public function createResourceFromMetadata($object, Metadata $metadata, $renderEmbeddedResources = true)
     {
         if ($metadata->isCollection()) {
             return $this->createCollectionFromMetadata($object, $metadata);
@@ -551,6 +609,8 @@ class Hal extends AbstractHelper implements
             ));
         }
         $id = $data[$identiferName];
+
+        if (!$renderEmbeddedResources) $data = array();
 
         $resource = new Resource($data, $id);
         $links    = $resource->getLinks();
@@ -821,7 +881,7 @@ class Hal extends AbstractHelper implements
             }
 
             if ($resource instanceof Resource) {
-                $collection[] = $this->renderResource($resource);
+                $collection[] = $this->renderResource($resource, $this->getRenderCollections());
                 continue;
             }
 
