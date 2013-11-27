@@ -700,6 +700,10 @@ class Hal extends AbstractHelper implements
      */
     public function injectSelfLink(LinkCollectionAwareInterface $resource, $route, $identifier = 'id')
     {
+        if ($resource->getLinks()->has('self')) {
+            return;
+        }
+
         $self = new Link('self');
         $self->setRoute($route);
 
