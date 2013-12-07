@@ -48,7 +48,10 @@
     "autoload": {
         "psr-0": {
             "ZF\\Hal\\": "src/",
-            "ZFTest\\": "test/"
-        }
+            "ZFTest\\Hal\\": "test/"
+        },
+        "classmap": [
+            "Module.php"
+        ]
     }
 }
