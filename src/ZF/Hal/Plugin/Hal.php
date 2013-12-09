@@ -428,11 +428,44 @@ class Hal extends AbstractHelper implements
             if ($value instanceof Collection) {
                 $this->extractEmbeddedCollection($resource, $key, $value);
             }
+            if ($value instanceof \Doctrine\ORM\PersistentCollection) {
+                if ($link = $this->getEmbeddedPersistentCollectionLink($resource, $key, $value)) {
+                    $links[$key] = $this->fromLink($link);
+                }
+                unset($resource[$key]);
+            }
         }
 
         $resource['_links'] = $links;
 
         return $resource;
+    }
+
+    /**
+     * Return a Link for an embedded persistent collection
+     *
+     */
+    public function getEmbeddedPersistentCollectionLink($resource, $key, $value)
+    {
+        if ($this->getMetadataMap()->has($value->getTypeClass()->getName())) {
+            $map = $this->getMetadataMap()->get($value->getTypeClass()->getName());
+
+            $link = new Link($key);
+            $link->setRoute($map->getRoute());
+            $link->setRouteParams(array('id' => null));
+
+            $mapping = $value->getMapping();
+
+            $link->setRouteOptions(array(
+                'query' => array(
+                    'query' => array(
+                        array('field' =>$mapping['mappedBy'], 'type'=>'eq', 'value' => $value->getOwner()->getId()),
+                    ),
+                ),
+            ));
+
+            return $link;
+        }
     }
 
     /**
