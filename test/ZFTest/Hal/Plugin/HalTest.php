@@ -496,6 +496,7 @@ class HalTest extends TestCase
 
         $this->assertArrayHasKey('_links', $rendered);
         $this->assertArrayHasKey('embeddedLink', $rendered['_links']);
+        $this->assertArrayNotHasKey('embeddedLink', $rendered);
         $this->assertArrayHasKey('href', $rendered['_links']['embeddedLink']);
         $this->assertEquals('http://localhost.localdomain/contacts/bar', $rendered['_links']['embeddedLink']['href']);
     }
