@@ -480,6 +480,28 @@ class HalTest extends TestCase
         $this->assertInstanceof('ZF\Hal\Link\Link', $link);
     }
 
+    public function testResoucePropertiesCanBeLinks()
+    {
+        $embeddedLink = new Link('embeddedLink');
+        $embeddedLink->setRoute('hostname/contacts', array('id' => 'bar'));
+
+        $properties = array(
+            'id' => '10',
+            'embeddedLink' => $embeddedLink,
+        );
+
+        $resource = new Resource((object) $properties, 'foo');
+
+        $rendered = $this->plugin->renderResource($resource);
+
+        $this->assertArrayHasKey('_links', $rendered);
+        $this->assertArrayHasKey('embeddedLink', $rendered['_links']);
+        $this->assertArrayNotHasKey('embeddedLink', $rendered);
+        $this->assertArrayHasKey('href', $rendered['_links']['embeddedLink']);
+        $this->assertEquals('http://localhost.localdomain/contacts/bar', $rendered['_links']['embeddedLink']['href']);
+    }
+
+
     /**
      * @group 71
      */
