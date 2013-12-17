@@ -428,6 +428,10 @@ class Hal extends AbstractHelper implements
             if ($value instanceof Collection) {
                 $this->extractEmbeddedCollection($resource, $key, $value);
             }
+            if ($value instanceof Link) {
+                $links[$key] = $this->fromLink($value);
+                unset($resource[$key]);
+            }
         }
 
         $resource['_links'] = $links;
