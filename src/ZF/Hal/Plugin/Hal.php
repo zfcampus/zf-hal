@@ -688,10 +688,21 @@ class Hal extends AbstractHelper implements
     public function createCollectionFromMetadata($object, Metadata $metadata)
     {
         $collection = new Collection($object);
+        $collection->setCollectionName($metadata->getCollectionName());
         $collection->setCollectionRoute($metadata->getRoute());
         $collection->setResourceRoute($metadata->getResourceRoute());
         $collection->setIdentifierName($metadata->getIdentifierName());
-        $this->marshalMetadataLinks($metadata, $collection->getLinks());
+
+        $links = $collection->getLinks();
+        $this->marshalMetadataLinks($metadata, $links);
+
+        if (!$links->has('self')
+            && ($metadata->hasUrl() || $metadata->hasRoute())
+        ) {
+            $link = $this->marshalSelfLinkFromMetadata($metadata, $object);
+            $links->add($link);
+        }
+
         return $collection;
     }
 
@@ -704,6 +715,11 @@ class Hal extends AbstractHelper implements
      */
     public function injectSelfLink(LinkCollectionAwareInterface $resource, $route, $identifier = 'id')
     {
+        $links = $resource->getLinks();
+        if ($links->has('self')) {
+            return;
+        }
+
         $self = new Link('self');
         $self->setRoute($route);
 
@@ -726,7 +742,7 @@ class Hal extends AbstractHelper implements
             $self->setRouteOptions($routeOptions);
         }
 
-        $resource->getLinks()->add($self, true);
+        $links->add($self, true);
     }
 
     /**
@@ -987,12 +1003,12 @@ class Hal extends AbstractHelper implements
      *
      * @param  Metadata $metadata
      * @param  object $object
-     * @param  string $id
-     * @param  string $identifierName
+     * @param  null|string $id
+     * @param  null|string $identifierName
      * @return Link
      * @throws Exception\RuntimeException
      */
-    protected function marshalSelfLinkFromMetadata(Metadata $metadata, $object, $id, $identifierName)
+    protected function marshalSelfLinkFromMetadata(Metadata $metadata, $object, $id = null, $identifierName = null)
     {
         $link = new Link('self');
         if ($metadata->hasUrl()) {
@@ -1007,7 +1023,11 @@ class Hal extends AbstractHelper implements
             ));
         }
 
-        $params = array_merge($metadata->getRouteParams(), array($identifierName => $id));
+        $params = $metadata->getRouteParams();
+        if ($id && $identifierName) {
+            $params = array_merge($params, array($identifierName => $id));
+        }
+
         $link->setRoute($metadata->getRoute(), $params, $metadata->getRouteOptions());
         return $link;
     }

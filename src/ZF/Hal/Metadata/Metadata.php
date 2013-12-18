@@ -20,6 +20,13 @@ class Metadata
     protected $class;
 
     /**
+     * Name of the field representing the collection
+     *
+     * @var string
+     */
+    protected $collectionName = 'items';
+
+    /**
      * Hydrator to use when extracting object of this class
      *
      * @var HydratorInterface
@@ -149,6 +156,16 @@ class Metadata
     }
 
     /**
+     * Retrieve the collection name
+     *
+     * @return string
+     */
+    public function getCollectionName()
+    {
+        return $this->collectionName;
+    }
+
+    /**
      * Retrieve the hydrator to associate with this class, if any
      *
      * @return null|HydratorInterface
@@ -275,6 +292,18 @@ class Metadata
     public function isCollection()
     {
         return $this->isCollection;
+    }
+
+    /**
+     * Set the collection name
+     *
+     * @param  string $collectionName
+     * @return self
+     */
+    public function setCollectionName($collectionName)
+    {
+        $this->collectionName = (string) $collectionName;
+        return $this;
     }
 
     /**
