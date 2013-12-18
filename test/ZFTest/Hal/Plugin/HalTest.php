@@ -306,6 +306,7 @@ class HalTest extends TestCase
         $metadata = new MetadataMap(array(
             'ZFTest\Hal\Plugin\TestAsset\Collection' => array(
                 'is_collection'       => true,
+                'collection_name'     => 'collection', // should be overridden
                 'route_name'          => 'hostname/contacts',
                 'resource_route_name' => 'hostname/embedded',
             ),
@@ -806,5 +807,47 @@ class HalTest extends TestCase
                 'version' => 2,
             ),
         ), $self->getRouteOptions());
+    }
+
+    public function testRenderingCollectionUsesCollectionNameFromMetadataMap()
+    {
+        $object1 = new TestAsset\Resource('foo', 'Foo');
+        $object2 = new TestAsset\Resource('bar', 'Bar');
+        $object3 = new TestAsset\Resource('baz', 'Baz');
+
+        $collection = new TestAsset\Collection(array(
+            $object1,
+            $object2,
+            $object3,
+        ));
+
+        $metadata = new MetadataMap(array(
+            'ZFTest\Hal\Plugin\TestAsset\Resource' => array(
+                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route_name' => 'hostname/resource',
+            ),
+            'ZFTest\Hal\Plugin\TestAsset\Collection' => array(
+                'is_collection'       => true,
+                'collection_name'     => 'collection',
+                'route_name'          => 'hostname/contacts',
+                'resource_route_name' => 'hostname/embedded',
+            ),
+        ));
+
+        $this->plugin->setMetadataMap($metadata);
+
+        $halCollection = $this->plugin->createCollection($collection);
+        $rendered = $this->plugin->renderCollection($halCollection);
+
+        $this->assertRelationalLinkContains('/contacts', 'self', $rendered);
+        $this->assertArrayHasKey('_embedded', $rendered);
+        $this->assertInternalType('array', $rendered['_embedded']);
+        $this->assertArrayHasKey('collection', $rendered['_embedded']);
+
+        $renderedCollection = $rendered['_embedded']['collection'];
+
+        foreach ($renderedCollection as $resource) {
+            $this->assertRelationalLinkContains('/resource/', 'self', $resource);
+        }
     }
 }
