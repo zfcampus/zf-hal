@@ -431,6 +431,18 @@ class Hal extends AbstractHelper implements
                 $halResource->getLinks()->add($value);
                 unset($resource[$key]);
             }
+            if($value instanceof LinkCollection){
+                array_walk_recursive($value, function($link, $rel) use ($halResource){
+                    if(!($link instanceof Link)){
+                        throw new DomainException(sprintf(
+                            'Link object for relation "%s" in resource was malformed; cannot add link',
+                            $rel
+                        ));
+                    }
+                    $halResource->getLinks()->add($link);
+                });
+                unset($resource[$key]);
+            }
         }
 
         $links    = $this->fromResource($halResource);

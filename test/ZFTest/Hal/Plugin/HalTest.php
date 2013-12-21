@@ -20,6 +20,7 @@ use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use ZF\Hal\Collection;
 use ZF\Hal\Resource;
 use ZF\Hal\Link\Link;
+use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Metadata\MetadataMap;
 use ZF\Hal\Plugin\Hal as HalHelper;
 
@@ -530,6 +531,42 @@ class HalTest extends TestCase
         $this->assertArrayNotHasKey('link2', $rendered);
     }
 
+    public function testResoucePropertiesCanBeLinkCollections()
+    {
+        $link = new Link('embeddedLink');
+        $link->setRoute('hostname/contacts', array('id' => 'bar'));
+
+        //simple link
+        $collection = new LinkCollection();
+        $collection->add($link);
+
+        //array of links
+        $linkArray = new Link('arrayLink');
+        $linkArray->setRoute('hostname/contacts', array('id' => 'bar'));
+        $collection->add($linkArray);
+
+        $linkArray = new Link('arrayLink');
+        $linkArray->setRoute('hostname/contacts', array('id' => 'baz'));
+        $collection->add($linkArray);
+
+        $properties = array(
+            'id' => '10',
+            'links' => $collection,
+        );
+
+        $resource = new Resource((object) $properties, 'foo');
+
+        $rendered = $this->plugin->renderResource($resource);
+
+        $this->assertArrayHasKey('_links', $rendered);
+        $this->assertArrayHasKey('embeddedLink', $rendered['_links']);
+        $this->assertArrayNotHasKey('embeddedLink', $rendered);
+        $this->assertArrayHasKey('href', $rendered['_links']['embeddedLink']);
+        $this->assertEquals('http://localhost.localdomain/contacts/bar', $rendered['_links']['embeddedLink']['href']);
+
+        $this->assertArrayHasKey('arrayLink', $rendered['_links']);
+        $this->assertCount(2, $rendered['_links']['arrayLink']);
+    }
 
     /**
      * @group 71
