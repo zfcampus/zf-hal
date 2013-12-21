@@ -502,6 +502,34 @@ class HalTest extends TestCase
         $this->assertEquals('http://localhost.localdomain/contacts/bar', $rendered['_links']['embeddedLink']['href']);
     }
 
+    public function testResourcePropertyLinksUseHref()
+    {
+        $link1 = new Link('link1');
+        $link1->setUrl('link1');
+
+        $link2 = new Link('link2');
+        $link2->setUrl('link2');
+
+        $properties = array(
+            'id' => '10',
+            'bar' => $link1,
+            'baz' => $link2,
+        );
+
+        $resource = new Resource((object) $properties, 'foo');
+
+        $rendered = $this->plugin->renderResource($resource);
+
+        $this->assertArrayHasKey('_links', $rendered);
+        $this->assertArrayHasKey('link1', $rendered['_links']);
+        $this->assertArrayNotHasKey('bar', $rendered['_links']);
+        $this->assertArrayNotHasKey('link1', $rendered);
+
+        $this->assertArrayHasKey('link2', $rendered['_links']);
+        $this->assertArrayNotHasKey('baz', $rendered['_links']);
+        $this->assertArrayNotHasKey('link2', $rendered);
+    }
+
 
     /**
      * @group 71

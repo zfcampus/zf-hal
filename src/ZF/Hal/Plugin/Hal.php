@@ -408,7 +408,6 @@ class Hal extends AbstractHelper implements
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('resource' => $halResource));
         $resource = $halResource->resource;
         $id       = $halResource->id;
-        $links    = $this->fromResource($halResource);
         $metadataMap = $this->getMetadataMap();
 
         if (!is_array($resource)) {
@@ -429,11 +428,12 @@ class Hal extends AbstractHelper implements
                 $this->extractEmbeddedCollection($resource, $key, $value);
             }
             if ($value instanceof Link) {
-                $links[$key] = $this->fromLink($value);
+                $halResource->getLinks()->add($value);
                 unset($resource[$key]);
             }
         }
 
+        $links    = $this->fromResource($halResource);
         $resource['_links'] = $links;
 
         return $resource;
