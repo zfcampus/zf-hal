@@ -24,7 +24,8 @@ return array(
             //             'url'   => 'string absolute URI to use', // OR
             //             'route' => array(
             //                 'name'    => 'route name for this link',
-            //                 'params'  => array( /* any route params to use for link generation */ ),
+            //                 'params'  => array( /* any route params to use for link generation, link generation logic
+            //                                        automatically seed this array with the identifier of this resource */ ),
             //                 'options' => array( /* any options to pass to the router */ ),
             //             ),
             //         ),
