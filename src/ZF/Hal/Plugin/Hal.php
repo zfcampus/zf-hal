@@ -408,7 +408,6 @@ class Hal extends AbstractHelper implements
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('resource' => $halResource));
         $resource = $halResource->resource;
         $id       = $halResource->id;
-        $links    = $this->fromResource($halResource);
         $metadataMap = $this->getMetadataMap();
 
         if (!is_array($resource)) {
@@ -429,11 +428,24 @@ class Hal extends AbstractHelper implements
                 $this->extractEmbeddedCollection($resource, $key, $value);
             }
             if ($value instanceof Link) {
-                $links[$key] = $this->fromLink($value);
+                $halResource->getLinks()->add($value);
+                unset($resource[$key]);
+            }
+            if($value instanceof LinkCollection){
+                array_walk_recursive($value, function($link, $rel) use ($halResource){
+                    if(!($link instanceof Link)){
+                        throw new DomainException(sprintf(
+                            'Link object for relation "%s" in resource was malformed; cannot add link',
+                            $rel
+                        ));
+                    }
+                    $halResource->getLinks()->add($link);
+                });
                 unset($resource[$key]);
             }
         }
 
+        $links    = $this->fromResource($halResource);
         $resource['_links'] = $links;
 
         return $resource;
