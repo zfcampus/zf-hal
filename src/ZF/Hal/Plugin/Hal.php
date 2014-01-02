@@ -406,10 +406,10 @@ class Hal extends AbstractHelper implements
     public function renderResource(Resource $halResource, $renderResource = true)
     {
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('resource' => $halResource));
-        $resource = $halResource->resource;
-        $id       = $halResource->id;
-        $links    = $this->fromResource($halResource);
-        $metadataMap = $this->getMetadataMap();
+        $resource      = $halResource->resource;
+        $id            = $halResource->id;
+        $resourceLinks = $halResource->getLinks();
+        $metadataMap   = $this->getMetadataMap();
 
         if (!is_array($resource)) {
             $resource = $this->convertResourceToArray($resource);
@@ -429,13 +429,18 @@ class Hal extends AbstractHelper implements
                 $this->extractEmbeddedCollection($resource, $key, $value);
             }
             if ($value instanceof Link) {
-                $links[$key] = $this->fromLink($value);
+                $resourceLinks->add($value);
+                unset($resource[$key]);
+            }
+            if ($value instanceof LinkCollection) {
+                array_walk_recursive($value, function ($link, $rel) use ($resourceLinks) {
+                    $resourceLinks->add($link);
+                });
                 unset($resource[$key]);
             }
         }
 
-        $resource['_links'] = $links;
-
+        $resource['_links'] = $this->fromResource($halResource);
         return $resource;
     }
 
