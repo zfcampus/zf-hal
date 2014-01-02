@@ -609,15 +609,37 @@ class Hal extends AbstractHelper implements
         }
         $data = $hydrator->extract($object);
 
-        $identiferName = $metadata->getIdentifierName();
-        if (!isset($data[$identiferName])) {
+        // Search object and ancestor objects for resource config
+        $config = $this->getController()->getServiceLocator()->get('Config');
+        $findRouteIdentifier = function($objectClass) use ($config) {
+            foreach ($config['zf-rest'] as $controllerName => $resourceConfig) {
+                if ($resourceConfig['entity_class'] == $objectClass) {
+                    return $resourceConfig['identifier_name'];
+                }
+            }
+        };
+        if (!$routeIdentifierName = $findRouteIdentifier(get_class($object))) {
+            $searchObject = $object;
+            while ($searchObject = get_parent_class($searchObject)) {
+                if ($routeIdentifierName = $findRouteIdentifier($searchObject)) {
+                    break;
+                }
+            }
+        }
+
+        if (!$routeIdentifierName) {
+            throw new \Exception("Unable to find resource config");
+        }
+
+        $entityIdentifierName = $metadata->getIdentifierName();
+        if (!isset($data[$entityIdentifierName])) {
             throw new Exception\RuntimeException(sprintf(
                 'Unable to determine identifier for object of type "%s"; no fields matching "%s"',
                 get_class($object),
-                $identiferName
+                $entityIdentifierName
             ));
         }
-        $id = $data[$identiferName];
+        $id = $data[$entityIdentifierName];
 
         if (!$renderEmbeddedResources) $data = array();
 
@@ -625,7 +647,7 @@ class Hal extends AbstractHelper implements
         $links    = $resource->getLinks();
         $this->marshalMetadataLinks($metadata, $links);
         if (!$links->has('self')) {
-            $link = $this->marshalSelfLinkFromMetadata($metadata, $object, $id, $identiferName);
+            $link = $this->marshalSelfLinkFromMetadata($metadata, $object, $id, $routeIdentifierName);
             $links->add($link);
         }
 
@@ -667,7 +689,7 @@ class Hal extends AbstractHelper implements
      *
      * @param  Collection|array|object $collection
      * @param  null|string $route
-     * @param  string $identiferName
+     * @param  string $identifierName
      * @return Collection
      */
     public function createCollection($collection, $route = null)
