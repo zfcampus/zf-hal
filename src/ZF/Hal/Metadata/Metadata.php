@@ -43,7 +43,14 @@ class Metadata
      *
      * @var string
      */
-    protected $identifierName = 'id';
+    protected $entityIdentifierName = 'id';
+
+    /**
+     * Name of the route parameter identifier for the resource
+     *
+     * @var string
+     */
+    protected $routeIdentifierName = 'id';
 
     /**
      * Does the class represent a collection?
@@ -176,13 +183,23 @@ class Metadata
     }
 
     /**
-     * Retrieve the identifier name
+     * Retrieve the entity identifier name
      *
      * @return string
      */
-    public function getIdentifierName()
+    public function getEntityIdentifierName()
     {
-        return $this->identifierName;
+        return $this->entityIdentifierName;
+    }
+
+    /**
+     * Retrieve the route identifier name
+     *
+     * @return string
+     */
+    public function getRouteIdentifierName()
+    {
+        return $this->routeIdentifierName;
     }
 
     /**
@@ -342,14 +359,26 @@ class Metadata
     }
 
     /**
-     * Set the identifier name
+     * Set the entity identifier name
      *
      * @param  string|mixed $identifier
      * @return self
      */
-    public function setIdentifierName($identifier)
+    public function setEntityIdentifierName($identifier)
     {
-        $this->identifierName = $identifier;
+        $this->entityIdentifierName = $identifier;
+        return $this;
+    }
+
+    /**
+     * Set the route identifier name
+     *
+     * @param  string|mixed $identifier
+     * @return self
+     */
+    public function setRouteIdentifierName($identifier)
+    {
+        $this->routeIdentifierName = $identifier;
         return $this;
     }
 
