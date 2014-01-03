@@ -32,7 +32,7 @@ class Collection implements Link\LinkCollectionAwareInterface
      *
      * @var string
      */
-    protected $collectionName = 'items';
+    protected $collectionName;
 
     /**
      * @var string
@@ -139,38 +139,7 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function __get($name)
     {
-        $filter = new FilterChain();
-        $filter->attachByName('WordUnderscoreToCamelCase')
-               ->attachByName('StringToLower');
-
-        $validNames = array(
-            'attributes'               => 'attributes',
-            'collection'               => 'collection',
-            'collectionname'           => 'collectionName',
-            'collectionroute'          => 'collectionRoute',
-            'collectionrouteoptions'   => 'collectionRouteOptions',
-            'collectionrouteparams'    => 'collectionRouteParams',
-            'routeidentifiername'      => 'routeidentifierName',
-            'entityidentifiername'     => 'entityidentifierName',
-            'links'                    => 'links',
-            'resourcelinks'            => 'resourceLinks',
-            'resourceroute'            => 'resourceRoute',
-            'resourcerouteoptions'     => 'resourceRouteOptions',
-            'resourcerouteparams'      => 'resourceRouteParams',
-            'page'                     => 'page',
-            'pagesize'                 => 'pageSize',
-        );
-
-        $filteredName = $filter($name);
-        if (!isset($validNames[$filteredName])) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                'Invalid property name "%s"',
-                $name
-            ));
-        }
-
-#        $prop = $names[$name];
-        return $this->{$names[$filteredName]};
+        throw new \Exception('Direct query of values is deprecated.  Use getters.');
     }
 
     /**
@@ -438,5 +407,155 @@ class Collection implements Link\LinkCollectionAwareInterface
     public function getResourceLinks()
     {
         return $this->resourceLinks;
+    }
+
+    /**
+     * Attributes
+     *
+     * @return array
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * Collection
+     *
+     * @return string
+     */
+    public function getCollection()
+    {
+        return $this->collection;
+    }
+
+    /**
+     * Collection Name
+     *
+     * @return string
+     */
+    public function getCollectionName()
+    {
+        return $this->collectionName;
+    }
+
+    /**
+     * Collection Route
+     *
+     * @return string
+     */
+    public function getCollectionRoute()
+    {
+        return $this->collectionRoute;
+    }
+
+    /**
+     * Collection Route Options
+     *
+     * @return string
+     */
+    public function getCollectionRouteOptions()
+    {
+        return $this->collectionRouteOptions;
+    }
+
+    /**
+     * Collection Route Params
+     *
+     * @return string
+     */
+    public function getCollectionRouteParams()
+    {
+        return $this->collectionRouteParams;
+    }
+
+    /**
+     * Route Identifier Name
+     *
+     * @return string
+     */
+    public function getRouteidentifierName()
+    {
+        return $this->routeidentifierName;
+    }
+
+    /**
+     * Entity Identifier Name
+     *
+     * @return string
+     */
+    public function getEntityidentifierName()
+    {
+        return $this->entityidentifierName;
+    }
+
+    /**
+     * Links
+     *
+     * @return Link\LinkCollection
+     */
+    public function getLinks()
+    {
+        return $this->links;
+    }
+
+    /**
+     * Links
+     *
+     * @return Link\LinkCollection
+     */
+    public function getResourceLinks()
+    {
+        return $this->resourceLinks;
+    }
+
+    /**
+     * Resource Route
+     *
+     * @return string
+     */
+    public function getResourceRoute()
+    {
+        return $this->resourceRoute;
+    }
+
+    /**
+     * Resource Route Options
+     *
+     * @return array
+     */
+    public function getResourceRouteOptions()
+    {
+        return $this->resourceRouteOptions;
+    }
+
+    /**
+     * Resource Route Params
+     *
+     * @return array
+     */
+    public function getResourceRouteParams()
+    {
+        return $this->resourceRouteParams;
+    }
+
+    /**
+     * Page
+     *
+     * @return int
+     */
+    public function getPage()
+    {
+        return $this->page;
+    }
+
+    /**
+     * Page Size
+     *
+     * @return int
+     */
+    public function getPageSize()
+    {
+        return $this->pageSize;
     }
 }
