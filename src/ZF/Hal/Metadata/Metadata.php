@@ -143,8 +143,12 @@ class Metadata
 
             // Strip "name" from route_name and resource_route_name keys (and
             // continue honoring simply "route" and "resource_route")
-            if (strstr($filteredKey, 'route') and substr($filteredKey, -4) === 'name') {
-                $filteredKey = substr($filteredKey, 0, strlen($filteredKey) - 4);
+            // Don't generically strip all 'name's
+            if ($filteredKey === 'routename') {
+                $filteredKey = 'route';
+            }
+            if ($filteredKey === 'resourceroutename') {
+                $filteredKey = 'resourceroute';
             }
 
             $method = 'set' . $filteredKey;
@@ -152,7 +156,7 @@ class Metadata
                 $this->$method($value);
             } else {
                 throw new Exception\InvalidArgumentException(
-                    "Unhandled option passed to Metadata constructor: " . $key);
+                    "Unhandled option passed to Metadata constructor: $method " . $key);
             }
         }
     }
