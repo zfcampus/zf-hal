@@ -32,7 +32,7 @@ class Collection implements Link\LinkCollectionAwareInterface
      *
      * @var string
      */
-    protected $collectionName;
+    protected $collectionName = 'items';
 
     /**
      * @var string
@@ -476,7 +476,7 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function getRouteidentifierName()
     {
-        return $this->routeidentifierName;
+        return $this->routeIdentifierName;
     }
 
     /**
@@ -486,27 +486,7 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function getEntityidentifierName()
     {
-        return $this->entityidentifierName;
-    }
-
-    /**
-     * Links
-     *
-     * @return Link\LinkCollection
-     */
-    public function getLinks()
-    {
-        return $this->links;
-    }
-
-    /**
-     * Links
-     *
-     * @return Link\LinkCollection
-     */
-    public function getResourceLinks()
-    {
-        return $this->resourceLinks;
+        return $this->entityIdentifierName;
     }
 
     /**

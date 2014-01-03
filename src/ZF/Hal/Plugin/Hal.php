@@ -373,8 +373,8 @@ class Hal extends AbstractHelper implements
     public function renderCollection(Collection $halCollection)
     {
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('collection' => $halCollection));
-        $collection     = $halCollection->collection;
-        $collectionName = $halCollection->collectionName;
+        $collection     = $halCollection->getCollection();
+        $collectionName = $halCollection->getCollectionName();
 
         if ($collection instanceof Paginator) {
             $status = $this->injectPaginationLinks($halCollection);
@@ -383,7 +383,7 @@ class Hal extends AbstractHelper implements
             }
         }
 
-        $payload = $halCollection->attributes;
+        $payload = $halCollection->getAttributes();
         $payload['_links']    = $this->fromResource($halCollection);
         $payload['_embedded'] = array(
             $collectionName => $this->extractCollection($halCollection),
@@ -737,8 +737,8 @@ class Hal extends AbstractHelper implements
             );
         }
         if ($resource instanceof Collection) {
-            $routeParams  = $resource->collectionRouteParams;
-            $routeOptions = $resource->collectionRouteOptions;
+            $routeParams  = $resource->getCollectionRouteParams();
+            $routeOptions = $resource->getCollectionRouteOptions();
         }
 
         if (!empty($routeParams)) {
@@ -759,12 +759,12 @@ class Hal extends AbstractHelper implements
      */
     protected function injectPaginationLinks(Collection $halCollection)
     {
-        $collection = $halCollection->collection;
-        $page       = $halCollection->page;
-        $pageSize   = $halCollection->pageSize;
-        $route      = $halCollection->collectionRoute;
-        $params     = $halCollection->collectionRouteParams;
-        $options    = $halCollection->collectionRouteOptions;
+        $collection = $halCollection->getCollection();
+        $page       = $halCollection->getPage();
+        $pageSize   = $halCollection->getPageSize();
+        $route      = $halCollection->getCollectionRoute();
+        $params     = $halCollection->getCollectionRouteParams();
+        $options    = $halCollection->getCollectionRouteOptions();
 
         $collection->setItemCountPerPage($pageSize);
         $collection->setCurrentPageNumber($page);
@@ -890,7 +890,7 @@ class Hal extends AbstractHelper implements
         $resourceRouteOptions = $halCollection->getResourceRouteOptions();
         $metadataMap          = $this->getMetadataMap();
 
-        foreach ($halCollection->collection as $resource) {
+        foreach ($halCollection->getCollection() as $resource) {
             $eventParams = new ArrayObject(array(
                 'collection'   => $halCollection,
                 'resource'     => $resource,
