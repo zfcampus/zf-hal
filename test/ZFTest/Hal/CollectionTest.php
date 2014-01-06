@@ -41,55 +41,55 @@ class CollectionTest extends TestCase
     public function testPropertiesAreAccessibleFollowingConstruction()
     {
         $hal = new Collection(array(), 'item/route', array('version' => 1), array('query' => 'format=json'));
-        $this->assertEquals(array(), $hal->collection);
-        $this->assertEquals('item/route', $hal->resourceRoute);
-        $this->assertEquals(array('version' => 1), $hal->resourceRouteParams);
-        $this->assertEquals(array('query' => 'format=json'), $hal->resourceRouteOptions);
+        $this->assertEquals(array(), $hal->getCollection());
+        $this->assertEquals('item/route', $hal->getResourceRoute());
+        $this->assertEquals(array('version' => 1), $hal->getResourceRouteParams());
+        $this->assertEquals(array('query' => 'format=json'), $hal->getResourceRouteOptions());
     }
 
     public function testDefaultPageIsOne()
     {
         $hal = new Collection(array(), 'item/route');
-        $this->assertEquals(1, $hal->page);
+        $this->assertEquals(1, $hal->getPage());
     }
 
     public function testPageIsMutable()
     {
         $hal = new Collection(array(), 'item/route');
         $hal->setPage(5);
-        $this->assertEquals(5, $hal->page);
+        $this->assertEquals(5, $hal->getPage());
     }
 
     public function testDefaultPageSizeIsThirty()
     {
         $hal = new Collection(array(), 'item/route');
-        $this->assertEquals(30, $hal->pageSize);
+        $this->assertEquals(30, $hal->getPageSize());
     }
 
     public function testPageSizeIsMutable()
     {
         $hal = new Collection(array(), 'item/route');
         $hal->setPageSize(3);
-        $this->assertEquals(3, $hal->pageSize);
+        $this->assertEquals(3, $hal->getPageSize());
     }
 
     public function testDefaultCollectionNameIsItems()
     {
         $hal = new Collection(array(), 'item/route');
-        $this->assertEquals('items', $hal->collectionName);
+        $this->assertEquals('items', $hal->getCollectionName());
     }
 
     public function testCollectionNameIsMutable()
     {
         $hal = new Collection(array(), 'item/route');
         $hal->setCollectionName('records');
-        $this->assertEquals('records', $hal->collectionName);
+        $this->assertEquals('records', $hal->getCollectionName());
     }
 
     public function testDefaultAttributesAreEmpty()
     {
         $hal = new Collection(array(), 'item/route');
-        $this->assertEquals(array(), $hal->attributes);
+        $this->assertEquals(array(), $hal->getAttributes());
     }
 
     public function testAttributesAreMutable()
@@ -100,7 +100,7 @@ class CollectionTest extends TestCase
             'order' => 'desc',
         );
         $hal->setAttributes($attributes);
-        $this->assertEquals($attributes, $hal->attributes);
+        $this->assertEquals($attributes, $hal->getAttributes());
     }
 
     public function testComposesLinkCollectionByDefault()
@@ -125,6 +125,5 @@ class CollectionTest extends TestCase
         $hal   = new Collection(array(), 'item/route');
         $hal->setResourceLinks($links);
         $this->assertSame($links, $hal->getResourceLinks());
-        $this->assertSame($links, $hal->resourceLinks);
     }
 }

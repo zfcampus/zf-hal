@@ -62,10 +62,10 @@ Now we have a new problem, or rather, two new problems: by default, the
 ``ResourceController`` uses "id" as the identifier, and this same identifier
 name is used to generate URIs. How can we change that?
 
-First, the ``ResourceController`` allows you to define the identifier name for
+First, the ``ResourceController`` allows you to define the route identifier name for
 the specific resource being exposed. You can do this via the
-``setIdentifierName()`` method, but more commonly, you'll handle it via the
-``identifier_name`` configuration parameter:
+``setRouteIdentifierName()`` method, but more commonly, you'll handle it via the
+``route_identifier_name`` configuration parameter:
 
 .. code-block:: php
     :linenos:
@@ -79,7 +79,7 @@ the specific resource being exposed. You can do this via the
             ),
             'UserAddressResourceController' => array(
                 // ...
-                'identifier_name' => 'address_id',
+                'route_identifier_name' => 'address_id',
                 // ...
             ),
         ),

@@ -9,6 +9,7 @@ namespace ZF\Hal\Metadata;
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use Zend\Stdlib\Hydrator\HydratorPluginManager;
 use ZF\Hal\Exception;
+use Zend\Filter\FilterChain;
 
 class Metadata
 {
@@ -43,7 +44,14 @@ class Metadata
      *
      * @var string
      */
-    protected $identifierName = 'id';
+    protected $entityIdentifierName;
+
+    /**
+     * Name of the route parameter identifier for the resource
+     *
+     * @var string
+     */
+    protected $routeIdentifierName;
 
     /**
      * Does the class represent a collection?
@@ -109,6 +117,10 @@ class Metadata
      */
     public function __construct($class, array $options = array(), HydratorPluginManager $hydrators = null)
     {
+        $filter = new FilterChain();
+        $filter->attachByName('WordUnderscoreToCamelCase')
+               ->attachByName('StringToLower');
+
         if (!class_exists($class)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 'Class provided to %s must exist; received "%s"',
@@ -123,24 +135,28 @@ class Metadata
         }
 
         foreach ($options as $key => $value) {
-            $key = strtolower($key);
-            $key = str_replace('_', '', $key);
+            $filteredKey = $filter($key);
 
-            if ('class' == $key) {
+            if ($filteredKey === 'class') {
                 continue;
             }
 
             // Strip "name" from route_name and resource_route_name keys (and
             // continue honoring simply "route" and "resource_route")
-            if (strstr($key, 'route')
-                && 'name' == substr($key, -4)
-            ) {
-                $key = substr($key, 0, strlen($key) - 4);
+            // Don't generically strip all 'name's
+            if ($filteredKey === 'routename') {
+                $filteredKey = 'route';
+            }
+            if ($filteredKey === 'resourceroutename') {
+                $filteredKey = 'resourceroute';
             }
 
-            $method = 'set' . $key;
+            $method = 'set' . $filteredKey;
             if (method_exists($this, $method)) {
                 $this->$method($value);
+            } else {
+                throw new Exception\InvalidArgumentException(
+                    "Unhandled option passed to Metadata constructor: $method " . $key);
             }
         }
     }
@@ -176,13 +192,23 @@ class Metadata
     }
 
     /**
-     * Retrieve the identifier name
+     * Retrieve the entity identifier name
      *
      * @return string
      */
-    public function getIdentifierName()
+    public function getEntityIdentifierName()
     {
-        return $this->identifierName;
+        return $this->entityIdentifierName;
+    }
+
+    /**
+     * Retrieve the route identifier name
+     *
+     * @return string
+     */
+    public function getRouteIdentifierName()
+    {
+        return $this->routeIdentifierName;
     }
 
     /**
@@ -342,14 +368,26 @@ class Metadata
     }
 
     /**
-     * Set the identifier name
+     * Set the entity identifier name
      *
      * @param  string|mixed $identifier
      * @return self
      */
-    public function setIdentifierName($identifier)
+    public function setEntityIdentifierName($identifier)
     {
-        $this->identifierName = $identifier;
+        $this->entityIdentifierName = $identifier;
+        return $this;
+    }
+
+    /**
+     * Set the route identifier name
+     *
+     * @param  string|mixed $identifier
+     * @return self
+     */
+    public function setRouteIdentifierName($identifier)
+    {
+        $this->routeIdentifierName = $identifier;
         return $this;
     }
 
