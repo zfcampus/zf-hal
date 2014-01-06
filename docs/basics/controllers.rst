@@ -133,9 +133,9 @@ example:
                         ),
                     ),
 
-                    // If a custom identifier_name is used
+                    // If a custom route_identifier_name is used
                     // (OPTIONAL)
-                    'identifier_name'  => 'contact_id',
+                    'route_identifier_name'  => 'contact_id',
 
                     // Number of items to return per page of a collection
                     // (OPTIONAL)
