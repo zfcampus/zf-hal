@@ -44,14 +44,14 @@ class Metadata
      *
      * @var string
      */
-    protected $entityIdentifierName = 'id';
+    protected $entityIdentifierName;
 
     /**
      * Name of the route parameter identifier for the resource
      *
      * @var string
      */
-    protected $routeIdentifierName = 'id';
+    protected $routeIdentifierName;
 
     /**
      * Does the class represent a collection?

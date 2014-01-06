@@ -609,15 +609,15 @@ class Hal extends AbstractHelper implements
         }
         $data = $hydrator->extract($object);
 
-        $entityIdentiferName = $metadata->getEntityIdentifierName();
-        if (!isset($data[$entityIdentiferName])) {
+        $entityIdentifierName = $metadata->getEntityIdentifierName();
+        if ($entityIdentifierName and !isset($data[$entityIdentifierName])) {
             throw new Exception\RuntimeException(sprintf(
                 'Unable to determine entity identifier for object of type "%s"; no fields matching "%s"',
                 get_class($object),
-                $entityIdentiferName
+                $entityIdentifierName
             ));
         }
-        $id = $data[$entityIdentiferName];
+        $id = ($entityIdentifierName) ? $data[$entityIdentifierName]: null;
 
         if (!$renderEmbeddedResources) $data = array();
 
