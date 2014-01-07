@@ -389,9 +389,9 @@ class Hal extends AbstractHelper implements
             $collectionName => $this->extractCollection($halCollection),
         );
 
-        $payload['page_total'] = $halCollection->page;
+        $payload['page_total'] = count($collection);
         $payload['page_size'] = $halCollection->pageSize;
-        $payload['page_total_items'] = count($collection);
+        $payload['page_total_items'] = count($payload['_embedded'][$collectionName]);
 
         return $payload;
     }
