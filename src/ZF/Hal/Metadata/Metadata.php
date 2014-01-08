@@ -134,6 +134,8 @@ class Metadata
             $this->hydrators = $hydrators;
         }
 
+        $legacyIdentifierName = false;
+
         foreach ($options as $key => $value) {
             $filteredKey = $filter($key);
 
@@ -151,6 +153,12 @@ class Metadata
                 $filteredKey = 'resourceroute';
             }
 
+            // Fix BC issue: s/identifier_name/route_identifier_name/
+            if ($filteredKey === 'identifiername')  {
+                $legacyIdentifierName = $value;
+                continue;
+            }
+
             $method = 'set' . $filteredKey;
             if (method_exists($this, $method)) {
                 $this->$method($value);
@@ -158,6 +166,14 @@ class Metadata
                 throw new Exception\InvalidArgumentException(
                     "Unhandled option passed to Metadata constructor: $method " . $key);
             }
+        }
+
+        if ($legacyIdentifierName && ! $this->routeIdentifierName) {
+            $this->setRouteIdentifierName($legacyIdentifierName);
+        }
+
+        if ($legacyIdentifierName && ! $this->entityIdentifierName) {
+            $this->setEntityIdentifierName($legacyIdentifierName);
         }
     }
 
