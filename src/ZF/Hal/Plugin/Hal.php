@@ -373,8 +373,8 @@ class Hal extends AbstractHelper implements
     public function renderCollection(Collection $halCollection)
     {
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('collection' => $halCollection));
-        $collection     = $halCollection->collection;
-        $collectionName = $halCollection->collectionName;
+        $collection     = $halCollection->getCollection();
+        $collectionName = $halCollection->getCollectionName();
 
         if ($collection instanceof Paginator) {
             $status = $this->injectPaginationLinks($halCollection);
@@ -383,7 +383,7 @@ class Hal extends AbstractHelper implements
             }
         }
 
-        $payload = $halCollection->attributes;
+        $payload = $halCollection->getAttributes();
         $payload['_links']    = $this->fromResource($halCollection);
         $payload['_embedded'] = array(
             $collectionName => $this->extractCollection($halCollection),
@@ -609,15 +609,15 @@ class Hal extends AbstractHelper implements
         }
         $data = $hydrator->extract($object);
 
-        $identiferName = $metadata->getIdentifierName();
-        if (!isset($data[$identiferName])) {
+        $entityIdentifierName = $metadata->getEntityIdentifierName();
+        if ($entityIdentifierName and !isset($data[$entityIdentifierName])) {
             throw new Exception\RuntimeException(sprintf(
-                'Unable to determine identifier for object of type "%s"; no fields matching "%s"',
+                'Unable to determine entity identifier for object of type "%s"; no fields matching "%s"',
                 get_class($object),
-                $identiferName
+                $entityIdentifierName
             ));
         }
-        $id = $data[$identiferName];
+        $id = ($entityIdentifierName) ? $data[$entityIdentifierName]: null;
 
         if (!$renderEmbeddedResources) $data = array();
 
@@ -625,7 +625,7 @@ class Hal extends AbstractHelper implements
         $links    = $resource->getLinks();
         $this->marshalMetadataLinks($metadata, $links);
         if (!$links->has('self')) {
-            $link = $this->marshalSelfLinkFromMetadata($metadata, $object, $id, $identiferName);
+            $link = $this->marshalSelfLinkFromMetadata($metadata, $object, $id, $metadata->getRouteIdentifierName());
             $links->add($link);
         }
 
@@ -637,10 +637,10 @@ class Hal extends AbstractHelper implements
      *
      * @param  Resource|array|object $resource
      * @param  string $route
-     * @param  string $identifierName
+     * @param  string $routeIdentifierName
      * @return Resource
      */
-    public function createResource($resource, $route, $identifierName)
+    public function createResource($resource, $route, $routeIdentifierName)
     {
         $metadataMap = $this->getMetadataMap();
         if (is_object($resource) && $metadataMap->has($resource)) {
@@ -658,7 +658,7 @@ class Hal extends AbstractHelper implements
             $resource = new Resource($resource, $id);
         }
 
-        $this->injectSelfLink($resource, $route, $identifierName);
+        $this->injectSelfLink($resource, $route, $routeIdentifierName);
         return $resource;
     }
 
@@ -696,7 +696,8 @@ class Hal extends AbstractHelper implements
         $collection->setCollectionName($metadata->getCollectionName());
         $collection->setCollectionRoute($metadata->getRoute());
         $collection->setResourceRoute($metadata->getResourceRoute());
-        $collection->setIdentifierName($metadata->getIdentifierName());
+        $collection->setRouteIdentifierName($metadata->getRouteIdentifierName());
+        $collection->setEntityIdentifierName($metadata->getEntityIdentifierName());
 
         $links = $collection->getLinks();
         $this->marshalMetadataLinks($metadata, $links);
@@ -718,7 +719,7 @@ class Hal extends AbstractHelper implements
      * @param  string $route
      * @param  string $identifier
      */
-    public function injectSelfLink(LinkCollectionAwareInterface $resource, $route, $identifier = 'id')
+    public function injectSelfLink(LinkCollectionAwareInterface $resource, $route, $routeIdentifier = 'id')
     {
         $links = $resource->getLinks();
         if ($links->has('self')) {
@@ -732,12 +733,12 @@ class Hal extends AbstractHelper implements
         $routeOptions = array();
         if ($resource instanceof Resource) {
             $routeParams = array(
-                $identifier => $resource->id,
+                $routeIdentifier => $resource->id,
             );
         }
         if ($resource instanceof Collection) {
-            $routeParams  = $resource->collectionRouteParams;
-            $routeOptions = $resource->collectionRouteOptions;
+            $routeParams  = $resource->getCollectionRouteParams();
+            $routeOptions = $resource->getCollectionRouteOptions();
         }
 
         if (!empty($routeParams)) {
@@ -758,12 +759,12 @@ class Hal extends AbstractHelper implements
      */
     protected function injectPaginationLinks(Collection $halCollection)
     {
-        $collection = $halCollection->collection;
-        $page       = $halCollection->page;
-        $pageSize   = $halCollection->pageSize;
-        $route      = $halCollection->collectionRoute;
-        $params     = $halCollection->collectionRouteParams;
-        $options    = $halCollection->collectionRouteOptions;
+        $collection = $halCollection->getCollection();
+        $page       = $halCollection->getPage();
+        $pageSize   = $halCollection->getPageSize();
+        $route      = $halCollection->getCollectionRoute();
+        $params     = $halCollection->getCollectionRouteParams();
+        $options    = $halCollection->getCollectionRouteOptions();
 
         $collection->setItemCountPerPage($pageSize);
         $collection->setCurrentPageNumber($page);
@@ -883,13 +884,13 @@ class Hal extends AbstractHelper implements
     {
         $collection           = array();
         $events               = $this->getEventManager();
-        $identifierName       = $halCollection->identifierName;
-        $resourceRoute        = $halCollection->resourceRoute;
-        $resourceRouteParams  = $halCollection->resourceRouteParams;
-        $resourceRouteOptions = $halCollection->resourceRouteOptions;
+        $routeIdentifierName  = $halCollection->getRouteIdentifierName();
+        $resourceRoute        = $halCollection->getResourceRoute();
+        $resourceRouteParams  = $halCollection->getResourceRouteParams();
+        $resourceRouteOptions = $halCollection->getResourceRouteOptions();
         $metadataMap          = $this->getMetadataMap();
 
-        foreach ($halCollection->collection as $resource) {
+        foreach ($halCollection->getCollection() as $resource) {
             $eventParams = new ArrayObject(array(
                 'collection'   => $halCollection,
                 'resource'     => $resource,
@@ -944,7 +945,7 @@ class Hal extends AbstractHelper implements
             $selfLink = new Link('self');
             $selfLink->setRoute(
                 $eventParams['route'],
-                array_merge($eventParams['routeParams'], array($identifierName => $id)),
+                array_merge($eventParams['routeParams'], array($routeIdentifierName => $id)),
                 $eventParams['routeOptions']
             );
             $links->add($selfLink);
@@ -1009,11 +1010,11 @@ class Hal extends AbstractHelper implements
      * @param  Metadata $metadata
      * @param  object $object
      * @param  null|string $id
-     * @param  null|string $identifierName
+     * @param  null|string $routeIdentifierName
      * @return Link
      * @throws Exception\RuntimeException
      */
-    protected function marshalSelfLinkFromMetadata(Metadata $metadata, $object, $id = null, $identifierName = null)
+    protected function marshalSelfLinkFromMetadata(Metadata $metadata, $object, $id = null, $routeIdentifierName = null)
     {
         $link = new Link('self');
         if ($metadata->hasUrl()) {
@@ -1029,8 +1030,8 @@ class Hal extends AbstractHelper implements
         }
 
         $params = $metadata->getRouteParams();
-        if ($id && $identifierName) {
-            $params = array_merge($params, array($identifierName => $id));
+        if ($routeIdentifierName) {
+            $params = array_merge($params, array($routeIdentifierName => $id));
         }
 
         $link->setRoute($metadata->getRoute(), $params, $metadata->getRouteOptions());

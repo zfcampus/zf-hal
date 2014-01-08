@@ -8,6 +8,7 @@ namespace ZF\Hal;
 
 use Traversable;
 use Zend\Stdlib\ArrayUtils;
+use Zend\Filter\FilterChain;
 
 /**
  * Model a collection for use with HAL payloads
@@ -49,12 +50,18 @@ class Collection implements Link\LinkCollectionAwareInterface
     protected $collectionRouteParams = array();
 
     /**
-     * Resource key indicating the identifier; used for generating URIs to
-     * individual resources
+     * Name of the field representing the identifier
      *
      * @var string
      */
-    protected $identifierName = 'id';
+    protected $entityIdentifierName = 'id';
+
+    /**
+     * Name of the route parameter identifier for the resource
+     *
+     * @var string
+     */
+    protected $routeIdentifierName = 'id';
 
     /**
      * @var Link\LinkCollection
@@ -132,41 +139,7 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function __get($name)
     {
-        $names = array(
-            'attributes'               => 'attributes',
-            'collection'               => 'collection',
-            'collectionname'           => 'collectionName',
-            'collection_name'          => 'collectionName',
-            'collectionroute'          => 'collectionRoute',
-            'collection_route'         => 'collectionRoute',
-            'collectionrouteoptions'   => 'collectionRouteOptions',
-            'collection_route_options' => 'collectionRouteOptions',
-            'collectionrouteparams'    => 'collectionRouteParams',
-            'collection_route_params'  => 'collectionRouteParams',
-            'identifiername'           => 'identifierName',
-            'identifier_name'          => 'identifierName',
-            'links'                    => 'links',
-            'resourcelinks'            => 'resourceLinks',
-            'resource_links'           => 'resourceLinks',
-            'resourceroute'            => 'resourceRoute',
-            'resource_route'           => 'resourceRoute',
-            'resourcerouteoptions'     => 'resourceRouteOptions',
-            'resource_route_options'   => 'resourceRouteOptions',
-            'resourcerouteparams'      => 'resourceRouteParams',
-            'resource_route_params'    => 'resourceRouteParams',
-            'page'                     => 'page',
-            'pagesize'                 => 'pageSize',
-            'page_size'                => 'pageSize',
-        );
-        $name = strtolower($name);
-        if (!in_array($name, array_keys($names))) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                'Invalid property name "%s"',
-                $name
-            ));
-        }
-        $prop = $names[$name];
-        return $this->{$prop};
+        throw new \Exception('Direct query of values is deprecated.  Use getters.');
     }
 
     /**
@@ -252,14 +225,26 @@ class Collection implements Link\LinkCollectionAwareInterface
     }
 
     /**
-     * Set the resource key that represents the identifier name
+     * Set the route identifier name
      *
      * @param  string $name
      * @return self
      */
-    public function setIdentifierName($name)
+    public function setRouteIdentifierName($identifier)
     {
-        $this->identifierName = (string) $name;
+        $this->routeIdentifierName = $identifier;
+        return $this;
+    }
+
+    /**
+     * Set the route identifier name
+     *
+     * @param  string $name
+     * @return self
+     */
+    public function setEntityIdentifierName($identifier)
+    {
+        $this->entityIdentifierName = $identifier;
         return $this;
     }
 
@@ -422,5 +407,135 @@ class Collection implements Link\LinkCollectionAwareInterface
     public function getResourceLinks()
     {
         return $this->resourceLinks;
+    }
+
+    /**
+     * Attributes
+     *
+     * @return array
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * Collection
+     *
+     * @return string
+     */
+    public function getCollection()
+    {
+        return $this->collection;
+    }
+
+    /**
+     * Collection Name
+     *
+     * @return string
+     */
+    public function getCollectionName()
+    {
+        return $this->collectionName;
+    }
+
+    /**
+     * Collection Route
+     *
+     * @return string
+     */
+    public function getCollectionRoute()
+    {
+        return $this->collectionRoute;
+    }
+
+    /**
+     * Collection Route Options
+     *
+     * @return string
+     */
+    public function getCollectionRouteOptions()
+    {
+        return $this->collectionRouteOptions;
+    }
+
+    /**
+     * Collection Route Params
+     *
+     * @return string
+     */
+    public function getCollectionRouteParams()
+    {
+        return $this->collectionRouteParams;
+    }
+
+    /**
+     * Route Identifier Name
+     *
+     * @return string
+     */
+    public function getRouteidentifierName()
+    {
+        return $this->routeIdentifierName;
+    }
+
+    /**
+     * Entity Identifier Name
+     *
+     * @return string
+     */
+    public function getEntityidentifierName()
+    {
+        return $this->entityIdentifierName;
+    }
+
+    /**
+     * Resource Route
+     *
+     * @return string
+     */
+    public function getResourceRoute()
+    {
+        return $this->resourceRoute;
+    }
+
+    /**
+     * Resource Route Options
+     *
+     * @return array
+     */
+    public function getResourceRouteOptions()
+    {
+        return $this->resourceRouteOptions;
+    }
+
+    /**
+     * Resource Route Params
+     *
+     * @return array
+     */
+    public function getResourceRouteParams()
+    {
+        return $this->resourceRouteParams;
+    }
+
+    /**
+     * Page
+     *
+     * @return int
+     */
+    public function getPage()
+    {
+        return $this->page;
+    }
+
+    /**
+     * Page Size
+     *
+     * @return int
+     */
+    public function getPageSize()
+    {
+        return $this->pageSize;
     }
 }

@@ -29,13 +29,13 @@ the :ref:`embedded resources section <ref/embedding-resources>`:
             'metadata_map' => array(
                 'User' => array(
                     'hydrator'        => 'ObjectProperty',
-                    'identifier_name' => 'id',
+                    'route_identifier_name' => 'id',
                     'route'           => 'api/user',
                 ),
                 'Url' => array(
                     'hydrator'        => 'ObjectProperty',
                     'route'           => 'api/user/url',
-                    'identifier_name' => 'url_id',
+                    'route_identifier_name' => 'url_id',
                 ),
                 'Phones' => array(
                     'is_collection'   => true,
@@ -44,7 +44,7 @@ the :ref:`embedded resources section <ref/embedding-resources>`:
                 'Phone' => array(
                     'hydrator'        => 'ObjectProperty',
                     'route'           => 'api/user/phone',
-                    'identifier_name' => 'phone_id',
+                    'route_identifier_name' => 'phone_id',
                 ),
             ),
         ),
@@ -61,7 +61,7 @@ The following options are available for metadata maps:
 - **hydrator**: the fully qualified class name of a hydrator, or a service name
   ``Zend\Stdlib\Hydrator\HydratorPluginManager`` recognizes,  to use to extract
   the resource. (**OPTIONAL**)
-- **identifier_name**: the resource parameter corresponding to the identifier;
+- **route_identifier_name**: the resource route parameter corresponding to the identifier;
   defaults to "id". (**OPTIONAL**)
 - **is_collection**: boolean flag indicating whether or not the resource is a
   collection; defaults to "false". (**OPTIONAL**)
