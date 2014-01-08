@@ -15,7 +15,7 @@ return array(
         'metadata_map' => array(
             // 'Class Name' => array(
             //     'hydrator'        => 'Hydrator Service Name, if a resource',
-            //     'identifier_name' => 'key representing identifier, if a resource',
+            //     'entity_identifier_name' => 'identifying field name, if a resource',
             //     'route_name'      => 'name of route for this resource',
             //     'is_collection'   => 'boolean; set to true for collections',
             //     'links'           => array(

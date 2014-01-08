@@ -89,16 +89,16 @@ metadata and hydrator maps for our resources.
             'metadata_map' => array(
                 'User' => array(
                     'hydrator'        => 'ClassMethods',
-                    'identifier_name' => 'user_id',
+                    'route_identifier_name' => 'user_id',
                     'route'           => 'users',
                 ),
                 'UserAddress' => array(
                     'hydrator'        => 'ObjectProperty',
-                    'identifier_name' => 'address_id',
+                    'route_identifier_name' => 'address_id',
                     'route'           => 'users/addresses',
                 ),
                 'UserAddresses' => array(
-                    'identifier_name' => 'address_id',
+                    'route_identifier_name' => 'address_id',
                     'route'           => 'users/addresses',
                     'is_collection'   => true,
                     'route_options'   => array('query' => true),
