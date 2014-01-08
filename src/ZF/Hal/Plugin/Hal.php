@@ -623,7 +623,7 @@ class Hal extends AbstractHelper implements
 
         $resource = new Resource($data, $id);
         $links    = $resource->getLinks();
-        $this->marshalMetadataLinks($metadata, $links);
+        $this->marshalMetadataLinks($metadata, $links, $id, $identiferName);
         if (!$links->has('self')) {
             $link = $this->marshalSelfLinkFromMetadata($metadata, $object, $id, $identiferName);
             $links->add($link);
@@ -1042,10 +1042,23 @@ class Hal extends AbstractHelper implements
      *
      * @param  Metadata $metadata
      * @param  LinkCollection $links
+     * @param  null|string $id
+     * @param  null|string $identifierName
      */
-    protected function marshalMetadataLinks(Metadata $metadata, LinkCollection $links)
+    protected function marshalMetadataLinks(Metadata $metadata, LinkCollection $links, $id = null, $identifierName = null)
     {
         foreach ($metadata->getLinks() as $linkData) {
+            // Seed the route params with the identifier of this resource
+            if ($id
+                && $identifierName
+                && isset($linkData['route'])
+                && is_array($linkData['route'])
+            ) {
+                $params = isset($linkData['route']['params'])
+                                && is_array($linkData['route']['params']) ? $linkData['route']['params'] : array();
+                $linkData['route']['params'] = array_merge($params, array($identifierName => $id));
+            }
+
             $link = Link::factory($linkData);
             $links->add($link);
         }
