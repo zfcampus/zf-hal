@@ -216,10 +216,14 @@ class HalTest extends TestCase
             'ZFTest\Hal\Plugin\TestAsset\Resource' => array(
                 'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
             ),
             'ZFTest\Hal\Plugin\TestAsset\EmbeddedResource' => array(
                 'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route'    => 'hostname/embedded',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
             ),
             'ZFTest\Hal\Plugin\TestAsset\EmbeddedResourceWithCustomIdentifier' => array(
                 'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
@@ -263,10 +267,14 @@ class HalTest extends TestCase
             'ZFTest\Hal\Plugin\TestAsset\Resource' => array(
                 'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
             ),
             'ZFTest\Hal\Plugin\TestAsset\EmbeddedResource' => array(
                 'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route'    => 'hostname/embedded',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
             ),
             'ZFTest\Hal\Plugin\TestAsset\EmbeddedResourceWithCustomIdentifier' => array(
                 'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
@@ -312,6 +320,8 @@ class HalTest extends TestCase
                 'collection_name'     => 'collection', // should be overridden
                 'route_name'          => 'hostname/contacts',
                 'resource_route_name' => 'hostname/embedded',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
             ),
         ));
 
@@ -362,10 +372,14 @@ class HalTest extends TestCase
                 'is_collection'  => true,
                 'route'          => 'hostname/contacts',
                 'resource_route' => 'hostname/embedded',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
             ),
             'ZFTest\Hal\Plugin\TestAsset\Resource' => array(
                 'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
             ),
         ));
 
@@ -893,6 +907,8 @@ class HalTest extends TestCase
             'ZFTest\Hal\Plugin\TestAsset\Resource' => array(
                 'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
             ),
             'ZFTest\Hal\Plugin\TestAsset\Collection' => array(
                 'is_collection'       => true,
