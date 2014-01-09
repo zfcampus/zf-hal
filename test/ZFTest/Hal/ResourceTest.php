@@ -59,4 +59,17 @@ class ResourceTest extends TestCase
         $hal->setLinks($links);
         $this->assertSame($links, $hal->getLinks());
     }
+
+    public function testRetrievingResourceCanReturnByReference()
+    {
+        $resource = ['foo' => 'bar'];
+        $hal      = new Resource($resource, 'id');
+        $this->assertEquals($resource, $hal->resource);
+
+        $resource =& $hal->resource;
+        $resource['foo'] = 'baz';
+
+        $secondRetrieval =& $hal->resource;
+        $this->assertEquals('baz', $secondRetrieval['foo']);
+    }
 }
