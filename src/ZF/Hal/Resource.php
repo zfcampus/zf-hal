@@ -38,7 +38,7 @@ class Resource implements Link\LinkCollectionAwareInterface
      * @param  string $name
      * @return mixed
      */
-    public function __get($name)
+    public function &__get($name)
     {
         $names = array(
             'resource'     => 'resource',
