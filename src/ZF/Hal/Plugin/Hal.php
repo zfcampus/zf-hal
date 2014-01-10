@@ -667,7 +667,6 @@ class Hal extends AbstractHelper implements
      *
      * @param  Collection|array|object $collection
      * @param  null|string $route
-     * @param  string $identiferName
      * @return Collection
      */
     public function createCollection($collection, $route = null)
