@@ -20,7 +20,7 @@ HalResource and HalCollection
 ``PhlyRestfully\HalResource`` and ``PhlyRestfully\HalCollection`` are simply
 wrappers for the resources and collections you create, and provide the ability
 to aggregate referential links. Links are aggregated in a
-``PhlyRestfully\LinkCollection`` as individual ``PhlyRestfully\Link`` objects. 
+``PhlyRestfully\LinkCollection`` as individual ``PhlyRestfully\Link`` objects.
 
 ``HalResource`` requires that you pass a resource and its identifier in the
 constructor, and then allows you to aggregate links:
@@ -71,8 +71,8 @@ addition of several relational links.
 .. code-block:: php
     :linenos:
 
-    use PhlyRestfully\HalCollection; 
-    use PhlyRestfully\Link; 
+    use PhlyRestfully\HalCollection;
+    use PhlyRestfully\Link;
 
     // Assume $users is an iterable set of users for seeding the collection.
     $collection = new HalCollection($users);
@@ -142,7 +142,7 @@ The signature of the constructor is:
     :linenos:
 
     public function __construct(
-        $httpStatus,                // HTTP status code used for the response
+        $status,                // HTTP status code used for the response
         $detail,                    // Summary of what happened
         $describedBy = null,        // URI to a description of the problem
         $title = null,              // Generic title for the problem
@@ -156,7 +156,7 @@ listener, and it will be used directly.
     :linenos:
 
     use PhlyRestfully\ApiProblem;
-    
+
     return new ApiProblem(
         418,
         'Exceeded rate limit',

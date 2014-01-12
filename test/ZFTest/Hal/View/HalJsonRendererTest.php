@@ -340,8 +340,8 @@ class HalJsonRendererTest extends TestCase
         $test       = $this->renderer->render($model);
         $test       = json_decode($test);
 
-        $this->assertObjectHasAttribute('httpStatus', $test, var_export($test, 1));
-        $this->assertEquals(409, $test->httpStatus);
+        $this->assertObjectHasAttribute('status', $test, var_export($test, 1));
+        $this->assertEquals(409, $test->status);
         $this->assertObjectHasAttribute('detail', $test);
         $this->assertEquals('Invalid page provided', $test->detail);
     }

@@ -76,7 +76,7 @@ needs to define the following methods:
 - **getDescribedBy()**, which should return a URI for the "describedBy" field.
 - **getTitle()**, which should return a string for the "title" field.
 
-The exception code and message will be used for the "httpStatus" and "detail",
+The exception code and message will be used for the "status" and "detail",
 respectively.
 
 The ``CreationException``, ``UpdateException``, and ``PatchException`` types all

@@ -17,13 +17,13 @@ returning ``Api-Problem`` payloads.
 API-Problem
 -----------
 
-This mediatype, ``application/api-problem+json`` is `via the IETF
+This mediatype, ``application/problem+json`` is `via the IETF
 <http://tools.ietf.org/html/draft-nottingham-http-problem-02>`_, and actually
 also includes an XML variant. The structure includes the following properties:
 
 - **describedBy**: a URL to a document describing the error condition (required)
 - **title**: a brief title for the error condition (required)
-- **httpStatus**: the HTTP status code for the current request (optional)
+- **status**: the HTTP status code for the current request (optional)
 - **detail**: error details specific to this request (optional)
 - **supportId**: a URL to the specific problem occurrence (e.g., to a log message) (optional)
 
@@ -32,12 +32,12 @@ As an example payload:
 .. code-block:: http
 
     HTTP/1.1 500 Internal Error
-    Content-Type: application/api-problem+json
-    
+    Content-Type: application/problem+json
+
     {
         "describedBy": "http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html",
         "detail": "Status failed validation",
-        "httpStatus": 500,
+        "status": 500,
         "title": "Internal Server Error"
     }
 
