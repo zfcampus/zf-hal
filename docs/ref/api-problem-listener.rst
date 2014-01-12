@@ -48,7 +48,7 @@ exception, setting it as the result.
 
 This latter bit, the ``Accept`` header matching, is configurable. If you want to
 allow an API-Problem response for other than the default set of mediatypes
-(``application/hal+json``, ``application/api-problem+json``, and
+(``application/hal+json``, ``application/problem+json``, and
 ``application/json``), you can do so via your configuration. Set the value in
 the ``accept_filter`` subkey of the ``zf-hal`` configuration; the value
 should be a comma-separated set of mimetypes.
