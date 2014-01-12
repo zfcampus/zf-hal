@@ -306,9 +306,9 @@
           <description>Constructor</description>
           <long-description>&lt;p&gt;Create an instance using the provided information. If nothing is
 provided for the describedBy field, the class default will be used;
-if the httpStatus matches any known, the title field will be selected
+if the status matches any known, the title field will be selected
 from $problemStatusTitles as a result.&lt;/p&gt;</long-description>
-          <tag line="118" name="param" description="" type="int" variable="$httpStatus">
+          <tag line="118" name="param" description="" type="int" variable="$status">
             <type by_reference="false">int</type>
           </tag>
           <tag line="118" name="param" description="" type="string" variable="$detail">
@@ -322,7 +322,7 @@ from $problemStatusTitles as a result.&lt;/p&gt;</long-description>
           </tag>
         </docblock>
         <argument line="131">
-          <name>$httpStatus</name>
+          <name>$status</name>
           <default></default>
           <type/>
         </argument>
@@ -1944,7 +1944,7 @@ a Content-Type header appropriate to the response it describes.</description>
 
 &lt;ul&gt;
 &lt;li&gt;application/hal+json for a result that contains HAL-compliant links&lt;/li&gt;
-&lt;li&gt;application/api-problem+json for a result that contains a Problem
+&lt;li&gt;application/problem+json for a result that contains a Problem
 API-formatted response&lt;/li&gt;
 &lt;li&gt;application/json for all other responses&lt;/li&gt;
 &lt;/ul&gt;</long-description>
