@@ -87,16 +87,16 @@ stack trace and previous exception information.</span><pre>setDetailIncludesStac
 <i class="icon-custom icon-method"></i> Methods</h3>
 <a id="method___construct"></a><div class="element clickable method public method___construct" data-toggle="collapse" data-target=".method___construct .collapse">
 <h2>Constructor</h2>
-<pre>__construct(int $httpStatus, string $detail, string $describedBy, string $title, array $additional) </pre>
+<pre>__construct(int $status, string $detail, string $describedBy, string $title, array $additional) </pre>
 <div class="labels"></div>
 <div class="row collapse"><div class="detail-description">
 <div class="long_description"><p>Create an instance using the provided information. If nothing is
 provided for the describedBy field, the class default will be used;
-if the httpStatus matches any known, the title field will be selected
+if the status matches any known, the title field will be selected
 from $problemStatusTitles as a result.</p></div>
 <h3>Parameters</h3>
 <div class="subelement argument">
-<h4>$httpStatus</h4>
+<h4>$status</h4>
 <code>int</code>
 </div>
 <div class="subelement argument">
