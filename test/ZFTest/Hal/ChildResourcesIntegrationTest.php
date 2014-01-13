@@ -271,7 +271,7 @@ class ChildResourcesIntegrationTest extends TestCase
         $this->helpers->get('url')->setRouter($router);
     }
 
-    public function testChildResourceObjectIdentiferMapping()
+    public function testChildResourceObjectIdentifierMapping()
     {
         $this->setUpAlternateRouter();
 
