@@ -40,11 +40,11 @@
     "require-dev": {
         "phpunit/PHPUnit": "3.7.*",
         "zendframework/zend-console": "~2.3-dev",
+        "zendframework/zend-filter": "~2.3-dev",
         "zendframework/zend-http": "~2.3-dev",
         "zendframework/zend-loader": "~2.3-dev",
         "zendframework/zend-servicemanager": "~2.3-dev",
-        "zendframework/zend-validator": "~2.3-dev",
-        "zendframework/zend-filter": "~2.3-dev"
+        "zendframework/zend-validator": "~2.3-dev"
     },
     "autoload": {
         "psr-0": {
