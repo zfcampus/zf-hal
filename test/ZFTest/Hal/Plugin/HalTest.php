@@ -13,6 +13,8 @@ use Zend\Mvc\Router\RouteMatch;
 use Zend\Mvc\Router\SimpleRouteStack;
 use Zend\Mvc\Router\Http\Segment;
 use Zend\Mvc\MvcEvent;
+use Zend\Paginator\Adapter\ArrayAdapter as ArrayPaginator;
+use Zend\Paginator\Paginator;
 use Zend\Uri\Http;
 use Zend\Uri\Uri;
 use Zend\View\Helper\Url as UrlHelper;
@@ -499,7 +501,7 @@ class HalTest extends TestCase
         $this->assertInstanceof('ZF\Hal\Link\Link', $link);
     }
 
-    public function testResoucePropertiesCanBeLinks()
+    public function testResourcePropertiesCanBeLinks()
     {
         $embeddedLink = new Link('embeddedLink');
         $embeddedLink->setRoute('hostname/contacts', array('id' => 'bar'));
@@ -933,5 +935,65 @@ class HalTest extends TestCase
         foreach ($renderedCollection as $resource) {
             $this->assertRelationalLinkContains('/resource/', 'self', $resource);
         }
+    }
+
+    /**
+     * @group 14
+     */
+    public function testRenderingPaginatorCollectionRendersPaginationAttributes()
+    {
+        $set = [];
+        for ($id = 1; $id <= 100; $id += 1) {
+            $resource = new Resource((object) ['id' => $id, 'name' => 'foo'], 'foo');
+            $links = $resource->getLinks();
+            $self = new Link('self');
+            $self->setRoute('hostname/users', ['id' => $id]);
+            $links->add($self);
+            $set[] = $resource;
+        }
+
+        $paginator  = new Paginator(new ArrayPaginator($set));
+        $collection = new Collection($paginator);
+        $collection->setCollectionName('users');
+        $collection->setCollectionRoute('hostname/users');
+        $collection->setPage(3);
+        $collection->setPageSize(10);
+
+        $rendered = $this->plugin->renderCollection($collection);
+        $expected = [
+            '_links',
+            '_embedded',
+            'page_count',
+            'page_size',
+            'total_items',
+        ];
+        $this->assertEquals($expected, array_keys($rendered));
+        $this->assertEquals(100, $rendered['total_items']);
+        $this->assertEquals(10, $rendered['page_count']);
+        $this->assertEquals(10, $rendered['page_size']);
+    }
+
+
+    /**
+     * @group 14
+     */
+    public function testRenderingNonPaginatorCollectionRendersCountOfTotalItems()
+    {
+        $embedded = new Resource((object) array('id' => 'foo', 'name' => 'foo'), 'foo');
+        $links = $embedded->getLinks();
+        $self = new Link('self');
+        $self->setRoute('hostname/users', array('id' => 'foo'));
+        $links->add($self);
+
+        $collection = new Collection(array($embedded));
+        $collection->setCollectionName('users');
+        $self = new Link('self');
+        $self->setRoute('hostname/users');
+        $collection->getLinks()->add($self);
+
+        $rendered = $this->plugin->renderCollection($collection);
+
+        $expectedKeys = ['_links', '_embedded', 'total_items'];
+        $this->assertEquals($expectedKeys, array_keys($rendered));
     }
 }

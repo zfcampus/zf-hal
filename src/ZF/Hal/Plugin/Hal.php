@@ -390,11 +390,11 @@ class Hal extends AbstractHelper implements
         );
 
         if ($collection instanceof Paginator) {
-            $payload['page_count'] = $collection->count();
-            $payload['page_size'] = $halCollection->getPageSize();
-            $payload['total_items'] = (int) $collection->getTotalItemCount();
+            $payload['page_count']  = isset($payload['page_count'])  ? $payload['page_count']  : $collection->count();
+            $payload['page_size']   = isset($payload['page_size'])   ? $payload['page_size']   : $halCollection->getPageSize();
+            $payload['total_items'] = isset($payload['total_items']) ? $payload['total_items'] : (int) $collection->getTotalItemCount();
         } elseif (is_array($collection) || $collection instanceof Countable) {
-            $payload['total_items'] = count($collection);
+            $payload['total_items'] = isset($payload['total_items']) ? $payload['total_items'] : count($collection);
         }
 
         return $payload;
