@@ -8,6 +8,7 @@ namespace ZF\Hal;
 
 use Zend\Stdlib\Hydrator\HydratorInterface;
 use Zend\Stdlib\Hydrator\HydratorPluginManager;
+use Zend\Mvc\MvcEvent;
 
 /**
  * ZF2 module
@@ -179,7 +180,7 @@ class Module
         $app      = $e->getTarget();
         $services = $app->getServiceManager();
         $events   = $app->getEventManager();
-        $events->attach('render', array($this, 'onRender'), 100);
+        $events->attach(MvcEvent::EVENT_RENDER, array($this, 'onRender'), 100);
     }
 
     /**
