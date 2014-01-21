@@ -104,8 +104,9 @@ class Collection implements Link\LinkCollectionAwareInterface
 
     /**
      * @param  array|Traversable|\Zend\Paginator\Paginator $collection
-     * @param  string $collectionRoute
      * @param  string $resourceRoute
+     * @param  array|Traversable $resourceRouteParams
+     * @param  array|Traversable $resourceRouteOptions
      * @throws Exception\InvalidCollectionException
      */
     public function __construct($collection, $resourceRoute = null, $resourceRouteParams = null, $resourceRouteOptions = null)
