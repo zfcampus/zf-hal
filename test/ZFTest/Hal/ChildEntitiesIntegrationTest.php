@@ -15,7 +15,7 @@ use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use Zend\View\Helper\Url as UrlHelper;
 use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Collection;
-use ZF\Hal\Resource;
+use ZF\Hal\Entity;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Plugin\Hal as HalHelper;
 use ZF\Hal\View\HalJsonModel;
@@ -24,7 +24,7 @@ use ZF\Hal\View\HalJsonRenderer;
 /**
  * @subpackage UnitTest
  */
-class ChildResourcesIntegrationTest extends TestCase
+class ChildEntitiesIntegrationTest extends TestCase
 {
     public function setUp()
     {
@@ -97,36 +97,36 @@ class ChildResourcesIntegrationTest extends TestCase
         $router->addRoutes($routes);
     }
 
-    public function setUpParentResource()
+    public function setUpParentEntity()
     {
         $this->parent = (object) array(
             'id'   => 'anakin',
             'name' => 'Anakin Skywalker',
         );
-        $resource = new Resource($this->parent, 'anakin');
+        $entity = new Entity($this->parent, 'anakin');
 
         $link = new Link('self');
         $link->setRoute('parent');
         $link->setRouteParams(array('parent'=> 'anakin'));
-        $resource->getLinks()->add($link);
+        $entity->getLinks()->add($link);
 
-        return $resource;
+        return $entity;
     }
 
-    public function setUpChildResource($id, $name)
+    public function setUpChildEntity($id, $name)
     {
         $this->child = (object) array(
             'id'   => $id,
             'name' => $name,
         );
-        $resource = new Resource($this->child, $id);
+        $entity = new Entity($this->child, $id);
 
         $link = new Link('self');
         $link->setRoute('parent/child');
         $link->setRouteParams(array('child'=> $id));
-        $resource->getLinks()->add($link);
+        $entity->getLinks()->add($link);
 
-        return $resource;
+        return $entity;
     }
 
     public function setUpChildCollection()
@@ -137,11 +137,11 @@ class ChildResourcesIntegrationTest extends TestCase
         );
         $this->collection = array();
         foreach ($children as $info) {
-            $collection[] = call_user_func_array(array($this, 'setUpChildResource'), $info);
+            $collection[] = call_user_func_array(array($this, 'setUpChildEntity'), $info);
         }
         $collection = new Collection($this->collection);
         $collection->setCollectionRoute('parent/child');
-        $collection->setResourceRoute('parent/child');
+        $collection->setEntityRoute('parent/child');
         $collection->setPage(1);
         $collection->setPageSize(10);
         $collection->setCollectionName('child');
@@ -153,7 +153,7 @@ class ChildResourcesIntegrationTest extends TestCase
         return $collection;
     }
 
-    public function testParentResourceRendersAsExpected()
+    public function testParentEntityRendersAsExpected()
     {
         $uri = 'http://localhost.localdomain/api/parent/anakin';
         $request = new Request();
@@ -166,7 +166,7 @@ class ChildResourcesIntegrationTest extends TestCase
         // Emulate url helper factory and inject route matches
         $this->helpers->get('url')->setRouteMatch($matches);
 
-        $parent = $this->setUpParentResource();
+        $parent = $this->setUpParentEntity();
         $model  = new HalJsonModel();
         $model->setPayload($parent);
 
@@ -178,7 +178,7 @@ class ChildResourcesIntegrationTest extends TestCase
         $this->assertEquals('http://localhost.localdomain/api/parent/anakin', $test->_links->self->href);
     }
 
-    public function testChildResourceRendersAsExpected()
+    public function testChildEntityRendersAsExpected()
     {
         $uri = 'http://localhost.localdomain/api/parent/anakin/child/luke';
         $request = new Request();
@@ -192,7 +192,7 @@ class ChildResourcesIntegrationTest extends TestCase
         // Emulate url helper factory and inject route matches
         $this->helpers->get('url')->setRouteMatch($matches);
 
-        $child = $this->setUpChildResource('luke', 'Luke Skywalker');
+        $child = $this->setUpChildEntity('luke', 'Luke Skywalker');
         $model = new HalJsonModel();
         $model->setPayload($child);
 
@@ -271,7 +271,7 @@ class ChildResourcesIntegrationTest extends TestCase
         $this->helpers->get('url')->setRouter($router);
     }
 
-    public function testChildResourceObjectIdentifierMapping()
+    public function testChildEntityObjectIdentifierMapping()
     {
         $this->setUpAlternateRouter();
 
@@ -287,7 +287,7 @@ class ChildResourcesIntegrationTest extends TestCase
         // Emulate url helper factory and inject route matches
         $this->helpers->get('url')->setRouteMatch($matches);
 
-        $child = $this->setUpChildResource('luke', 'Luke Skywalker');
+        $child = $this->setUpChildEntity('luke', 'Luke Skywalker');
         $model = new HalJsonModel();
         $model->setPayload($child);
 
@@ -299,7 +299,7 @@ class ChildResourcesIntegrationTest extends TestCase
         $this->assertEquals('http://localhost.localdomain/api/parent/anakin/child/luke', $test->_links->self->href);
     }
 
-    public function testChildResourceIdentifierMappingInsideCollection()
+    public function testChildEntityIdentifierMappingInsideCollection()
     {
         $this->setUpAlternateRouter();
 

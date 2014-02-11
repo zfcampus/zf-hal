@@ -19,7 +19,7 @@ use Zend\View\Model\ViewModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Collection;
-use ZF\Hal\Resource;
+use ZF\Hal\Entity;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Plugin\Hal as HalHelper;
 use ZF\Hal\View\HalJsonModel;
@@ -36,36 +36,36 @@ class HalJsonRendererTest extends TestCase
         $this->renderer = new HalJsonRenderer(new ApiProblemRenderer());
     }
 
-    public function assertIsResource($resource)
+    public function assertIsEntity($entity)
     {
-        $this->assertInstanceOf('stdClass', $resource, 'Invalid HAL resource; not an object');
-        $this->assertObjectHasAttribute('_links', $resource, 'Invalid HAL resource; does not contain links');
-        $links = $resource->_links;
-        $this->assertInstanceOf('stdClass', $links, 'Invalid HAL resource; links are not an object');
+        $this->assertInstanceOf('stdClass', $entity, 'Invalid HAL entity; not an object');
+        $this->assertObjectHasAttribute('_links', $entity, 'Invalid HAL entity; does not contain links');
+        $links = $entity->_links;
+        $this->assertInstanceOf('stdClass', $links, 'Invalid HAL entity; links are not an object');
     }
 
-    public function assertResourceHasRelationalLink($relation, $resource)
+    public function assertEntityHasRelationalLink($relation, $entity)
     {
-        $this->assertIsResource($resource);
-        $links = $resource->_links;
+        $this->assertIsEntity($entity);
+        $links = $entity->_links;
         $this->assertObjectHasAttribute($relation, $links, sprintf('HAL links do not contain relation "%s"', $relation));
         $link = $links->{$relation};
         $this->assertInstanceOf('stdClass', $link, sprintf('Relational links for "%s" are malformed', $relation));
     }
 
-    public function assertRelationalLinkContains($match, $relation, $resource)
+    public function assertRelationalLinkContains($match, $relation, $entity)
     {
-        $this->assertResourceHasRelationalLink($relation, $resource);
-        $link = $resource->_links->{$relation};
+        $this->assertEntityHasRelationalLink($relation, $entity);
+        $link = $entity->_links->{$relation};
         $this->assertObjectHasAttribute('href', $link, sprintf('%s relational link does not have an href attribute; received %s', $relation, var_export($link, 1)));
         $href = $link->href;
         $this->assertContains($match, $href);
     }
 
-    public function assertRelationalLinkEquals($match, $relation, $resource)
+    public function assertRelationalLinkEquals($match, $relation, $entity)
     {
-        $this->assertResourceHasRelationalLink($relation, $resource);
-        $link = $resource->_links->{$relation};
+        $this->assertEntityHasRelationalLink($relation, $entity);
+        $link = $entity->_links->{$relation};
         $this->assertObjectHasAttribute('href', $link, sprintf('%s relational link does not have an href attribute; received %s', $relation, var_export($link, 1)));
         $href = $link->href;
         $this->assertEquals($match, $href);
@@ -94,8 +94,8 @@ class HalJsonRendererTest extends TestCase
         // need to setup routes
         // need to get a url and serverurl helper that have appropriate injections
         $this->router = $router = new TreeRouteStack();
-        $this->resourceRoute = new Segment('/resource[/[:id]]');
-        $this->router->addRoute('resource', $this->resourceRoute);
+        $this->entityRoute = new Segment('/resource[/[:id]]');
+        $this->router->addRoute('resource', $this->entityRoute);
 
         $this->helpers = $helpers  = new HelperPluginManager();
         $serverUrl = $helpers->get('ServerUrl');
@@ -111,11 +111,11 @@ class HalJsonRendererTest extends TestCase
         $this->renderer->setHelperPluginManager($helpers);
     }
 
-    public function testRendersResourceWithAssociatedLinks()
+    public function testRendersEntityWithAssociatedLinks()
     {
         $this->setUpHelpers();
 
-        $item = new Resource(array(
+        $item = new Entity(array(
             'foo' => 'bar',
             'id'  => 'identifier',
         ), 'identifier');
@@ -133,7 +133,7 @@ class HalJsonRendererTest extends TestCase
         $this->assertEquals('bar', $test->foo);
     }
 
-    public function testCanRenderStdclassResource()
+    public function testCanRenderStdclassEntity()
     {
         $this->setUpHelpers();
 
@@ -142,7 +142,7 @@ class HalJsonRendererTest extends TestCase
             'id'  => 'identifier',
         );
 
-        $item  = new Resource($item, 'identifier', 'resource');
+        $item  = new Entity($item, 'identifier', 'resource');
         $links = $item->getLinks();
         $self  = new Link('self');
         $self->setRoute('resource')->setRouteParams(array('id' => 'identifier'));
@@ -157,7 +157,7 @@ class HalJsonRendererTest extends TestCase
         $this->assertEquals('bar', $test->foo);
     }
 
-    public function testCanSerializeHydratableResource()
+    public function testCanSerializeHydratableEntity()
     {
         $this->setUpHelpers();
         $this->helpers->get('Hal')->addHydrator(
@@ -166,7 +166,7 @@ class HalJsonRendererTest extends TestCase
         );
 
         $item  = new TestAsset\ArraySerializable();
-        $item  = new Resource(new TestAsset\ArraySerializable(), 'identifier', 'resource');
+        $item  = new Entity(new TestAsset\ArraySerializable(), 'identifier', 'resource');
         $links = $item->getLinks();
         $self  = new Link('self');
         $self->setRoute('resource')->setRouteParams(array('id' => 'identifier'));
@@ -189,7 +189,7 @@ class HalJsonRendererTest extends TestCase
         );
 
         $item  = new TestAsset\ArraySerializable();
-        $item  = new Resource(new TestAsset\ArraySerializable(), 'identifier', 'resource');
+        $item  = new Entity(new TestAsset\ArraySerializable(), 'identifier', 'resource');
         $links = $item->getLinks();
         $self  = new Link('self');
         $self->setRoute('resource')->setRouteParams(array('id' => 'identifier'));
@@ -219,7 +219,7 @@ class HalJsonRendererTest extends TestCase
 
         $collection = new Collection($items);
         $collection->setCollectionRoute('resource');
-        $collection->setResourceRoute('resource');
+        $collection->setEntityRoute('resource');
         $links = $collection->getLinks();
         $self  = new Link('self');
         $self->setRoute('resource');
@@ -267,7 +267,7 @@ class HalJsonRendererTest extends TestCase
         $collection->setPageSize(5);
         $collection->setPage(3);
         $collection->setCollectionRoute('resource');
-        $collection->setResourceRoute('resource');
+        $collection->setEntityRoute('resource');
         $links = $collection->getLinks();
         $self  = new Link('self');
         $self->setRoute('resource');
@@ -378,7 +378,7 @@ class HalJsonRendererTest extends TestCase
         $this->assertEquals('foo', $test->type);
     }
 
-    public function testRendersAttributeAsPartOfPaginatedCollectionResource()
+    public function testRendersAttributeAsPartOfPaginatedCollection()
     {
         $this->setUpHelpers();
 
@@ -403,7 +403,7 @@ class HalJsonRendererTest extends TestCase
         $collection->setPage(3);
         $collection->setAttributes($attributes);
         $collection->setCollectionRoute('resource');
-        $collection->setResourceRoute('resource');
+        $collection->setEntityRoute('resource');
         $links = $collection->getLinks();
         $self  = new Link('self');
         $self->setRoute('resource');
@@ -420,12 +420,12 @@ class HalJsonRendererTest extends TestCase
         $this->assertEquals('foo', $test->type);
     }
 
-    public function testCanRenderNestedResourcesAsEmbeddedResources()
+    public function testCanRenderNestedEntitiesAsEmbeddedEntities()
     {
         $this->setUpHelpers();
         $this->router->addRoute('user', new Segment('/user[/:id]'));
 
-        $child = new Resource(array(
+        $child = new Entity(array(
             'id'     => 'matthew',
             'name'   => 'matthew',
             'github' => 'weierophinney',
@@ -434,7 +434,7 @@ class HalJsonRendererTest extends TestCase
         $link->setRoute('user')->setRouteParams(array('id' => 'matthew'));
         $child->getLinks()->add($link);
 
-        $item = new Resource(array(
+        $item = new Entity(array(
             'foo'  => 'bar',
             'id'   => 'identifier',
             'user' => $child,
@@ -454,18 +454,18 @@ class HalJsonRendererTest extends TestCase
         $user = $embedded->user;
         $this->assertRelationalLinkContains('/user/matthew', 'self', $user);
         $user = (array) $user;
-        foreach ($child->resource as $key => $value) {
+        foreach ($child->entity as $key => $value) {
             $this->assertArrayHasKey($key, $user);
             $this->assertEquals($value, $user[$key]);
         }
     }
 
-    public function testRendersEmbeddedResourcesOfIndividualNonPaginatedCollectionResources()
+    public function testRendersEmbeddedEntitiesOfIndividualNonPaginatedCollections()
     {
         $this->setUpHelpers();
         $this->router->addRoute('user', new Segment('/user[/:id]'));
 
-        $child = new Resource(array(
+        $child = new Entity(array(
             'id'     => 'matthew',
             'name'   => 'matthew',
             'github' => 'weierophinney',
@@ -485,7 +485,7 @@ class HalJsonRendererTest extends TestCase
 
         $collection = new Collection($items);
         $collection->setCollectionRoute('resource');
-        $collection->setResourceRoute('resource');
+        $collection->setEntityRoute('resource');
         $links = $collection->getLinks();
         $self  = new Link('self');
         $self->setRoute('resource');
@@ -504,19 +504,19 @@ class HalJsonRendererTest extends TestCase
             $user = $embedded->user;
             $this->assertRelationalLinkContains('/user/matthew', 'self', $user);
             $user = (array) $user;
-            foreach ($child->resource as $key => $value) {
+            foreach ($child->entity as $key => $value) {
                 $this->assertArrayHasKey($key, $user);
                 $this->assertEquals($value, $user[$key]);
             }
         }
     }
 
-    public function testRendersEmbeddedResourcesOfIndividualPaginatedCollectionResources()
+    public function testRendersEmbeddedEntitiesOfIndividualPaginatedCollections()
     {
         $this->setUpHelpers();
         $this->router->addRoute('user', new Segment('/user[/:id]'));
 
-        $child = new Resource(array(
+        $child = new Entity(array(
             'id'     => 'matthew',
             'name'   => 'matthew',
             'github' => 'weierophinney',
@@ -540,7 +540,7 @@ class HalJsonRendererTest extends TestCase
         $collection->setPageSize(5);
         $collection->setPage(1);
         $collection->setCollectionRoute('resource');
-        $collection->setResourceRoute('resource');
+        $collection->setEntityRoute('resource');
         $links = $collection->getLinks();
         $self  = new Link('self');
         $self->setRoute('resource');
@@ -559,26 +559,26 @@ class HalJsonRendererTest extends TestCase
             $user = $embedded->user;
             $this->assertRelationalLinkContains('/user/matthew', 'self', $user);
             $user = (array) $user;
-            foreach ($child->resource as $key => $value) {
+            foreach ($child->entity as $key => $value) {
                 $this->assertArrayHasKey($key, $user);
                 $this->assertEquals($value, $user[$key]);
             }
         }
     }
 
-    public function testAllowsSpecifyingAlternateCallbackForReturningResourceId()
+    public function testAllowsSpecifyingAlternateCallbackForReturningEntityId()
     {
         $this->setUpHelpers();
 
-        $this->helpers->get('Hal')->getEventManager()->attach('getIdFromResource', function ($e) {
-            $resource = $e->getParam('resource');
+        $this->helpers->get('Hal')->getEventManager()->attach('getIdFromEntity', function ($e) {
+            $entity = $e->getParam('entity');
 
-            if (!is_array($resource)) {
+            if (!is_array($entity)) {
                 return false;
             }
 
-            if (array_key_exists('name', $resource)) {
-                return $resource['name'];
+            if (array_key_exists('name', $entity)) {
+                return $entity['name'];
             }
 
             return false;
@@ -595,7 +595,7 @@ class HalJsonRendererTest extends TestCase
 
         $collection = new Collection($items);
         $collection->setCollectionRoute('resource');
-        $collection->setResourceRoute('resource');
+        $collection->setEntityRoute('resource');
         $links = $collection->getLinks();
         $self  = new Link('self');
         $self->setRoute('resource');

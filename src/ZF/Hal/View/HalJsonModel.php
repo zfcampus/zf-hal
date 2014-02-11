@@ -7,7 +7,7 @@
 namespace ZF\Hal\View;
 
 use ZF\Hal\Collection;
-use ZF\Hal\Resource;
+use ZF\Hal\Entity;
 use Zend\View\Model\JsonModel;
 
 /**
@@ -35,12 +35,26 @@ class HalJsonModel extends JsonModel
     /**
      * Does the payload represent a HAL item?
      *
+     * Deprecated; please use isEntity().
+     *
+     * @deprecated
      * @return bool
      */
     public function isResource()
     {
+        trigger_error(sprintf('%s is deprecated; please use %s::isEntity', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        return self::isEntity();
+    }
+
+    /**
+     * Does the payload represent a HAL entity?
+     * 
+     * @return bool
+     */
+    public function isEntity()
+    {
         $payload = $this->getPayload();
-        return ($payload instanceof Resource);
+        return ($payload instanceof Entity);
     }
 
     /**

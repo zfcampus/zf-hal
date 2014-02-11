@@ -6,14 +6,14 @@
 
 namespace ZFTest\Hal\Plugin\TestAsset;
 
-class EmbeddedProxyResourceWithCustomIdentifier extends EmbeddedResourceWithCustomIdentifier
+class EmbeddedProxyEntity extends EmbeddedEntity
 {
-    public $custom_id;
+    public $id;
     public $name;
 
     public function __construct($id, $name)
     {
-        $this->custom_id = $id;
-        $this->name      = $name;
+        $this->id   = $id;
+        $this->name = $name;
     }
 }

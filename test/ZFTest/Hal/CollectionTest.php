@@ -42,9 +42,9 @@ class CollectionTest extends TestCase
     {
         $hal = new Collection(array(), 'item/route', array('version' => 1), array('query' => 'format=json'));
         $this->assertEquals(array(), $hal->getCollection());
-        $this->assertEquals('item/route', $hal->getResourceRoute());
-        $this->assertEquals(array('version' => 1), $hal->getResourceRouteParams());
-        $this->assertEquals(array('query' => 'format=json'), $hal->getResourceRouteOptions());
+        $this->assertEquals('item/route', $hal->getEntityRoute());
+        $this->assertEquals(array('version' => 1), $hal->getEntityRouteParams());
+        $this->assertEquals(array('query' => 'format=json'), $hal->getEntityRouteOptions());
     }
 
     public function testDefaultPageIsOne()
@@ -117,13 +117,13 @@ class CollectionTest extends TestCase
         $this->assertSame($links, $hal->getLinks());
     }
 
-    public function testAllowsSettingAdditionalResourceLinks()
+    public function testAllowsSettingAdditionalEntityLinks()
     {
         $links = new LinkCollection();
         $links->add(new Link('describedby'));
         $links->add(new Link('orders'));
         $hal   = new Collection(array(), 'item/route');
-        $hal->setResourceLinks($links);
-        $this->assertSame($links, $hal->getResourceLinks());
+        $hal->setEntityLinks($links);
+        $this->assertSame($links, $hal->getEntityLinks());
     }
 }

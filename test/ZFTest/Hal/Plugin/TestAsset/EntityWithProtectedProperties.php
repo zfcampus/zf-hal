@@ -8,7 +8,7 @@ namespace ZFTest\Hal\Plugin\TestAsset;
 
 use Zend\Stdlib\ArraySerializableInterface;
 
-class ResourceWithProtectedProperties implements ArraySerializableInterface
+class EntityWithProtectedProperties implements ArraySerializableInterface
 {
     protected $id;
     protected $name;

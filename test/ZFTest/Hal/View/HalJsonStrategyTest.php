@@ -12,7 +12,7 @@ use Zend\View\Renderer\JsonRenderer;
 use Zend\View\ViewEvent;
 use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Collection;
-use ZF\Hal\Resource;
+use ZF\Hal\Entity;
 use ZF\Hal\Link\Link;
 use ZF\Hal\View\HalJsonModel;
 use ZF\Hal\View\HalJsonRenderer;
@@ -74,19 +74,19 @@ class HalJsonStrategyTest extends TestCase
 
     public function halObjects()
     {
-        $resource = new Resource(array(
+        $entity = new Entity(array(
             'foo' => 'bar',
         ), 'identifier', 'route');
         $link = new Link('self');
         $link->setRoute('resource/route')->setRouteParams(array('id' => 'identifier'));
-        $resource->getLinks()->add($link);
+        $entity->getLinks()->add($link);
 
-        $collection = new Collection(array($resource));
+        $collection = new Collection(array($entity));
         $collection->setCollectionRoute('collection/route');
-        $collection->setResourceRoute('resource/route');
+        $collection->setEntityRoute('resource/route');
 
         return array(
-            'resource'   => array($resource),
+            'entity'     => array($entity),
             'collection' => array($collection),
         );
     }

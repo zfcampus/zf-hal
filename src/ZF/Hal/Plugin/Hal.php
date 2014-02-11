@@ -21,6 +21,7 @@ use Zend\View\Helper\ServerUrl;
 use Zend\View\Helper\Url;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\Exception\DomainException;
+use ZF\Hal\Entity;
 use ZF\Hal\Exception;
 use ZF\Hal\Collection;
 use ZF\Hal\Resource;
@@ -43,18 +44,18 @@ class Hal extends AbstractHelper implements
     protected $controller;
 
     /**
-     * Default hydrator to use if no hydrator found for a specific resource class.
+     * Default hydrator to use if no hydrator found for a specific entity class.
      *
      * @var HydratorInterface
      */
     protected $defaultHydrator;
 
     /**
-     * Boolean to render embedded resources or just include _embedded data
+     * Boolean to render embedded entities or just include _embedded data
      *
      * @var boolean
      */
-    protected $renderEmbeddedResources = true;
+    protected $renderEmbeddedEntities = true;
 
     /**
      * Boolean to render collections or just return their _embedded data
@@ -150,27 +151,27 @@ class Hal extends AbstractHelper implements
         ));
         $this->events = $events;
 
-        $events->attach('getIdFromResource', function ($e) {
-            $resource = $e->getParam('resource');
+        $events->attach('getIdFromEntity', function ($e) {
+            $entity = $e->getParam('entity');
 
             // Found id in array
-            if (is_array($resource) && array_key_exists('id', $resource)) {
-                return $resource['id'];
+            if (is_array($entity) && array_key_exists('id', $entity)) {
+                return $entity['id'];
             }
 
             // No id in array, or not an object; return false
-            if (is_array($resource) || !is_object($resource)) {
+            if (is_array($entity) || !is_object($entity)) {
                 return false;
             }
 
             // Found public id property on object
-            if (isset($resource->id)) {
-                return $resource->id;
+            if (isset($entity->id)) {
+                return $entity->id;
             }
 
             // Found public id getter on object
-            if (method_exists($resource, 'getid')) {
-                return $resource->getId();
+            if (method_exists($entity, 'getid')) {
+                return $entity->getId();
             }
 
             // not found
@@ -230,7 +231,7 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * Map a resource class to a specific hydrator instance
+     * Map an entity class to a specific hydrator instance
      *
      * @param  string $class
      * @param  HydratorInterface $hydrator
@@ -265,28 +266,53 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * Set boolean to render embedded resources or just include _embedded data
+     * Set boolean to render embedded eneities or just include _embedded data
      *
+     * @deprecated
      * @var boolean
      */
     public function setRenderEmbeddedResources($value)
     {
-        $this->renderEmbeddedResources = $value;
+        trigger_error(sprintf('%s has been deprecated; please use %s::setRenderEmbeddedEntities', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        $this->renderEmbeddedEntities = $value;
+        return $this;
+    }
+
+    /**
+     * Set boolean to render embedded entities or just include _embedded data
+     *
+     * @var boolean
+     */
+    public function setRenderEmbeddedEntities($value)
+    {
+        $this->renderEmbeddedEntities = $value;
         return $this;
     }
 
     /**
      * Get boolean to render embedded resources or just include _embedded data
      *
+     * @deprecated
      * @return boolean
      */
     public function getRenderEmbeddedResources()
     {
-        return $this->renderEmbeddedResources;
+        trigger_error(sprintf('%s has been deprecated; please use %s::getRenderEmbeddedEntities', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        return $this->renderEmbeddedEntities;
     }
 
     /**
-     * Set boolean to render embedded resources or just include _embedded data
+     * Get boolean to render embedded entities or just include _embedded data
+     *
+     * @return boolean
+     */
+    public function getRenderEmbeddedEntities()
+    {
+        return $this->renderEmbeddedEntities;
+    }
+
+    /**
+     * Set boolean to render embedded collections or just include _embedded data
      *
      * @var boolean
      */
@@ -297,7 +323,7 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * Get boolean to render embedded resources or just include _embedded data
+     * Get boolean to render embedded collections or just include _embedded data
      *
      * @return boolean
      */
@@ -307,27 +333,42 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * Retrieve a hydrator for a given resource
+     * Retrieve a hydrator for a given entity
      *
-     * If the resource has a mapped hydrator, returns that hydrator. If not, and
-     * a default hydrator is present, the default hydrator is returned.
-     * Otherwise, a boolean false is returned.
+     * Please use getHydratorForEntity().
      *
+     * @deprecated
      * @param  object $resource
      * @return HydratorInterface|false
      */
     public function getHydratorForResource($resource)
     {
+        trigger_error(sprintf('%s is deprecated; please use %s::getHydratorForEntity', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        return self::getHydratorForEntity($resource);
+    }
+
+    /**
+     * Retrieve a hydrator for a given entity
+     *
+     * If the entity has a mapped hydrator, returns that hydrator. If not, and
+     * a default hydrator is present, the default hydrator is returned.
+     * Otherwise, a boolean false is returned.
+     *
+     * @param  object $entity
+     * @return HydratorInterface|false
+     */
+    public function getHydratorForEntity($entity)
+    {
         $metadataMap = $this->getMetadataMap();
-        if ($metadataMap->has($resource)) {
-            $metadata = $metadataMap->get($resource);
+        if ($metadataMap->has($entity)) {
+            $metadata = $metadataMap->get($entity);
             $hydrator = $metadata->getHydrator();
             if ($hydrator instanceof HydratorInterface) {
                 return $hydrator;
             }
         }
 
-        $class = strtolower(get_class($resource));
+        $class = strtolower(get_class($entity));
         if (isset($this->hydratorMap[$class])) {
             return $this->hydratorMap[$class];
         }
@@ -346,11 +387,11 @@ class Hal extends AbstractHelper implements
      * then loops through the collection to create the data structure representing
      * the collection.
      *
-     * For each resource in the collection, the event "renderCollection.resource" is
+     * For each entity in the collection, the event "renderCollection.entity" is
      * triggered, with the following parameters:
      *
      * - "collection", which is the $halCollection passed to the method
-     * - "resource", which is the current resource
+     * - "entity", which is the current entity
      * - "route", the resource route that will be used to generate links
      * - "routeParams", any default routing parameters/substitutions to use in URL assembly
      * - "routeOptions", any default routing options to use in URL assembly
@@ -401,70 +442,92 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * Render an individual resource
+     * Deprecated: render an individual entity
      *
-     * Creates a hash representation of the Resource. The resource is first
-     * converted to an array, and its associated links are injected as the
-     * "_links" member. If any members of the resource are themselves
-     * Resource objects, they are extracted into an "_embedded" hash.
-     *
-     * @param  Resource $halResource
+     * This method exists for pre-0.9.0 consumers, and ensures the 
+     * renderResource event is triggered, before proxing to the renderEntity() 
+     * method.
+     * 
+     * @deprecated
+     * @param  Resource $halResource 
+     * @param  bool $renderResource 
      * @return array
      */
     public function renderResource(Resource $halResource, $renderResource = true)
     {
+        trigger_error(sprintf('The method %s is deprecated; please use %s::renderEntity()', __METHOD__, __CLASS__), E_USER_DEPRECATED);
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('resource' => $halResource));
-        $resource      = $halResource->resource;
-        $id            = $halResource->id;
-        $resourceLinks = $halResource->getLinks();
+        return $this->renderEntity($halResource, $renderResource);
+    }
+
+    /**
+     * Render an individual entity
+     *
+     * Creates a hash representation of the Entity. The entity is first
+     * converted to an array, and its associated links are injected as the
+     * "_links" member. If any members of the entity are themselves
+     * Entity objects, they are extracted into an "_embedded" hash.
+     *
+     * @param  Entity $halEntity
+     * @return array
+     */
+    public function renderEntity(Entity $halEntity, $renderEntity = true)
+    {
+        $this->getEventManager()->trigger(__FUNCTION__, $this, array('entity' => $halEntity));
+        $entity        = $halEntity->entity;
+        $id            = $halEntity->id;
+        $entityLinks   = $halEntity->getLinks();
         $metadataMap   = $this->getMetadataMap();
 
-        if (!is_array($resource)) {
-            $resource = $this->convertResourceToArray($resource);
+        if (!is_array($entity)) {
+            $entity = $this->convertEntityToArray($entity);
         }
 
-        if (!$renderResource) $resource = array();
+        if (!$renderEntity) {
+            $entity = array();
+        }
 
-        foreach ($resource as $key => $value) {
+        foreach ($entity as $key => $value) {
             if (is_object($value) && $metadataMap->has($value)) {
-                $value = $this->createResourceFromMetadata($value, $metadataMap->get($value), $this->getRenderEmbeddedResources());
+                $value = $this->createEntityFromMetadata($value, $metadataMap->get($value), $this->getRenderEmbeddedEntities());
             }
 
-            if ($value instanceof Resource) {
-                $this->extractEmbeddedResource($resource, $key, $value);
+            if ($value instanceof Entity) {
+                $this->extractEmbeddedEntity($entity, $key, $value);
             }
             if ($value instanceof Collection) {
-                $this->extractEmbeddedCollection($resource, $key, $value);
+                $this->extractEmbeddedCollection($entity, $key, $value);
             }
             if ($value instanceof Link) {
-                $resourceLinks->add($value);
-                unset($resource[$key]);
+                $entityLinks->add($value);
+                unset($entity[$key]);
             }
             if ($value instanceof LinkCollection) {
-                array_walk_recursive($value, function ($link, $rel) use ($resourceLinks) {
-                    $resourceLinks->add($link);
+                array_walk_recursive($value, function ($link, $rel) use ($entityLinks) {
+                    $entityLinks->add($link);
                 });
-                unset($resource[$key]);
+                unset($entity[$key]);
             }
         }
 
-        $resource['_links'] = $this->fromResource($halResource);
-        return $resource;
+        $entity['_links'] = $this->fromResource($halEntity);
+        return $entity;
     }
 
     /**
      * Create a fully qualified URI for a link
      *
-     * Triggers the "createLink" event with the route, id, resource, and a set of
+     * Triggers the "createLink" event with the route, id, entity, and a set of
      * params that will be passed to the route; listeners can alter any of the
      * arguments, which will then be used by the method to generate the url.
      *
+     * @todo   Remove 'resource' from the event parameters prior to 1.0.0.
      * @param  string $route
      * @param  null|false|int|string $id
-     * @param  null|mixed $resource
+     * @param  null|mixed $entity
      * @return string
      */
-    public function createLink($route, $id = null, $resource = null)
+    public function createLink($route, $id = null, $entity = null)
     {
         $params             = new ArrayObject();
         $reUseMatchedParams = true;
@@ -479,7 +542,8 @@ class Hal extends AbstractHelper implements
         $eventParams = $events->prepareArgs(array(
             'route'    => $route,
             'id'       => $id,
-            'resource' => $resource,
+            'entity'   => $entity,
+            'resource' => $entity,
             'params'   => $params,
         ));
         $events->trigger(__FUNCTION__, $this, $eventParams);
@@ -581,7 +645,7 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * Create HAL links "object" from a resource/collection
+     * Create HAL links "object" from an entity or collection
      *
      * @param  LinkCollectionAwareInterface $resource
      * @return array
@@ -592,13 +656,29 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * Create a resource and/or collection based on a metadata map
+     * Create a entity and/or collection based on a metadata map
+     *
+     * Deprecated; please use createEntityFromMetadata().
+     *
+     * @deprecated
+     * @param  object $object
+     * @param  Metadata $metadata
+     * @return Entity|Collection
+     */
+    public function createResourceFromMetadata($object, Metadata $metadata, $renderEmbeddedEntities = true)
+    {
+        trigger_error(sprintf('%s is deprecated; please use %s::createEntityFromMetadata', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        return $this->createEntityFromMetadata($object, $metadata, $renderEmbeddedEntities);
+    }
+
+    /**
+     * Create a entity and/or collection based on a metadata map
      *
      * @param  object $object
      * @param  Metadata $metadata
-     * @return Resource|Collection
+     * @return Entity|Collection
      */
-    public function createResourceFromMetadata($object, Metadata $metadata, $renderEmbeddedResources = true)
+    public function createEntityFromMetadata($object, Metadata $metadata, $renderEmbeddedEntities = true)
     {
         if ($metadata->isCollection()) {
             return $this->createCollectionFromMetadata($object, $metadata);
@@ -607,7 +687,7 @@ class Hal extends AbstractHelper implements
         if ($metadata->hasHydrator()) {
             $hydrator = $metadata->getHydrator();
         } else {
-            $hydrator = $this->getHydratorForResource($object);
+            $hydrator = $this->getHydratorForEntity($object);
         }
         if (!$hydrator instanceof HydratorInterface) {
             throw new Exception\RuntimeException(sprintf(
@@ -627,47 +707,66 @@ class Hal extends AbstractHelper implements
         }
         $id = ($entityIdentifierName) ? $data[$entityIdentifierName]: null;
 
-        if (!$renderEmbeddedResources) $data = array();
+        if (!$renderEmbeddedEntities) {
+            $data = array();
+        }
 
-        $resource = new Resource($data, $id);
-        $links    = $resource->getLinks();
+        $entity   = new Entity($data, $id);
+        $links    = $entity->getLinks();
         $this->marshalMetadataLinks($metadata, $links);
         if (!$links->has('self')) {
             $link = $this->marshalSelfLinkFromMetadata($metadata, $object, $id, $metadata->getRouteIdentifierName());
             $links->add($link);
         }
 
-        return $resource;
+        return $entity;
     }
 
     /**
-     * Create a Resource instance and inject it with a self relational link
+     * Create an Entity instance and inject it with a self relational link
      *
-     * @param  Resource|array|object $resource
+     * Deprecated; please use createEntity().
+     *
+     * @deprecated
+     * @param  Entity|array|object $resource
      * @param  string $route
      * @param  string $routeIdentifierName
-     * @return Resource
+     * @return Entity
      */
     public function createResource($resource, $route, $routeIdentifierName)
     {
+        trigger_error(sprintf('%s is deprecated; use %s::createEntity instead', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        return $this->createEntity($resource, $route, $routeIdentifierName);
+    }
+
+    /**
+     * Create an Entity instance and inject it with a self relational link
+     *
+     * @param  Entity|array|object $entity
+     * @param  string $route
+     * @param  string $routeIdentifierName
+     * @return Entity
+     */
+    public function createEntity($entity, $route, $routeIdentifierName)
+    {
         $metadataMap = $this->getMetadataMap();
-        if (is_object($resource) && $metadataMap->has($resource)) {
-            $resource = $this->createResourceFromMetadata($resource, $metadataMap->get($resource));
+        if (is_object($entity) && $metadataMap->has($entity)) {
+            $entity = $this->createEntityFromMetadata($entity, $metadataMap->get($entity));
         }
 
-        if (!$resource instanceof Resource) {
-            $id = $this->getIdFromResource($resource);
+        if (!$entity instanceof Entity) {
+            $id = $this->getIdFromEntity($entity);
             if (!$id) {
                 return new ApiProblem(
                     422,
-                    'No resource identifier present following resource creation.'
+                    'No entity identifier present following entity creation.'
                 );
             }
-            $resource = new Resource($resource, $id);
+            $entity = new Entity($entity, $id);
         }
 
-        $this->injectSelfLink($resource, $route, $routeIdentifierName);
-        return $resource;
+        $this->injectSelfLink($entity, $route, $routeIdentifierName);
+        return $entity;
     }
 
     /**
@@ -702,7 +801,7 @@ class Hal extends AbstractHelper implements
         $collection = new Collection($object);
         $collection->setCollectionName($metadata->getCollectionName());
         $collection->setCollectionRoute($metadata->getRoute());
-        $collection->setResourceRoute($metadata->getResourceRoute());
+        $collection->setEntityRoute($metadata->getEntityRoute());
         $collection->setRouteIdentifierName($metadata->getRouteIdentifierName());
         $collection->setEntityIdentifierName($metadata->getEntityIdentifierName());
 
@@ -738,7 +837,7 @@ class Hal extends AbstractHelper implements
 
         $routeParams  = array();
         $routeOptions = array();
-        if ($resource instanceof Resource) {
+        if ($resource instanceof Entity) {
             $routeParams = array(
                 $routeIdentifier => $resource->id,
             );
@@ -840,7 +939,7 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * Extracts and renders a Resource and embeds it in the parent
+     * Extracts and renders an Entity and embeds it in the parent
      * representation
      *
      * Removes the key from the parent representation, and creates a
@@ -848,11 +947,11 @@ class Hal extends AbstractHelper implements
      *
      * @param  array $parent
      * @param  string $key
-     * @param  Resource $resource
+     * @param  Entity $entity
      */
-    protected function extractEmbeddedResource(array &$parent, $key, Resource $resource)
+    protected function extractEmbeddedEntity(array &$parent, $key, Entity $entity)
     {
-        $rendered = $this->renderResource($resource);
+        $rendered = $this->renderEntity($entity);
         if (!isset($parent['_embedded'])) {
             $parent['_embedded'] = array();
         }
@@ -884,6 +983,8 @@ class Hal extends AbstractHelper implements
     /**
      * Extract a collection as an array
      *
+     * @todo   Remove 'resource' from event parameters for 1.0.0
+     * @todo   Remove trigger of 'renderCollection.resource' for 1.0.0
      * @param  Collection $halCollection
      * @return array
      */
@@ -892,59 +993,62 @@ class Hal extends AbstractHelper implements
         $collection           = array();
         $events               = $this->getEventManager();
         $routeIdentifierName  = $halCollection->getRouteIdentifierName();
-        $resourceRoute        = $halCollection->getResourceRoute();
-        $resourceRouteParams  = $halCollection->getResourceRouteParams();
-        $resourceRouteOptions = $halCollection->getResourceRouteOptions();
+        $entityRoute          = $halCollection->getEntityRoute();
+        $entityRouteParams    = $halCollection->getEntityRouteParams();
+        $entityRouteOptions   = $halCollection->getEntityRouteOptions();
         $metadataMap          = $this->getMetadataMap();
 
-        foreach ($halCollection->getCollection() as $resource) {
+        foreach ($halCollection->getCollection() as $entity) {
             $eventParams = new ArrayObject(array(
                 'collection'   => $halCollection,
-                'resource'     => $resource,
-                'route'        => $resourceRoute,
-                'routeParams'  => $resourceRouteParams,
-                'routeOptions' => $resourceRouteOptions,
+                'entity'       => $entity,
+                'resource'     => $entity,
+                'route'        => $entityRoute,
+                'routeParams'  => $entityRouteParams,
+                'routeOptions' => $entityRouteOptions,
             ));
             $events->trigger('renderCollection.resource', $this, $eventParams);
+            $events->trigger('renderCollection.entity', $this, $eventParams);
 
-            $resource = $eventParams['resource'];
+            $entity = $eventParams['entity'];
 
-            if (is_object($resource) && $metadataMap->has($resource)) {
-                $resource = $this->createResourceFromMetadata($resource, $metadataMap->get($resource));
+            if (is_object($entity) && $metadataMap->has($entity)) {
+                $entity = $this->createEntityFromMetadata($entity, $metadataMap->get($entity));
             }
 
-            if ($resource instanceof Resource) {
-                $collection[] = $this->renderResource($resource, $this->getRenderCollections());
+            if ($entity instanceof Entity) {
+                $collection[] = $this->renderEntity($entity, $this->getRenderCollections());
                 continue;
             }
 
-            if (!is_array($resource)) {
-                $resource = $this->convertResourceToArray($resource);
+            if (!is_array($entity)) {
+                $entity = $this->convertEntityToArray($entity);
             }
 
-            foreach ($resource as $key => $value) {
+            foreach ($entity as $key => $value) {
                 if (is_object($value) && $metadataMap->has($value)) {
-                    $value = $this->createResourceFromMetadata($value, $metadataMap->get($value));
+                    $value = $this->createEntityFromMetadata($value, $metadataMap->get($value));
                 }
 
-                if ($value instanceof Resource) {
-                    $this->extractEmbeddedResource($resource, $key, $value);
+                if ($value instanceof Entity) {
+                    $this->extractEmbeddedEntity($entity, $key, $value);
                 }
+
                 if ($value instanceof Collection) {
-                    $this->extractEmbeddedCollection($resource, $key, $value);
+                    $this->extractEmbeddedCollection($entity, $key, $value);
                 }
             }
 
-            $id = $this->getIdFromResource($resource);
+            $id = $this->getIdFromEntity($entity);
             if (!$id) {
-                // Cannot handle resources without an identifier
+                // Cannot handle entities without an identifier
                 // Return as-is
-                $collection[] = $resource;
+                $collection[] = $entity;
                 continue;
             }
 
-            if ($eventParams['resource'] instanceof LinkCollectionAwareInterface) {
-                $links = $eventParams['resource']->getLinks();
+            if ($eventParams['entity'] instanceof LinkCollectionAwareInterface) {
+                $links = $eventParams['entity']->getLinks();
             } else {
                 $links = new LinkCollection();
             }
@@ -957,35 +1061,55 @@ class Hal extends AbstractHelper implements
             );
             $links->add($selfLink);
 
-            $resource['_links'] = $this->fromLinkCollection($links);
+            $entity['_links'] = $this->fromLinkCollection($links);
 
-            $collection[] = $resource;
+            $collection[] = $entity;
         }
 
         return $collection;
     }
 
     /**
-     * Retrieve the identifier from a resource
+     * Retrieve the identifier from an entity
      *
      * Expects an "id" member to exist; if not, a boolean false is returned.
      *
-     * Triggers the "getIdFromResource" event with the resource; listeners can
+     * Triggers the "getIdFromEntity" event with the entity; listeners can
      * return a non-false, non-null value in order to specify the identifier
      * to use for URL assembly.
      *
-     * @param  array|object $resource
+     * @todo   Remove 'resource' from parameters sent to event for 1.0.0
+     * @todo   Remove trigger of getIdFromResource for 1.0.0
+     * @param  array|object $entity
      * @return mixed|false
      */
-    protected function getIdFromResource($resource)
+    protected function getIdFromEntity($entity)
     {
+        $params  = array(
+            'entity'   => $entity,
+            'resource' => $entity
+        );
+
+        $callback = function ($r) {
+            return (null !== $r && false !== $r);
+        };
+
         $results = $this->getEventManager()->trigger(
             __FUNCTION__,
             $this,
-            array('resource' => $resource),
-            function ($r) {
-                return (null !== $r && false !== $r);
-            }
+            $params,
+            $callback
+        );
+
+        if ($results->stopped()) {
+            return $results->last();
+        }
+
+        $results = $this->getEventManager()->trigger(
+            'getIdFromResource',
+            $this,
+            $params,
+            $callback
         );
 
         if ($results->stopped()) {
@@ -996,19 +1120,19 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * Convert an individual resource to an array
+     * Convert an individual entity to an array
      *
-     * @param  object $resource
+     * @param  object $entity
      * @return array
      */
-    protected function convertResourceToArray($resource)
+    protected function convertEntityToArray($entity)
     {
-        $hydrator = $this->getHydratorForResource($resource);
+        $hydrator = $this->getHydratorForEntity($entity);
         if (!$hydrator) {
-            return (array) $resource;
+            return (array) $entity;
         }
 
-        return $hydrator->extract($resource);
+        return $hydrator->extract($entity);
     }
 
     /**

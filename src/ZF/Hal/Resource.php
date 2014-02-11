@@ -6,17 +6,11 @@
 
 namespace ZF\Hal;
 
-class Resource implements Link\LinkCollectionAwareInterface
+/**
+ * @deprecated
+ */
+class Resource extends Entity
 {
-    protected $id;
-
-    /**
-     * @var Link\LinkCollection
-     */
-    protected $links;
-
-    protected $resource;
-
     /**
      * @param  object|array $resource
      * @param  mixed $id
@@ -24,59 +18,7 @@ class Resource implements Link\LinkCollectionAwareInterface
      */
     public function __construct($resource, $id)
     {
-        if (!is_object($resource) && !is_array($resource)) {
-            throw new Exception\InvalidResourceException();
-        }
-
-        $this->resource    = $resource;
-        $this->id          = $id;
-    }
-
-    /**
-     * Retrieve properties
-     *
-     * @param  string $name
-     * @return mixed
-     */
-    public function &__get($name)
-    {
-        $names = array(
-            'resource'     => 'resource',
-            'id'           => 'id',
-        );
-        $name = strtolower($name);
-        if (!in_array($name, array_keys($names))) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                'Invalid property name "%s"',
-                $name
-            ));
-        }
-        $prop = $names[$name];
-        return $this->{$prop};
-    }
-
-    /**
-     * Set link collection
-     *
-     * @param  Link\LinkCollection $links
-     * @return self
-     */
-    public function setLinks(Link\LinkCollection $links)
-    {
-        $this->links = $links;
-        return $this;
-    }
-
-    /**
-     * Get link collection
-     *
-     * @return Link\LinkCollection
-     */
-    public function getLinks()
-    {
-        if (!$this->links instanceof Link\LinkCollection) {
-            $this->setLinks(new Link\LinkCollection());
-        }
-        return $this->links;
+        trigger_error(sprintf('%s is deprecated; please use %s\Entity instead', __CLASS__, __NAMESPACE__), E_USER_DEPRECATED);
+        parent::__construct($resource, $id);
     }
 }

@@ -20,7 +20,7 @@ use Zend\Uri\Uri;
 use Zend\View\Helper\Url as UrlHelper;
 use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use ZF\Hal\Collection;
-use ZF\Hal\Resource;
+use ZF\Hal\Entity;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Metadata\MetadataMap;
@@ -110,11 +110,11 @@ class HalTest extends TestCase
         $plugin->setServerUrlHelper($serverUrlHelper);
     }
 
-    public function assertRelationalLinkContains($match, $relation, $resource)
+    public function assertRelationalLinkContains($match, $relation, $entity)
     {
-        $this->assertInternalType('array', $resource);
-        $this->assertArrayHasKey('_links', $resource);
-        $links = $resource['_links'];
+        $this->assertInternalType('array', $entity);
+        $this->assertArrayHasKey('_links', $entity);
+        $links = $entity['_links'];
         $this->assertInternalType('array', $links);
         $this->assertArrayHasKey($relation, $links);
         $link = $links[$relation];
@@ -143,15 +143,15 @@ class HalTest extends TestCase
         $this->assertEquals('http://localhost.localdomain/resource/123', $url);
     }
 
-    public function testLinkCreationFromResource()
+    public function testLinkCreationFromEntity()
     {
         $self = new Link('self');
         $self->setRoute('resource', array('id' => 123));
         $docs = new Link('describedby');
         $docs->setRoute('docs');
-        $resource = new Resource(array(), 123);
-        $resource->getLinks()->add($self)->add($docs);
-        $links = $this->plugin->fromResource($resource);
+        $entity = new Entity(array(), 123);
+        $entity->getLinks()->add($self)->add($docs);
+        $links = $this->plugin->fromResource($entity);
 
         $this->assertInternalType('array', $links);
         $this->assertArrayHasKey('self', $links, var_export($links, 1));
@@ -168,7 +168,7 @@ class HalTest extends TestCase
         $this->assertEquals('http://localhost.localdomain/help', $docsLink['href']);
     }
 
-    public function testRendersEmbeddedCollectionsInsideResources()
+    public function testRendersEmbeddedCollectionsInsideEntities()
     {
         $collection = new Collection(
             array(
@@ -178,7 +178,7 @@ class HalTest extends TestCase
             ),
             'hostname/contacts'
         );
-        $resource = new Resource(
+        $entity = new Entity(
             (object) array(
                 'id'       => 'user',
                 'contacts' => $collection,
@@ -187,9 +187,9 @@ class HalTest extends TestCase
         );
         $self = new Link('self');
         $self->setRoute('hostname/users', array('id' => 'user'));
-        $resource->getLinks()->add($self);
+        $entity->getLinks()->add($self);
 
-        $rendered = $this->plugin->renderResource($resource);
+        $rendered = $this->plugin->renderEntity($entity);
         $this->assertRelationalLinkContains('/users/', 'self', $rendered);
 
         $this->assertArrayHasKey('_embedded', $rendered);
@@ -204,30 +204,30 @@ class HalTest extends TestCase
         }
     }
 
-    public function testRendersEmbeddedResourcesInsideResourcesBasedOnMetadataMap()
+    public function testRendersEmbeddedEntitiesInsideEntitiesBasedOnMetadataMap()
     {
-        $object = new TestAsset\Resource('foo', 'Foo');
-        $object->first_child  = new TestAsset\EmbeddedResource('bar', 'Bar');
-        $object->second_child = new TestAsset\EmbeddedResourceWithCustomIdentifier('baz', 'Baz');
-        $resource = new Resource($object, 'foo');
+        $object = new TestAsset\Entity('foo', 'Foo');
+        $object->first_child  = new TestAsset\EmbeddedEntity('bar', 'Bar');
+        $object->second_child = new TestAsset\EmbeddedEntityWithCustomIdentifier('baz', 'Baz');
+        $entity = new Entity($object, 'foo');
         $self = new Link('self');
         $self->setRoute('hostname/resource', array('id' => 'foo'));
-        $resource->getLinks()->add($self);
+        $entity->getLinks()->add($self);
 
         $metadata = new MetadataMap(array(
-            'ZFTest\Hal\Plugin\TestAsset\Resource' => array(
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
                 'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
             ),
-            'ZFTest\Hal\Plugin\TestAsset\EmbeddedResource' => array(
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntity' => array(
                 'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route'    => 'hostname/embedded',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
             ),
-            'ZFTest\Hal\Plugin\TestAsset\EmbeddedResourceWithCustomIdentifier' => array(
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithCustomIdentifier' => array(
                 'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route'           => 'hostname/embedded_custom',
                 'route_identifier_name' => 'custom_id',
@@ -237,7 +237,7 @@ class HalTest extends TestCase
 
         $this->plugin->setMetadataMap($metadata);
 
-        $rendered = $this->plugin->renderResource($resource);
+        $rendered = $this->plugin->renderEntity($entity);
         $this->assertRelationalLinkContains('/resource/foo', 'self', $rendered);
 
         $this->assertArrayHasKey('_embedded', $rendered);
@@ -257,28 +257,28 @@ class HalTest extends TestCase
 
     public function testMetadataMapLooksForParentClasses()
     {
-        $object = new TestAsset\Resource('foo', 'Foo');
-        $object->first_child  = new TestAsset\EmbeddedProxyResource('bar', 'Bar');
-        $object->second_child = new TestAsset\EmbeddedProxyResourceWithCustomIdentifier('baz', 'Baz');
-        $resource = new Resource($object, 'foo');
+        $object = new TestAsset\Entity('foo', 'Foo');
+        $object->first_child  = new TestAsset\EmbeddedProxyEntity('bar', 'Bar');
+        $object->second_child = new TestAsset\EmbeddedProxyEntityWithCustomIdentifier('baz', 'Baz');
+        $entity = new Entity($object, 'foo');
         $self = new Link('self');
         $self->setRoute('hostname/resource', array('id' => 'foo'));
-        $resource->getLinks()->add($self);
+        $entity->getLinks()->add($self);
 
         $metadata = new MetadataMap(array(
-            'ZFTest\Hal\Plugin\TestAsset\Resource' => array(
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
                 'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
             ),
-            'ZFTest\Hal\Plugin\TestAsset\EmbeddedResource' => array(
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntity' => array(
                 'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route'    => 'hostname/embedded',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
             ),
-            'ZFTest\Hal\Plugin\TestAsset\EmbeddedResourceWithCustomIdentifier' => array(
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithCustomIdentifier' => array(
                 'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route'           => 'hostname/embedded_custom',
                 'route_identifier_name' => 'custom_id',
@@ -288,7 +288,7 @@ class HalTest extends TestCase
 
         $this->plugin->setMetadataMap($metadata);
 
-        $rendered = $this->plugin->renderResource($resource);
+        $rendered = $this->plugin->renderEntity($entity);
         $this->assertRelationalLinkContains('/resource/foo', 'self', $rendered);
 
         $this->assertArrayHasKey('_embedded', $rendered);
@@ -306,7 +306,7 @@ class HalTest extends TestCase
         $this->assertRelationalLinkContains('/embedded_custom/baz', 'self', $second);
     }
 
-    public function testRendersEmbeddedCollectionsInsideResourcesBasedOnMetadataMap()
+    public function testRendersEmbeddedCollectionsInsideEntitiesBasedOnMetadataMap()
     {
         $collection = new TestAsset\Collection(
             array(
@@ -321,7 +321,7 @@ class HalTest extends TestCase
                 'is_collection'       => true,
                 'collection_name'     => 'collection', // should be overridden
                 'route_name'          => 'hostname/contacts',
-                'resource_route_name' => 'hostname/embedded',
+                'entity_route_name'   => 'hostname/embedded',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
             ),
@@ -329,7 +329,7 @@ class HalTest extends TestCase
 
         $this->plugin->setMetadataMap($metadata);
 
-        $resource = new Resource(
+        $entity = new Entity(
             (object) array(
                 'id'       => 'user',
                 'contacts' => $collection,
@@ -338,9 +338,9 @@ class HalTest extends TestCase
         );
         $self = new Link('self');
         $self->setRoute('hostname/users', array('id' => 'user'));
-        $resource->getLinks()->add($self);
+        $entity->getLinks()->add($self);
 
-        $rendered = $this->plugin->renderResource($resource);
+        $rendered = $this->plugin->renderEntity($entity);
 
         $this->assertRelationalLinkContains('/users/', 'self', $rendered);
 
@@ -366,18 +366,18 @@ class HalTest extends TestCase
                 (object) array('id' => 'baz', 'name' => 'baz'),
             )
         );
-        $resource = new TestAsset\Resource('spock', 'Spock');
-        $resource->first_child = $childCollection;
+        $entity = new TestAsset\Entity('spock', 'Spock');
+        $entity->first_child = $childCollection;
 
         $metadata = new MetadataMap(array(
             'ZFTest\Hal\Plugin\TestAsset\Collection' => array(
                 'is_collection'  => true,
                 'route'          => 'hostname/contacts',
-                'resource_route' => 'hostname/embedded',
+                'entity_route'   => 'hostname/embedded',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
             ),
-            'ZFTest\Hal\Plugin\TestAsset\Resource' => array(
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
                 'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
@@ -387,7 +387,7 @@ class HalTest extends TestCase
 
         $this->plugin->setMetadataMap($metadata);
 
-        $collection = new Collection(array($resource), 'hostname/resource');
+        $collection = new Collection(array($entity), 'hostname/resource');
         $self = new Link('self');
         $self->setRoute('hostname/resource');
         $collection->getLinks()->add($self);
@@ -418,19 +418,19 @@ class HalTest extends TestCase
         }
     }
 
-    public function testDoesNotRenderEmbeddedResourcesInsideCollectionsBasedOnMetadataMapAndRenderEmbeddedResourcesAsFalse()
+    public function testDoesNotRenderEmbeddedEntitiesInsideCollectionsBasedOnMetadataMapAndRenderEmbeddedEntitiesAsFalse()
     {
 
-        $resource = new TestAsset\Resource('spock', 'Spock');
-        $resource->first_child  = new TestAsset\EmbeddedResource('bar', 'Bar');
-        $resource->second_child = new TestAsset\EmbeddedResourceWithCustomIdentifier('baz', 'Baz');
+        $entity = new TestAsset\Entity('spock', 'Spock');
+        $entity->first_child  = new TestAsset\EmbeddedEntity('bar', 'Bar');
+        $entity->second_child = new TestAsset\EmbeddedEntityWithCustomIdentifier('baz', 'Baz');
 
         $metadata = new MetadataMap(array(
-            'ZFTest\Hal\Plugin\TestAsset\EmbeddedResource' => array(
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntity' => array(
                 'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route'    => 'hostname/embedded',
             ),
-            'ZFTest\Hal\Plugin\TestAsset\EmbeddedResourceWithCustomIdentifier' => array(
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithCustomIdentifier' => array(
                 'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route'           => 'hostname/embedded_custom',
                 'route_identifier_name' => 'custom_id',
@@ -440,18 +440,18 @@ class HalTest extends TestCase
             'ZFTest\Hal\Plugin\TestAsset\Collection' => array(
                 'is_collection'  => true,
                 'route'          => 'hostname/contacts',
-                'resource_route' => 'hostname/embedded',
+                'entity_route'   => 'hostname/embedded',
             ),
-            'ZFTest\Hal\Plugin\TestAsset\Resource' => array(
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
                 'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
             ),
         ));
 
         $this->plugin->setMetadataMap($metadata);
-        $this->plugin->setRenderEmbeddedResources(false);
+        $this->plugin->setRenderEmbeddedEntities(false);
 
-        $collection = new Collection(array($resource), 'hostname/resource');
+        $collection = new Collection(array($entity), 'hostname/resource');
         $self = new Link('self');
         $self->setRoute('hostname/resource');
         $collection->getLinks()->add($self);
@@ -481,27 +481,27 @@ class HalTest extends TestCase
 
     public function testWillNotAllowInjectingASelfRelationMultipleTimes()
     {
-        $resource = new Resource(array(
+        $entity = new Entity(array(
             'id'  => 1,
             'foo' => 'bar',
         ), 1);
-        $links = $resource->getLinks();
+        $links = $entity->getLinks();
 
         $this->assertFalse($links->has('self'));
 
-        $this->plugin->injectSelfLink($resource, 'hostname/resource');
+        $this->plugin->injectSelfLink($entity, 'hostname/resource');
 
         $this->assertTrue($links->has('self'));
         $link = $links->get('self');
         $this->assertInstanceof('ZF\Hal\Link\Link', $link);
 
-        $this->plugin->injectSelfLink($resource, 'hostname/resource');
+        $this->plugin->injectSelfLink($entity, 'hostname/resource');
         $this->assertTrue($links->has('self'));
         $link = $links->get('self');
         $this->assertInstanceof('ZF\Hal\Link\Link', $link);
     }
 
-    public function testResourcePropertiesCanBeLinks()
+    public function testEntityPropertiesCanBeLinks()
     {
         $embeddedLink = new Link('embeddedLink');
         $embeddedLink->setRoute('hostname/contacts', array('id' => 'bar'));
@@ -511,9 +511,9 @@ class HalTest extends TestCase
             'embeddedLink' => $embeddedLink,
         );
 
-        $resource = new Resource((object) $properties, 'foo');
+        $entity = new Entity((object) $properties, 'foo');
 
-        $rendered = $this->plugin->renderResource($resource);
+        $rendered = $this->plugin->renderEntity($entity);
 
         $this->assertArrayHasKey('_links', $rendered);
         $this->assertArrayHasKey('embeddedLink', $rendered['_links']);
@@ -522,7 +522,7 @@ class HalTest extends TestCase
         $this->assertEquals('http://localhost.localdomain/contacts/bar', $rendered['_links']['embeddedLink']['href']);
     }
 
-    public function testResourcePropertyLinksUseHref()
+    public function testEntityPropertyLinksUseHref()
     {
         $link1 = new Link('link1');
         $link1->setUrl('link1');
@@ -536,9 +536,9 @@ class HalTest extends TestCase
             'baz' => $link2,
         );
 
-        $resource = new Resource((object) $properties, 'foo');
+        $entity = new Entity((object) $properties, 'foo');
 
-        $rendered = $this->plugin->renderResource($resource);
+        $rendered = $this->plugin->renderEntity($entity);
 
         $this->assertArrayHasKey('_links', $rendered);
         $this->assertArrayHasKey('link1', $rendered['_links']);
@@ -573,9 +573,9 @@ class HalTest extends TestCase
             'links' => $collection,
         );
 
-        $resource = new Resource((object) $properties, 'foo');
+        $entity = new Entity((object) $properties, 'foo');
 
-        $rendered = $this->plugin->renderResource($resource);
+        $rendered = $this->plugin->renderEntity($entity);
 
         $this->assertArrayHasKey('_links', $rendered);
         $this->assertArrayHasKey('embeddedLink', $rendered['_links']);
@@ -590,19 +590,19 @@ class HalTest extends TestCase
     /**
      * @group 71
      */
-    public function testRenderingEmbeddedResourceEmbedsResource()
+    public function testRenderingEmbeddedEntityEmbedsEntity()
     {
-        $embedded = new Resource((object) array('id' => 'foo', 'name' => 'foo'), 'foo');
+        $embedded = new Entity((object) array('id' => 'foo', 'name' => 'foo'), 'foo');
         $self = new Link('self');
         $self->setRoute('hostname/contacts', array('id' => 'foo'));
         $embedded->getLinks()->add($self);
 
-        $resource = new Resource((object) array('id' => 'user', 'contact' => $embedded), 'user');
+        $entity = new Entity((object) array('id' => 'user', 'contact' => $embedded), 'user');
         $self = new Link('self');
         $self->setRoute('hostname/users', array('id' => 'user'));
-        $resource->getLinks()->add($self);
+        $entity->getLinks()->add($self);
 
-        $rendered = $this->plugin->renderResource($resource);
+        $rendered = $this->plugin->renderEntity($entity);
 
         $this->assertRelationalLinkContains('/users/user', 'self', $rendered);
         $this->assertArrayHasKey('_embedded', $rendered);
@@ -615,9 +615,9 @@ class HalTest extends TestCase
     /**
      * @group 71
      */
-    public function testRenderingCollectionRendersAllLinksInEmbeddedResources()
+    public function testRenderingCollectionRendersAllLinksInEmbeddedEntities()
     {
-        $embedded = new Resource((object) array('id' => 'foo', 'name' => 'foo'), 'foo');
+        $embedded = new Entity((object) array('id' => 'foo', 'name' => 'foo'), 'foo');
         $links = $embedded->getLinks();
         $self = new Link('self');
         $self->setRoute('hostname/users', array('id' => 'foo'));
@@ -647,19 +647,19 @@ class HalTest extends TestCase
         $this->assertRelationalLinkContains('/users/foo/phones', 'phones', $user);
     }
 
-    public function testResourcesFromCollectionCanUseHydratorSetInMetadataMap()
+    public function testEntitiesFromCollectionCanUseHydratorSetInMetadataMap()
     {
-        $object   = new TestAsset\ResourceWithProtectedProperties('foo', 'Foo');
-        $resource = new Resource($object, 'foo');
+        $object   = new TestAsset\EntityWithProtectedProperties('foo', 'Foo');
+        $entity   = new Entity($object, 'foo');
 
         $metadata = new MetadataMap(array(
-            'ZFTest\Hal\Plugin\TestAsset\ResourceWithProtectedProperties' => array(
+            'ZFTest\Hal\Plugin\TestAsset\EntityWithProtectedProperties' => array(
                 'hydrator'   => 'ArraySerializable',
                 'route_name' => 'hostname/resource',
             ),
         ));
 
-        $collection = new Collection(array($resource));
+        $collection = new Collection(array($entity));
         $collection->setCollectionName('resource');
         $collection->setCollectionRoute('hostname/resource');
 
@@ -683,13 +683,13 @@ class HalTest extends TestCase
     /**
      * @group 79
      */
-    public function testInjectsLinksFromMetadataWhenCreatingResource()
+    public function testInjectsLinksFromMetadataWhenCreatingEntity()
     {
-        $object = new TestAsset\Resource('foo', 'Foo');
-        $resource = new Resource($object, 'foo');
+        $object = new TestAsset\Entity('foo', 'Foo');
+        $entity = new Entity($object, 'foo');
 
         $metadata = new MetadataMap(array(
-            'ZFTest\Hal\Plugin\TestAsset\Resource' => array(
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
                 'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
                 'links'      => array(
@@ -708,9 +708,9 @@ class HalTest extends TestCase
         ));
 
         $this->plugin->setMetadataMap($metadata);
-        $resource = $this->plugin->createResourceFromMetadata($object, $metadata->get('ZFTest\Hal\Plugin\TestAsset\Resource'));
-        $this->assertInstanceof('ZF\Hal\Resource', $resource);
-        $links = $resource->getLinks();
+        $entity = $this->plugin->createEntityFromMetadata($object, $metadata->get('ZFTest\Hal\Plugin\TestAsset\Entity'));
+        $this->assertInstanceof('ZF\Hal\Entity', $entity);
+        $links = $entity->getLinks();
         $this->assertTrue($links->has('describedby'));
         $this->assertTrue($links->has('children'));
 
@@ -740,7 +740,7 @@ class HalTest extends TestCase
             'ZFTest\Hal\Plugin\TestAsset\Collection' => array(
                 'is_collection'       => true,
                 'route_name'          => 'hostname/contacts',
-                'resource_route_name' => 'hostname/embedded',
+                'entity_route_name'   => 'hostname/embedded',
                 'links'               => array(
                     array(
                         'rel' => 'describedby',
@@ -767,9 +767,9 @@ class HalTest extends TestCase
     /**
      * @group 79
      */
-    public function testRenderResourceTriggersEvent()
+    public function testRenderEntityTriggersEvent()
     {
-        $resource = new Resource(
+        $entity = new Entity(
             (object) array(
                 'id'   => 'user',
                 'name' => 'matthew',
@@ -778,14 +778,14 @@ class HalTest extends TestCase
         );
         $self = new Link('self');
         $self->setRoute('hostname/users', array('id' => 'user'));
-        $resource->getLinks()->add($self);
+        $entity->getLinks()->add($self);
 
-        $this->plugin->getEventManager()->attach('renderResource', function ($e) {
-            $resource = $e->getParam('resource');
-            $resource->getLinks()->get('self')->setRouteParams(array('id' => 'matthew'));
+        $this->plugin->getEventManager()->attach('renderEntity', function ($e) {
+            $entity = $e->getParam('entity');
+            $entity->getLinks()->get('self')->setRouteParams(array('id' => 'matthew'));
         });
 
-        $rendered = $this->plugin->renderResource($resource);
+        $rendered = $this->plugin->renderEntity($entity);
         $this->assertContains('/users/matthew', $rendered['_links']['self']['href']);
     }
 
@@ -895,9 +895,9 @@ class HalTest extends TestCase
 
     public function testRenderingCollectionUsesCollectionNameFromMetadataMap()
     {
-        $object1 = new TestAsset\Resource('foo', 'Foo');
-        $object2 = new TestAsset\Resource('bar', 'Bar');
-        $object3 = new TestAsset\Resource('baz', 'Baz');
+        $object1 = new TestAsset\Entity('foo', 'Foo');
+        $object2 = new TestAsset\Entity('bar', 'Bar');
+        $object3 = new TestAsset\Entity('baz', 'Baz');
 
         $collection = new TestAsset\Collection(array(
             $object1,
@@ -906,7 +906,7 @@ class HalTest extends TestCase
         ));
 
         $metadata = new MetadataMap(array(
-            'ZFTest\Hal\Plugin\TestAsset\Resource' => array(
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
                 'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
@@ -916,7 +916,7 @@ class HalTest extends TestCase
                 'is_collection'       => true,
                 'collection_name'     => 'collection',
                 'route_name'          => 'hostname/contacts',
-                'resource_route_name' => 'hostname/embedded',
+                'entity_route_name'   => 'hostname/embedded',
             ),
         ));
 
@@ -932,8 +932,8 @@ class HalTest extends TestCase
 
         $renderedCollection = $rendered['_embedded']['collection'];
 
-        foreach ($renderedCollection as $resource) {
-            $this->assertRelationalLinkContains('/resource/', 'self', $resource);
+        foreach ($renderedCollection as $entity) {
+            $this->assertRelationalLinkContains('/resource/', 'self', $entity);
         }
     }
 
@@ -944,12 +944,12 @@ class HalTest extends TestCase
     {
         $set = [];
         for ($id = 1; $id <= 100; $id += 1) {
-            $resource = new Resource((object) ['id' => $id, 'name' => 'foo'], 'foo');
-            $links = $resource->getLinks();
+            $entity = new Entity((object) ['id' => $id, 'name' => 'foo'], 'foo');
+            $links = $entity->getLinks();
             $self = new Link('self');
             $self->setRoute('hostname/users', ['id' => $id]);
             $links->add($self);
-            $set[] = $resource;
+            $set[] = $entity;
         }
 
         $paginator  = new Paginator(new ArrayPaginator($set));
@@ -979,7 +979,7 @@ class HalTest extends TestCase
      */
     public function testRenderingNonPaginatorCollectionRendersCountOfTotalItems()
     {
-        $embedded = new Resource((object) array('id' => 'foo', 'name' => 'foo'), 'foo');
+        $embedded = new Entity((object) array('id' => 'foo', 'name' => 'foo'), 'foo');
         $links = $embedded->getLinks();
         $self = new Link('self');
         $self->setRoute('hostname/users', array('id' => 'foo'));
