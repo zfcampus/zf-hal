@@ -74,7 +74,7 @@ class HalJsonStrategy extends JsonStrategy
         $response    = $e->getResponse();
 
         if ($model instanceof HalJsonModel
-            && ($model->isCollection() || $model->isResource())
+            && ($model->isCollection() || $model->isEntity())
         ) {
             $contentType = 'application/hal+json';
         }

@@ -47,7 +47,14 @@ class Metadata
     protected $entityIdentifierName;
 
     /**
-     * Name of the route parameter identifier for the resource
+     * Route for entities composed in a collection
+     *
+     * @var string
+     */
+    protected $entityRoute;
+
+    /**
+     * Name of the route parameter identifier for the entity
      *
      * @var string
      */
@@ -61,42 +68,35 @@ class Metadata
     protected $isCollection = false;
 
     /**
-     * Collection of additional relational links to inject in resource
+     * Collection of additional relational links to inject in entity
      *
      * @var array
      */
     protected $links = array();
 
     /**
-     * Route for resources composed in a collection
-     *
-     * @var string
-     */
-    protected $resourceRoute;
-
-    /**
-     * Route to use to generate a self link for this resource
+     * Route to use to generate a self link for this entity
      *
      * @var string
      */
     protected $route;
 
     /**
-     * Additional options to use when generating a self link for this resource
+     * Additional options to use when generating a self link for this entity
      *
      * @var array
      */
     protected $routeOptions = array();
 
     /**
-     * Additional route parameters to use when generating a self link for this resource
+     * Additional route parameters to use when generating a self link for this entity
      *
      * @var array
      */
     protected $routeParams = array();
 
     /**
-     * URL to use for this resource (instead of a route)
+     * URL to use for this entity (instead of a route)
      *
      * @var string
      */
@@ -143,14 +143,17 @@ class Metadata
                 continue;
             }
 
-            // Strip "name" from route_name and resource_route_name keys (and
-            // continue honoring simply "route" and "resource_route")
+            // Strip "name" from route_name key
+            // Rename "resourceroutename" and "resourceroute" to "entityroute".
             // Don't generically strip all 'name's
             if ($filteredKey === 'routename') {
                 $filteredKey = 'route';
             }
-            if ($filteredKey === 'resourceroutename') {
-                $filteredKey = 'resourceroute';
+            if ($filteredKey === 'resourceroutename' || $filteredKey === 'resourceroute') {
+                $filteredKey = 'entityroute';
+            }
+            if ($filteredKey === 'entityroutename') {
+                $filteredKey = 'entityroute';
             }
 
             // Fix BC issue: s/identifier_name/route_identifier_name/
@@ -238,22 +241,36 @@ class Metadata
     }
 
     /**
-     * Retrieve the resource route
+     * Retrieve the entity route
      *
      * If not set, uses the route or url, depending on which is present.
      *
      * @return null|string
      */
-    public function getResourceRoute()
+    public function getEntityRoute()
     {
-        if (null === $this->resourceRoute) {
+        if (null === $this->entityRoute) {
             if ($this->hasRoute()) {
-                $this->setResourceRoute($this->getRoute());
+                $this->setEntityRoute($this->getRoute());
             } else {
-                $this->setResourceRoute($this->getUrl());
+                $this->setEntityRoute($this->getUrl());
             }
         }
-        return $this->resourceRoute;
+        return $this->entityRoute;
+    }
+
+    /**
+     * Retrieve the resource route
+     *
+     * Deprecated; please use getEntityRoute()
+     *
+     * @deprecated
+     * @return null|string
+     */
+    public function getResourceRoute()
+    {
+        trigger_error(sprintf('%s is deprecated; please use %s::getEntityRoute', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        return $this->getEntityRoute();
     }
 
     /**
@@ -287,7 +304,7 @@ class Metadata
     }
 
     /**
-     * Retrieve the URL to use for this resource, if present
+     * Retrieve the URL to use for this entity, if present
      *
      * @return null|string
      */
@@ -441,15 +458,30 @@ class Metadata
     }
 
     /**
-     * Set the resource route (for embedded resources in collections)
+     * Set the entity route (for embedded entities in collections)
      *
+     * @param  string $route
+     * @return self
+     */
+    public function setEntityRoute($route)
+    {
+        $this->entityRoute = $route;
+        return $this;
+    }
+
+    /**
+     * Set the entity route (for embedded entities in collections)
+     *
+     * Deprecated; please use setEntityRoute().
+     *
+     * @deprecated
      * @param  string $route
      * @return self
      */
     public function setResourceRoute($route)
     {
-        $this->resourceRoute = $route;
-        return $this;
+        trigger_error(sprintf('%s is deprecated; please use %s::setEntityRoute', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        return $this->setEntityRoute($route);
     }
 
     /**
@@ -489,7 +521,7 @@ class Metadata
     }
 
     /**
-     * Set the URL to use with this resource
+     * Set the URL to use with this entity
      *
      * @param  string $url
      * @return self

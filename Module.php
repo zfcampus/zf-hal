@@ -148,7 +148,11 @@ class Module
                     }
 
                     if (isset($config['render_embedded_resources'])) {
-                        $helper->setRenderEmbeddedResources($config['render_embedded_resources']);
+                        $helper->setRenderEmbeddedEntities($config['render_embedded_resources']);
+                    }
+
+                    if (isset($config['render_embedded_entities'])) {
+                        $helper->setRenderEmbeddedEntities($config['render_embedded_entities']);
                     }
 
                     if (isset($config['render_collections'])) {

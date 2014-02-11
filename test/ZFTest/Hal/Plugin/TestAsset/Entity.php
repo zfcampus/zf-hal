@@ -6,10 +6,13 @@
 
 namespace ZFTest\Hal\Plugin\TestAsset;
 
-class EmbeddedResource
+class Entity
 {
     public $id;
     public $name;
+
+    public $first_child;
+    public $second_child;
 
     public function __construct($id, $name)
     {

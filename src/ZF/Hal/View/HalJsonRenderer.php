@@ -14,8 +14,8 @@ use Zend\View\ViewEvent;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\View\ApiProblemModel;
 use ZF\ApiProblem\View\ApiProblemRenderer;
+use ZF\Hal\Entity;
 use ZF\Hal\Collection;
-use ZF\Hal\Resource;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Plugin\Hal as HalPlugin;
@@ -102,7 +102,7 @@ class HalJsonRenderer extends JsonRenderer
      * Render a view model
      *
      * If the view model is a HalJsonRenderer, determines if it represents
-     * a Collection or Resource, and, if so, creates a custom
+     * a Collection or Entity, and, if so, creates a custom
      * representation appropriate to the type.
      *
      * If not, it passes control to the parent to render.
@@ -117,9 +117,9 @@ class HalJsonRenderer extends JsonRenderer
             return parent::render($nameOrModel, $values);
         }
 
-        if ($nameOrModel->isResource()) {
+        if ($nameOrModel->isEntity()) {
             $helper  = $this->helpers->get('Hal');
-            $payload = $helper->renderResource($nameOrModel->getPayload());
+            $payload = $helper->renderEntity($nameOrModel->getPayload());
             return parent::render($payload);
         }
 

@@ -9,7 +9,7 @@ namespace ZFTest\Hal\View;
 use PHPUnit_Framework_TestCase as TestCase;
 use stdClass;
 use ZF\Hal\Collection;
-use ZF\Hal\Resource;
+use ZF\Hal\Entity;
 use ZF\Hal\View\HalJsonModel;
 
 /**
@@ -54,7 +54,7 @@ class HalJsonModelTest extends TestCase
         $payloads = $this->invalidPayloads();
         $payloads['exception'] = array(new \Exception);
         $payloads['stdclass']  = array(new stdClass);
-        $payloads['hal-item']  = array(new Resource(array(), 'id', 'route'));
+        $payloads['hal-item']  = array(new Entity(array(), 'id', 'route'));
         return $payloads;
     }
 
@@ -74,7 +74,7 @@ class HalJsonModelTest extends TestCase
         $this->assertTrue($this->model->isCollection());
     }
 
-    public function invalidResourcePayloads()
+    public function invalidEntityPayloads()
     {
         $payloads = $this->invalidPayloads();
         $payloads['exception']      = array(new \Exception);
@@ -84,19 +84,19 @@ class HalJsonModelTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidResourcePayloads
+     * @dataProvider invalidEntityPayloads
      */
-    public function testIsResourceReturnsFalseForInvalidValues($payload)
+    public function testIsEntityReturnsFalseForInvalidValues($payload)
     {
         $this->model->setPayload($payload);
-        $this->assertFalse($this->model->isResource());
+        $this->assertFalse($this->model->isEntity());
     }
 
-    public function testIsResourceReturnsTrueForResourcePayload()
+    public function testIsEntityReturnsTrueForEntityPayload()
     {
-        $item = new Resource(array(), 'id', 'route');
+        $item = new Entity(array(), 'id', 'route');
         $this->model->setPayload($item);
-        $this->assertTrue($this->model->isResource());
+        $this->assertTrue($this->model->isEntity());
     }
 
     public function testIsTerminalByDefault()

@@ -6,14 +6,14 @@
 
 namespace ZFTest\Hal;
 
-use ZF\Hal\Resource;
+use ZF\Hal\Entity;
 use ZF\Hal\Link\LinkCollection;
 use PHPUnit_Framework_TestCase as TestCase;
 use stdClass;
 
-class ResourceTest extends TestCase
+class EntityTest extends TestCase
 {
-    public function invalidResources()
+    public function invalidEntities()
     {
         return array(
             'null'       => array(null),
@@ -28,48 +28,48 @@ class ResourceTest extends TestCase
     }
 
     /**
-     * @dataProvider invalidResources
+     * @dataProvider invalidEntities
      */
-    public function testConstructorRaisesExceptionForNonObjectNonArrayResource($resource)
+    public function testConstructorRaisesExceptionForNonObjectNonArrayEntity($entity)
     {
-        $this->setExpectedException('ZF\Hal\Exception\InvalidResourceException');
-        $hal = new Resource($resource, 'id');
+        $this->setExpectedException('ZF\Hal\Exception\InvalidEntityException');
+        $hal = new Entity($entity, 'id');
     }
 
     public function testPropertiesAreAccessibleAfterConstruction()
     {
-        $resource = new stdClass;
-        $hal      = new Resource($resource, 'id');
-        $this->assertSame($resource, $hal->resource);
+        $entity   = new stdClass;
+        $hal      = new Entity($entity, 'id');
+        $this->assertSame($entity, $hal->entity);
         $this->assertEquals('id', $hal->id);
     }
 
     public function testComposesLinkCollectionByDefault()
     {
-        $resource = new stdClass;
-        $hal      = new Resource($resource, 'id', 'route', array('foo' => 'bar'));
+        $entity = new stdClass;
+        $hal    = new Entity($entity, 'id', 'route', array('foo' => 'bar'));
         $this->assertInstanceOf('ZF\Hal\Link\LinkCollection', $hal->getLinks());
     }
 
     public function testLinkCollectionMayBeInjected()
     {
-        $resource = new stdClass;
-        $hal      = new Resource($resource, 'id', 'route', array('foo' => 'bar'));
+        $entity   = new stdClass;
+        $hal      = new Entity($entity, 'id', 'route', array('foo' => 'bar'));
         $links    = new LinkCollection();
         $hal->setLinks($links);
         $this->assertSame($links, $hal->getLinks());
     }
 
-    public function testRetrievingResourceCanReturnByReference()
+    public function testRetrievingEntityCanReturnByReference()
     {
-        $resource = ['foo' => 'bar'];
-        $hal      = new Resource($resource, 'id');
-        $this->assertEquals($resource, $hal->resource);
+        $entity   = ['foo' => 'bar'];
+        $hal      = new Entity($entity, 'id');
+        $this->assertEquals($entity, $hal->entity);
 
-        $resource =& $hal->resource;
-        $resource['foo'] = 'baz';
+        $entity =& $hal->entity;
+        $entity['foo'] = 'baz';
 
-        $secondRetrieval =& $hal->resource;
+        $secondRetrieval =& $hal->entity;
         $this->assertEquals('baz', $secondRetrieval['foo']);
     }
 }
