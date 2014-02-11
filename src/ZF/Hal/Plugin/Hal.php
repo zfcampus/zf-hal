@@ -7,6 +7,7 @@
 namespace ZF\Hal\Plugin;
 
 use ArrayObject;
+use JsonSerializable;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
@@ -1003,6 +1004,10 @@ class Hal extends AbstractHelper implements
      */
     protected function convertResourceToArray($resource)
     {
+        if ($resource instanceof JsonSerializable) {
+            return $resource->jsonSerialize();
+        }
+
         $hydrator = $this->getHydratorForResource($resource);
         if (!$hydrator) {
             return (array) $resource;

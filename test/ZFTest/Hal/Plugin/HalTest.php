@@ -306,6 +306,16 @@ class HalTest extends TestCase
         $this->assertRelationalLinkContains('/embedded_custom/baz', 'self', $second);
     }
 
+    public function testRendersJsonSerializableObjectUsingJsonserializeMethod()
+    {
+        $object   = new TestAsset\JsonSerializableResource('foo', 'Foo');
+        $resource = new Resource($object, 'foo');
+        $rendered = $this->plugin->renderResource($resource);
+        $this->assertArrayHasKey('id', $rendered);
+        $this->assertArrayNotHasKey('name', $rendered);
+        $this->assertArrayHasKey('_links', $rendered);
+    }
+
     public function testRendersEmbeddedCollectionsInsideResourcesBasedOnMetadataMap()
     {
         $collection = new TestAsset\Collection(
