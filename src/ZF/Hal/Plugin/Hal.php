@@ -7,6 +7,7 @@
 namespace ZF\Hal\Plugin;
 
 use ArrayObject;
+use JsonSerializable;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
@@ -1128,11 +1129,16 @@ class Hal extends AbstractHelper implements
     protected function convertEntityToArray($entity)
     {
         $hydrator = $this->getHydratorForEntity($entity);
-        if (!$hydrator) {
-            return (array) $entity;
+
+        if ($hydrator) {
+            return $hydrator->extract($entity);
         }
 
-        return $hydrator->extract($entity);
+        if ($entity instanceof JsonSerializable) {
+            return $entity->jsonSerialize();
+        }
+
+        return (array) $entity;
     }
 
     /**
