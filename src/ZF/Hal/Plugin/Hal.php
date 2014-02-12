@@ -445,13 +445,13 @@ class Hal extends AbstractHelper implements
     /**
      * Deprecated: render an individual entity
      *
-     * This method exists for pre-0.9.0 consumers, and ensures the 
-     * renderResource event is triggered, before proxing to the renderEntity() 
+     * This method exists for pre-0.9.0 consumers, and ensures the
+     * renderResource event is triggered, before proxing to the renderEntity()
      * method.
-     * 
+     *
      * @deprecated
-     * @param  Resource $halResource 
-     * @param  bool $renderResource 
+     * @param  Resource $halResource
+     * @param  bool $renderResource
      * @return array
      */
     public function renderResource(Resource $halResource, $renderResource = true)
