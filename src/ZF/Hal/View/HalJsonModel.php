@@ -48,7 +48,7 @@ class HalJsonModel extends JsonModel
 
     /**
      * Does the payload represent a HAL entity?
-     * 
+     *
      * @return bool
      */
     public function isEntity()
