@@ -62,7 +62,7 @@ class EntityTest extends TestCase
 
     public function testRetrievingEntityCanReturnByReference()
     {
-        $entity   = ['foo' => 'bar'];
+        $entity   = array('foo' => 'bar');
         $hal      = new Entity($entity, 'id');
         $this->assertEquals($entity, $hal->entity);
 

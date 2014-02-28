@@ -6,7 +6,7 @@
 
 namespace ZFTest\Hal\TestAsset;
 
-use JsonSerializable as JsonSerializableInterface;
+use Zend\Stdlib\JsonSerializable as JsonSerializableInterface;
 
 /**
  * @subpackage UnitTest

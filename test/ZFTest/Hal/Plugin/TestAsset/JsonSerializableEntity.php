@@ -6,7 +6,7 @@
 
 namespace ZFTest\Hal\Plugin\TestAsset;
 
-use JsonSerializable;
+use Zend\Stdlib\JsonSerializable;
 
 class JsonSerializableEntity extends Entity implements JsonSerializable
 {

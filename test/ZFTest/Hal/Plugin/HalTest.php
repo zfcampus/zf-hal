@@ -952,12 +952,12 @@ class HalTest extends TestCase
      */
     public function testRenderingPaginatorCollectionRendersPaginationAttributes()
     {
-        $set = [];
+        $set = array();
         for ($id = 1; $id <= 100; $id += 1) {
-            $entity = new Entity((object) ['id' => $id, 'name' => 'foo'], 'foo');
+            $entity = new Entity((object) array('id' => $id, 'name' => 'foo'), 'foo');
             $links = $entity->getLinks();
             $self = new Link('self');
-            $self->setRoute('hostname/users', ['id' => $id]);
+            $self->setRoute('hostname/users', array('id' => $id));
             $links->add($self);
             $set[] = $entity;
         }
@@ -970,13 +970,13 @@ class HalTest extends TestCase
         $collection->setPageSize(10);
 
         $rendered = $this->plugin->renderCollection($collection);
-        $expected = [
+        $expected = array(
             '_links',
             '_embedded',
             'page_count',
             'page_size',
             'total_items',
-        ];
+        );
         $this->assertEquals($expected, array_keys($rendered));
         $this->assertEquals(100, $rendered['total_items']);
         $this->assertEquals(10, $rendered['page_count']);
@@ -1003,7 +1003,7 @@ class HalTest extends TestCase
 
         $rendered = $this->plugin->renderCollection($collection);
 
-        $expectedKeys = ['_links', '_embedded', 'total_items'];
+        $expectedKeys = array('_links', '_embedded', 'total_items');
         $this->assertEquals($expectedKeys, array_keys($rendered));
     }
 }
