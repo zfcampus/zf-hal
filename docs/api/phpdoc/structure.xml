@@ -5,7 +5,7 @@
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -287,7 +287,7 @@
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -408,7 +408,7 @@ stack trace and previous exception information.</description>
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -506,7 +506,7 @@ of options used to define a Metadata instance.&lt;/p&gt;</long-description>
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -947,7 +947,7 @@ layer to select the current page based on the query string or route.&lt;/p&gt;</
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -970,7 +970,7 @@ an inability to update an item and automatically report it.</description>
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -993,7 +993,7 @@ an inability to patch an item and automatically report it.</description>
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -1113,7 +1113,7 @@ an inability to patch an item and automatically report it.</description>
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -1132,7 +1132,7 @@ an inability to patch an item and automatically report it.</description>
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -1152,7 +1152,7 @@ an inability to patch an item and automatically report it.</description>
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -1188,7 +1188,7 @@ an inability to patch an item and automatically report it.</description>
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -1209,7 +1209,7 @@ an inability to patch an item and automatically report it.</description>
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -1229,7 +1229,7 @@ an inability to patch an item and automatically report it.</description>
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -1252,7 +1252,7 @@ an inability to create an item and automatically report it.</description>
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -1271,7 +1271,7 @@ an inability to create an item and automatically report it.</description>
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -1614,7 +1614,7 @@ underscores.&lt;/p&gt;
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -1746,7 +1746,7 @@ underscores.&lt;/p&gt;
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -1843,7 +1843,7 @@ underscores.&lt;/p&gt;
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -1929,7 +1929,7 @@ in this Module.</description>
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -2007,7 +2007,7 @@ type based on the detection that occurred during renderer selection.&lt;/p&gt;</
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -2136,7 +2136,7 @@ representation appropriate to the type.&lt;/p&gt;
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -2526,7 +2526,7 @@ representation appropriate to the type.&lt;/p&gt;
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -2979,7 +2979,7 @@ AcceptableViewModelSelector plugin, and the $acceptCriteria property.&lt;/p&gt;<
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -3072,7 +3072,7 @@ replaced with a RestfulJsonModel containing an API-Problem payload.&lt;/p&gt;</l
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -3179,7 +3179,7 @@ replaced with a RestfulJsonModel containing an API-Problem payload.&lt;/p&gt;</l
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -3411,7 +3411,7 @@ replaced with a RestfulJsonModel containing an API-Problem payload.&lt;/p&gt;</l
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -3552,7 +3552,7 @@ replaced with a RestfulJsonModel containing an API-Problem payload.&lt;/p&gt;</l
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -4073,7 +4073,7 @@ arguments, which will then be used by the method to generate the url.&lt;/p&gt;<
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
@@ -4174,7 +4174,7 @@ arguments, which will then be used by the method to generate the url.&lt;/p&gt;<
       <description></description>
       <long-description></long-description>
       <tag line="2" name="link" description="for the canonical source repository" link="https://github.com/weierophinney/PhlyRestfully"/>
-      <tag line="2" name="copyright" description="Copyright (c) 2013 Matthew Weier O'Phinney"/>
+      <tag line="2" name="copyright" description="Copyright (c) 2014 Matthew Weier O'Phinney"/>
       <tag line="2" name="license" description="http://opensource.org/licenses/BSD-2-Clause BSD-2-Clause"/>
       <tag line="2" name="package" description="PhlyRestfully"/>
     </docblock>
