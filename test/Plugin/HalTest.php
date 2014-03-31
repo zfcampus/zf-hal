@@ -775,10 +775,14 @@ class HalTest extends TestCase
     }
 
     /**
-     * Test that the hal metadata route params config allows callables. All callables should be passed the object
-     * being used for entity creation. If closure binding is supported, any closures should be bound to that object.
+     * Test that the hal metadata route params config allows callables.
      *
-     * The return value should be used as the route param for the link (in place of the callable).
+     * All callables should be passed the object being used for entity creation.
+     * If closure binding is supported, any closures should be bound to that
+     * object.
+     *
+     * The return value should be used as the route param for the link (in 
+     * place of the callable).
      */
     public function testRouteParamsAllowsCallable()
     {
@@ -790,7 +794,9 @@ class HalTest extends TestCase
                  ->with($this->equalTo($object))
                  ->will($this->returnValue('callback-param'));
 
-        $closure = function(){};
+        $closure = function () {
+            // does nothing
+        };
 
         $canBind = is_callable(array($closure, 'bindTo'));
         $test = $this;
@@ -799,17 +805,17 @@ class HalTest extends TestCase
             'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
                 'hydrator'     => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route_name'   => 'hostname/resource',
-                'route_params' => [
+                'route_params' => array(
                     'test-1' => array($callback, 'callback'),
-                    'test-2' => function($expected) use ($object, $canBind, $test){
+                    'test-2' => function ($expected) use ($object, $canBind, $test) {
                         $test->assertSame($expected, $object);
-                        if($canBind){
+                        if ($canBind) {
                             $test->assertSame($object, $this);
                         }
 
                         return 'closure-param';
-                    }
-                ]
+                    },
+                ),
             ),
         ));
 
