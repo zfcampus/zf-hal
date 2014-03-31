@@ -7,6 +7,7 @@
 namespace ZF\Hal\Plugin;
 
 use ArrayObject;
+use Closure;
 use JsonSerializable;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
@@ -1167,6 +1168,22 @@ class Hal extends AbstractHelper implements
         }
 
         $params = $metadata->getRouteParams();
+
+        // process any callbacks
+        foreach ($params as $key => $param) {
+            // bind to the object if supported
+            if ($param instanceof Closure) {
+                if (is_callable(array($param, 'bindTo'))) {
+                    $param = $param->bindTo($object);
+                }
+            }
+
+            // pass the object for callbacks and non-bound closures
+            if (is_callable($param)) {
+                $params[$key] = $param($object);
+            }
+        }
+
         if ($routeIdentifierName) {
             $params = array_merge($params, array($routeIdentifierName => $id));
         }
