@@ -82,4 +82,17 @@ class LinkCollectionTest extends TestCase
         }
         $this->assertEquals(2, $i);
     }
+
+    public function testCannotDuplicateSelf()
+    {
+        $first = new Link('self');
+        $second = new Link('self');
+
+        $this->links->add($first)
+                    ->add($second);
+
+        $this->assertTrue($this->links->has('self'));
+        $this->assertInstanceOf('ZF\Hal\Link\Link', $this->links->get('self'));
+        $this->assertSame($second, $this->links->get('self'));
+    }
 }
