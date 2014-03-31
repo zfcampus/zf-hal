@@ -51,7 +51,7 @@ class LinkCollection implements Countable, IteratorAggregate
     public function add(Link $link, $overwrite = false)
     {
         $relation = $link->getRelation();
-        if (!isset($this->links[$relation]) || $overwrite) {
+        if (!isset($this->links[$relation]) || $overwrite || 'self' == $relation) {
             $this->links[$relation] = $link;
             return $this;
         }
