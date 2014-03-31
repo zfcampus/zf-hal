@@ -781,7 +781,7 @@ class HalTest extends TestCase
      * If closure binding is supported, any closures should be bound to that
      * object.
      *
-     * The return value should be used as the route param for the link (in 
+     * The return value should be used as the route param for the link (in
      * place of the callable).
      */
     public function testRouteParamsAllowsCallable()
@@ -794,11 +794,6 @@ class HalTest extends TestCase
                  ->with($this->equalTo($object))
                  ->will($this->returnValue('callback-param'));
 
-        $closure = function () {
-            // does nothing
-        };
-
-        $canBind = is_callable(array($closure, 'bindTo'));
         $test = $this;
 
         $metadata = new MetadataMap(array(
@@ -807,9 +802,9 @@ class HalTest extends TestCase
                 'route_name'   => 'hostname/resource',
                 'route_params' => array(
                     'test-1' => array($callback, 'callback'),
-                    'test-2' => function ($expected) use ($object, $canBind, $test) {
+                    'test-2' => function ($expected) use ($object, $test) {
                         $test->assertSame($expected, $object);
-                        if ($canBind) {
+                        if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
                             $test->assertSame($object, $this);
                         }
 

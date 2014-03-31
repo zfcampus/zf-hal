@@ -1172,15 +1172,15 @@ class Hal extends AbstractHelper implements
         // process any callbacks
         foreach ($params as $key => $param) {
             // bind to the object if supported
-            if ($param instanceof Closure) {
-                if (is_callable(array($param, 'bindTo'))) {
-                    $param = $param->bindTo($object);
-                }
+            if ($param instanceof Closure
+                && version_compare(PHP_VERSION, '5.4.0') >= 0
+            ) {
+                $param = $param->bindTo($object);
             }
 
             // pass the object for callbacks and non-bound closures
             if (is_callable($param)) {
-                $params[$key] = $param($object);
+                $params[$key] = call_user_func_array($param, array($object));
             }
         }
 
