@@ -781,7 +781,7 @@ class HalTest extends TestCase
      * If closure binding is supported, any closures should be bound to that
      * object.
      *
-     * The return value should be used as the route param for the link (in 
+     * The return value should be used as the route param for the link (in
      * place of the callable).
      */
     public function testRouteParamsAllowsCallable()

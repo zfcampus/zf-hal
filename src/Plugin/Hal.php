@@ -1172,7 +1172,9 @@ class Hal extends AbstractHelper implements
         // process any callbacks
         foreach ($params as $key => $param) {
             // bind to the object if supported
-            if ($param instanceof Closure AND version_compare(PHP_VERSION, '5.4.0') >= 0) {
+            if ($param instanceof Closure
+                && version_compare(PHP_VERSION, '5.4.0') >= 0
+            ) {
                 $param = $param->bindTo($object);
             }
 
