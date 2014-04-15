@@ -6,13 +6,8 @@ ZF HAL
 Introduction
 ------------
 
-This module provides data structures for Hypermedia Application Language, as
-well as the ability to render them to JSON.
-
-- [HAL](http://tools.ietf.org/html/draft-kelly-json-hal-03), used for creating
-  hypermedia links
-- [Problem API](http://tools.ietf.org/html/draft-nottingham-http-problem-02),
-  used for reporting API problems
+This module provides the ability to generate [Hypermedia Application
+Language](http://tools.ietf.org/html/draft-kelly-json-hal-06) JSON representations.
 
 Installation
 ------------
@@ -52,27 +47,50 @@ Configuration
 
 ### User Configuration
 
-This module utilizes the top level key `zf-hal` for user configuration
+This module utilizes the top level key `zf-hal` for user configuration.
 
 #### Key: `renderer`
 
-This is a configuration array is used to configure the `zf-hal` `Hal` service plugin.  It
+This is a configuration array used to configure the `zf-hal` `Hal` view helper/controller plugin.  It
 consists of the following keys:
 
-- `default_hydrator` - if this value is present, this hydrator will be used as the default
-  hydrator from the Hal plugin.
-- `render_embedded_entities` - boolean, default is true, to embed entities in response
-- `render_collections` - boolean, default is true, to render collections in HAL responses
-- `hydrators` - a class to service name map of hydrators that HAL can use when hydrating
+- `default_hydrator` - when present, this named hydrator service will be used as the default
+  hydrator by the `Hal` plugin when no hydrator is configured for an entity class.
+- `render_embedded_entities` - boolean, default `true`, to render full embedded entities in HAL
+  responses; if `false`, embedded entities will contain only their relational links.
+- `render_collections` - boolean, default is `true`, to render collections in HAL responses; if
+  `false`, only a collection's relational links will be rendered.
+- `hydrators` - a map of entity class names to hydrator service names that the `Hal` plugin can use
+  when hydrating entities.
 
 #### Key: `metadata_map`
 
-- `entity_identifier_name` - name of property used for the id
-- `route_name` - a back-reference to the router route name for this resource
-- `route_identifier_name` - the identifier name in the route to be mapped to the resource id
-- `hydrator` - the hydrator service to use for hydrating this resource
-- `is_collection` - boolean; set to true for collections
-- `links` - an array of configuration for constructing relational links, structure:
+The metadata map is used to hint to the `Hal` plugin how it should render objects of specific
+class types. When the `Hal` plugin encounters an object found in the metadata map, it will use the
+configuration for that class when creating a representation; this information typically indicates
+how to generate relational links, how to serialize the object, and whether or not it represents a
+collection.
+
+Each class in the metadata map may contain one or more of the following configuration keys:
+
+- `entity_identifier_name` - name of the class property (after serialization) used for the
+  identifier.
+- `route_name` - a reference to the route name used to generate `self` relational links for the
+  collection or entity.
+- `route_identifier_name` - the identifier name used in the route that will represent the entity
+  identifier in the URI path. This is often different than the `entity_identifier_name` as each
+  variable segment in a route must have a unique name.
+- `hydrator` - the hydrator service name to use when serializing an entity.
+- `is_collection` - boolean; set to `true` when the class represents a collection.
+- `links` - an array of configuration for constructing relational links; see below for the structure
+  of links.
+- `entity_route_name` - route name for embedded entities of a collection.
+- `route_params` - an array of route parameters to use for link generation.
+- `route_options` - an array of options to pass to the router during link generation.
+- `url` - specific URL to use with this resource, if not using a route.
+
+The `links` property is an array of arrays, each with the following structure:
+
 ```php
 array(
     'rel'   => 'link relation',
@@ -83,20 +101,16 @@ array(
         'options' => array( /* any options to pass to the router */ ),
     ),
 ),
-// repeat as needed for any additional relational links you want for this resource
+// repeat as needed for any additional relational links
 ```
-- `resource_route_name` - route name for embedded resources of a collection
-- `route_params` - an array of route params to use for link generation
-- `route_options` - an array of options to pass to the router
-- `url` - pecific URL to use with this resource, if not using a route
 
 ### System Configuration
 
 The following configuration is present to ensure the proper functioning of this module in
-a ZF2 based application.
+a ZF2-based application.
 
 ```php
-// Creates a "HalJson" selector for zfcampus/zf-content-negotiation
+// Creates a "HalJson" selector for use with zfcampus/zf-content-negotiation
 'zf-content-negotiation' => array(
     'selectors' => array(
         'HalJson' => array(
@@ -116,15 +130,51 @@ ZF2 Events
 
 #### `ZF\Hal\Plugin\Hal` Event Manager
 
-The `ZF\Hal\Plugin\Hal` triggers its own events during its lifecycle and workflows.  From the
-`EventManager` instance composed into the HAL plugin, the following events can be attached to:
+The `ZF\Hal\Plugin\Hal` triggers several events during its lifecycle. From the `EventManager`
+instance composed into the HAL plugin, you may attach to the following events:
 
 - `renderCollection`
 - `renderEntity`
 - `createLink`
-- `renderCollection.resource`
 - `renderCollection.entity`
 - `getIdFromEntity`
+
+As an example, you could listen to the `renderEntity` event as follows (the following is done within
+a `Module` class for a ZF2 module and/or Apigility API module):
+
+```php
+class Module
+{
+    public function onBootstrap($e)
+    {
+        $app = $e->getTarget();
+        $services = $app->getServiceManager();
+        $helpers  = $services->get('ViewHelperManager');
+        $hal      = $helpers->get('Hal');
+
+        // The HAL plugin's EventManager instance does not compose a SharedEventManager,
+        // so you must attach directly to it.
+        $hal->getEventManager()->attach('renderEntity', array($this, 'onRenderEntity'));
+    }
+
+    public function onRenderEntity($e)
+    {
+        $entity = $e->getParam('entity');
+        if (! $entity->entity instanceof SomeTypeIHaveDefined) {
+            // do nothing
+            return;
+        }
+
+        // Add a "describedBy" relational link
+        $entity->getLinks()->add(\ZF\Hal\Link\Link::factory(array(
+            'rel' => 'describedBy',
+            'route' => array(
+                'name' => 'my/api/docs',
+            ),
+        ));
+    }
+}
+```
 
 ### Listeners
 
@@ -132,7 +182,7 @@ The `ZF\Hal\Plugin\Hal` triggers its own events during its lifecycle and workflo
 
 This listener is attached to `MvcEvent::EVENT_RENDER` at priority `100`.  If the controller service
 result is a `HalJsonModel`, this listener attaches the `ZF\Hal\JsonStrategy` to the view at
-priority 200.
+priority `200`.
 
 ZF2 Services
 ============
@@ -141,38 +191,41 @@ ZF2 Services
 
 #### `ZF\Hal\Collection`
 
-`Collection` is responsible for modeling general collections as HAL collections.
+`Collection` is responsible for modeling general collections as HAL collections, and composing
+relational links.
 
 #### `ZF\Hal\Entity`
 
-`Entity` is responsible for modeling general purpose entities and plain objects as HAL entities.
+`Entity` is responsible for modeling general purpose entities and plain objects as HAL entities, and
+composing relational links.
 
 #### `ZF\Hal\Link\Link`
 
-`Link\Link` is responsible for modeling a link in HAL.  The `Link\Link` class also has a
-`factory()` method that can take an array of information as an argument to produce valid
-`Link\Link` instances.
+`Link` is responsible for modeling a relational link.  The `Link` class also has a static
+`factory()` method that can take an array of information as an argument to produce valid `Link`
+instances.
 
 #### `ZF\Hal\Link\LinkCollection`
 
-`LinkCollection` is a model responsible for aggregating a collection of `Link\Link`.
+`LinkCollection` is a model responsible for aggregating a collection of `Link` instances.
 
 #### `ZF\Hal\Metadata\Metadata`
 
-`Metadata\Metadata` is responsible for collecting all the necessary dependencies, hydrators
-and other information necessary to create HAL entities, links, or collections.
+`Metadata` is responsible for collecting all the necessary dependencies, hydrators and other
+information necessary to create HAL entities, links, or collections.
 
 #### `ZF\Hal\Metadata\MetadataMap`
 
-`Metadata\MetadataMap` aggregates an array of service/class name keyed `Metadata\Metadata`
-instances to be used in producing HAL entities, links, or collections.
+The `MetadataMap` aggregates an array of class name keyed `Metadata` instances to be used in
+producing HAL entities, links, or collections.
 
 ### Controller Plugins
 
 #### `ZF\Hal\Plugin\Hal` (a.k.a. `Hal`)
 
-This controller plugin is responsible for providing controllers the facilities to generate
-HAL data models based on both configuration and through calling the various factory methods.
+This class operates both as a view helper and as a controller plugin. It is responsible for
+providing controllers the facilities to generate HAL data models, as well as rendering relational
+links and HAL data structures.
 
 ### View Layer
 
@@ -180,15 +233,15 @@ HAL data models based on both configuration and through calling the various fact
 
 `HalJsonModel` is a view model that when used as the result of a controller service response
 signifies to the `zf-hal` module that the data within the model should be utilized to
-produce a HAL based HTTP JSON response.
+produce a JSON HAL representation.
 
 #### `ZF\Hal\View\HalJsonRenderer`
 
-`HalJsonRenderer` is a view renderer responsible for rendering `HalJsonModel`'s.  In turn,
-this renderer will call upon the `Plugin\Hal` in order to do the heavy lifting of transforming
-the individual model content (`Entity`, `Collection`) into HAL payloads.
+`HalJsonRenderer` is a view renderer responsible for rendering `HalJsonModel` instances. In turn,
+this renderer will call upon the `Hal` plugin/view helper in order to transform the model content
+(an `Entity` or `Collection`) into a HAL representation.
 
 #### `ZF\Hal\View\HalJsonStrategy`
 
-`HalJsonStrategy` is responsible for selecting `HalJsonRenderer` when inspecting the controller
-service response and it is found to be (or match) `HalJsonModel`.
+`HalJsonStrategy` is responsible for selecting `HalJsonRenderer` when it identifies a `HalJsonModel`
+as the controller service response.
