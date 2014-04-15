@@ -112,6 +112,20 @@ a ZF2 based application.
 ZF2 Events
 ==========
 
+### Events
+
+#### `ZF\Hal\Plugin\Hal` Event Manager
+
+The `ZF\Hal\Plugin\Hal` triggers its own events during its lifecycle and workflows.  From the
+`EventManager` instance composed into the HAL plugin, the following events can be attached to:
+
+- `renderCollection`
+- `renderEntity`
+- `createLink`
+- `renderCollection.resource`
+- `renderCollection.entity`
+- `getIdFromEntity`
+
 ### Listeners
 
 #### `ZF\Hal\Module::onRender`
