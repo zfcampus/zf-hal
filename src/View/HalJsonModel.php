@@ -80,4 +80,17 @@ class HalJsonModel extends JsonModel
     {
         return $this->getVariable('payload');
     }
+
+    /**
+     * Override setTerminal()
+     *
+     * Does nothing; does not allow re-setting "terminate" flag.
+     *
+     * @param  bool $flag
+     * @return self
+     */
+    public function setTerminal($flag = true)
+    {
+        return $this;
+    }
 }

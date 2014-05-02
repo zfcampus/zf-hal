@@ -103,4 +103,13 @@ class HalJsonModelTest extends TestCase
     {
         $this->assertTrue($this->model->terminate());
     }
+
+    /**
+     * @depends testIsTerminalByDefault
+     */
+    public function testTerminalFlagIsNotMutable()
+    {
+        $this->model->setTerminal(false);
+        $this->assertTrue($this->model->terminate());
+    }
 }
