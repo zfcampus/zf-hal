@@ -6,8 +6,6 @@
 
 namespace ZF\Hal\View;
 
-use Zend\Paginator\Paginator;
-use Zend\Stdlib\Hydrator\HydratorInterface;
 use Zend\View\HelperPluginManager;
 use Zend\View\Renderer\JsonRenderer;
 use Zend\View\ViewEvent;
@@ -17,8 +15,6 @@ use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Entity;
 use ZF\Hal\Collection;
 use ZF\Hal\Link\Link;
-use ZF\Hal\Link\LinkCollection;
-use ZF\Hal\Plugin\Hal as HalPlugin;
 
 /**
  * Handles rendering of the following:

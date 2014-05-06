@@ -157,7 +157,7 @@ class Metadata
             }
 
             // Fix BC issue: s/identifier_name/route_identifier_name/
-            if ($filteredKey === 'identifiername')  {
+            if ($filteredKey === 'identifiername') {
                 $legacyIdentifierName = $value;
                 continue;
             }

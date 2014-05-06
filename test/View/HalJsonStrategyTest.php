@@ -8,7 +8,6 @@ namespace ZFTest\Hal\View;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use Zend\Http\Response;
-use Zend\View\Renderer\JsonRenderer;
 use Zend\View\ViewEvent;
 use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Collection;

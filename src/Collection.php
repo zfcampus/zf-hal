@@ -8,7 +8,6 @@ namespace ZF\Hal;
 
 use Traversable;
 use Zend\Stdlib\ArrayUtils;
-use Zend\Filter\FilterChain;
 
 /**
  * Model a collection for use with HAL payloads

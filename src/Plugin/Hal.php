@@ -619,7 +619,7 @@ class Hal extends AbstractHelper implements
     public function fromLinkCollection(LinkCollection $collection)
     {
         $links = array();
-        foreach($collection as $rel => $linkDefinition) {
+        foreach ($collection as $rel => $linkDefinition) {
             if ($linkDefinition instanceof Link) {
                 $links[$rel] = $this->fromLink($linkDefinition);
                 continue;

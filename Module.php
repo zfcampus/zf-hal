@@ -6,7 +6,6 @@
 
 namespace ZF\Hal;
 
-use Zend\Stdlib\Hydrator\HydratorInterface;
 use Zend\Stdlib\Hydrator\HydratorPluginManager;
 use Zend\Mvc\MvcEvent;
 
