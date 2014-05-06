@@ -14,7 +14,6 @@ use ZF\ApiProblem\View\ApiProblemModel;
 use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Entity;
 use ZF\Hal\Collection;
-use ZF\Hal\Link\Link;
 
 /**
  * Handles rendering of the following:
