@@ -23,11 +23,14 @@
     "extra": {
         "branch-alias": {
             "dev-master": "1.0-dev"
+        },
+        "branch-alias": {
+            "dev-develop": "1.1-dev"
         }
     },
     "require": {
         "php": ">=5.3.23",
-        "zfcampus/zf-api-problem": "~1.0-dev",
+        "zfcampus/zf-api-problem": "~1.0",
         "zendframework/zend-escaper": "~2.3",
         "zendframework/zend-eventmanager": "~2.3",
         "zendframework/zend-json": "~2.3",
