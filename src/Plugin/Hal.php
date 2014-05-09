@@ -975,10 +975,12 @@ class Hal extends AbstractHelper implements
     protected function extractEmbeddedCollection(array &$parent, $key, Collection $collection)
     {
         $rendered = $this->extractCollection($collection);
-        if (!isset($parent['_embedded'])) {
-            $parent['_embedded'] = array();
+        if (count($rendered) > 0) {
+            if (!isset($parent['_embedded'])) {
+                $parent['_embedded'] = array();
+            }
+            $parent['_embedded'][$key] = $rendered;
         }
-        $parent['_embedded'][$key] = $rendered;
         unset($parent[$key]);
     }
 

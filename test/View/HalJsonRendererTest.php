@@ -16,7 +16,6 @@ use Zend\Stdlib\Hydrator;
 use Zend\View\HelperPluginManager;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
-use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
@@ -31,6 +30,11 @@ use ZFTest\Hal\TestAsset;
  */
 class HalJsonRendererTest extends TestCase
 {
+    /**
+     * @var HalJsonRenderer
+     */
+    protected $renderer;
+
     public function setUp()
     {
         $this->renderer = new HalJsonRenderer(new ApiProblemRenderer());
@@ -623,5 +627,51 @@ class HalJsonRendererTest extends TestCase
             $this->assertObjectHasAttribute('foo', $item);
             $this->assertEquals('bar', $item->foo);
         }
+    }
+
+    public function testOnlyEmptyCollectionPreventsEmbeddedInResponse()
+    {
+        $this->setUpHelpers();
+
+        $emptyCollection = new Collection(array());
+
+        $entity = new Entity(array(
+            'name' => 'phpunit-collection-test',
+            'collection' => $emptyCollection
+        ), 'phpunit-test-id');
+
+        $model = new HalJsonModel(array('payload' => $entity));
+
+        $renderResult = json_decode($this->renderer->render($model));
+
+        $this->assertObjectNotHasAttribute('_embedded', $renderResult);
+    }
+
+    public function testEmptyCollectionDoesNotAppearInResponse()
+    {
+        $this->setUpHelpers();
+
+        $collectionEntity = new Entity(array(
+            'test-key' => 'test-value'
+        ), 'phpunit-inner-test-entity');
+
+        $emptyCollection = new Collection(array());
+        $collection = new Collection(array(
+            'phpunit' => $collectionEntity
+        ));
+
+        $entity = new Entity(array(
+            'name' => 'phpunit-collectiontest',
+            'empty-collection' => $emptyCollection,
+            'collection' => $collection
+        ), 'phpunit-test-id');
+
+        $model = new HalJsonModel(array('payload' => $entity));
+
+        $renderResult = json_decode($this->renderer->render($model));
+
+        $this->assertObjectHasAttribute('_embedded', $renderResult);
+        $this->assertObjectHasAttribute('collection', $renderResult->_embedded);
+        $this->assertObjectNotHasAttribute('empty-collection', $renderResult->_embedded);
     }
 }
