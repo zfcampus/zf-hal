@@ -1,15 +1,17 @@
 <?php
 printf("Executing php_cs!!!\n\n");
+
+$rootDir = __DIR__;
+
 $finder = Symfony\CS\Finder\DefaultFinder::create()
-    ->in(__DIR__)
+    ->in($rootDir)
     ->ignoreDotFiles(true)
-    ->filter(function (SplFileInfo $file) {
-        $path = $file->getPathname();
+    ->filter(function (SplFileInfo $file) use ($rootDir) {
+        $path = $file->getRealPath();
 
         switch (true) {
-            case (strrpos($path, '/test/Bootstrap.php')):
-                return false;
-            case (strrpos($path, '/vendor/')):
+            case (strrpos($path, $rootDir . '/test/Bootstrap.php')):
+            case (strrpos($path, $rootDir . '/vendor/')):
                 return false;
             default:
                 return true;

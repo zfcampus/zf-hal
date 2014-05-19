@@ -746,9 +746,9 @@ class HalTest extends TestCase
         $this->plugin->setMetadataMap($metadata);
         $halEntity = $this->plugin->createEntityFromMetadata($object, $metadata->get('ZFTest\Hal\Plugin\TestAsset\Entity'));
         $this->assertInstanceof('ZF\Hal\Entity', $halEntity);
-        
+
         $this->assertSame($object, $halEntity->entity);
-        
+
     }
 
     /**
