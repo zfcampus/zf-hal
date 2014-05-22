@@ -7,6 +7,7 @@
 namespace ZFTest\Hal\Plugin;
 
 use PHPUnit_Framework_TestCase as TestCase;
+use ReflectionObject;
 use Zend\Http\Request;
 use Zend\Mvc\Router\Http\TreeRouteStack;
 use Zend\Mvc\Router\RouteMatch;
@@ -1061,5 +1062,74 @@ class HalTest extends TestCase
 
         $expectedKeys = array('_links', '_embedded', 'total_items');
         $this->assertEquals($expectedKeys, array_keys($rendered));
+    }
+
+    /**
+     * @group 33
+     */
+    public function testCreateEntityShouldNotSerializeEntity()
+    {
+        $metadata = new MetadataMap(array(
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
+                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route_name' => 'hostname/resource',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
+            ),
+        ));
+        $this->plugin->setMetadataMap($metadata);
+
+        $foo = new TestAsset\Entity('foo', 'Foo Bar');
+
+        $entity = $this->plugin->createEntity($foo, 'api.foo', 'foo_id');
+        $this->assertInstanceOf('ZF\Hal\Entity', $entity);
+        $this->assertSame($foo, $entity->entity);
+    }
+
+    /**
+     * Test that the convertEntityToArray() caches serialization results by object.
+     *
+     * This is done because if you call createEntity() -- say, from a ZF\Rest\RestController,
+     * you may end up calling convertEntityToArray() twice -- once to create the HAL
+     * entity with the appropriate identifier, and another when creating the serialized
+     * representation.
+     *
+     * This method is testing internals of the plugin; realistically, the behavior is
+     * transparent to the end-user.
+     *
+     * @group 33
+     */
+    public function testConvertEntityToArrayCachesSerialization()
+    {
+        $metadata = new MetadataMap(array(
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
+                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route_name' => 'hostname/resource',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
+            ),
+        ));
+        $this->plugin->setMetadataMap($metadata);
+
+        $foo = new TestAsset\Entity('foo', 'Foo Bar');
+
+        $entity1 = $this->plugin->createEntityFromMetadata($foo, $metadata->get($foo));
+        $serialized1 = $this->plugin->renderEntity($entity1);
+
+        $entity2 = $this->plugin->createEntityFromMetadata($foo, $metadata->get($foo));
+        $serialized2 = $this->plugin->renderEntity($entity2);
+
+        $this->assertSame($serialized1, $serialized2);
+
+        $data = $serialized1;
+        unset($data['_links']);
+
+        $r = new ReflectionObject($this->plugin);
+        $p = $r->getProperty('serializedEntities');
+        $p->setAccessible(true);
+        $serializedEntities = $p->getValue($this->plugin);
+        $this->assertInstanceOf('SplObjectStorage', $serializedEntities);
+        $this->assertTrue($serializedEntities->contains($foo));
+        $this->assertSame($data, $serializedEntities[$foo]);
     }
 }
