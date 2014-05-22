@@ -9,6 +9,7 @@ namespace ZF\Hal\Plugin;
 use ArrayObject;
 use Closure;
 use JsonSerializable;
+use SplObjectStorage;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
@@ -67,6 +68,13 @@ class Hal extends AbstractHelper implements
     protected $renderCollections = true;
 
     /**
+     * Map of entities to their ZF\Hal\Entity serializations
+     * 
+     * @var SplObjectStorage
+     */
+    protected $serializedEntities;
+
+    /**
      * @var EventManagerInterface
      */
     protected $events;
@@ -107,6 +115,8 @@ class Hal extends AbstractHelper implements
             $hydrators = new HydratorPluginManager();
         }
         $this->hydrators = $hydrators;
+
+        $this->serializedEntities = new SplObjectStorage();
     }
 
     /**
@@ -686,18 +696,7 @@ class Hal extends AbstractHelper implements
             return $this->createCollectionFromMetadata($object, $metadata);
         }
 
-        if ($metadata->hasHydrator()) {
-            $hydrator = $metadata->getHydrator();
-        } else {
-            $hydrator = $this->getHydratorForEntity($object);
-        }
-        if (!$hydrator instanceof HydratorInterface) {
-            throw new Exception\RuntimeException(sprintf(
-                'Unable to extract %s; no hydrator registered',
-                get_class($object)
-            ));
-        }
-        $data = $hydrator->extract($object);
+        $data = $this->convertEntityToArray($object);
 
         $entityIdentifierName = $metadata->getEntityIdentifierName();
         if ($entityIdentifierName and !isset($data[$entityIdentifierName])) {
@@ -752,23 +751,33 @@ class Hal extends AbstractHelper implements
     public function createEntity($entity, $route, $routeIdentifierName)
     {
         $metadataMap = $this->getMetadataMap();
-        if (is_object($entity) && $metadataMap->has($entity)) {
-            $entity = $this->createEntityFromMetadata($entity, $metadataMap->get($entity));
+
+        switch (true) {
+            case (is_object($entity) && $metadataMap->has($entity)):
+                $halEntity = $this->createEntityFromMetadata($entity, $metadataMap->get($entity));
+                $halEntity = new Entity($entity, $halEntity->id);
+                break;
+
+            case (! $entity instanceof Entity):
+                $id = $this->getIdFromEntity($entity);
+                if (!$id) {
+                    return new ApiProblem(
+                        422,
+                        'No entity identifier present following entity creation.'
+                    );
+                }
+                $halEntity = new Entity($entity, $id);
+                break;
+
+            case ($entity instanceof Entity):
+            default:
+                $halEntity = $entity;
+                // nothing special to do
+                break;
         }
 
-        if (!$entity instanceof Entity) {
-            $id = $this->getIdFromEntity($entity);
-            if (!$id) {
-                return new ApiProblem(
-                    422,
-                    'No entity identifier present following entity creation.'
-                );
-            }
-            $entity = new Entity($entity, $id);
-        }
-
-        $this->injectSelfLink($entity, $route, $routeIdentifierName);
-        return $entity;
+        $this->injectSelfLink($halEntity, $route, $routeIdentifierName);
+        return $halEntity;
     }
 
     /**
@@ -1129,17 +1138,28 @@ class Hal extends AbstractHelper implements
      */
     protected function convertEntityToArray($entity)
     {
+        if (isset($this->serializedEntities[$entity])) {
+            return $this->serializedEntities[$entity];
+        }
+
+        $array    = false;
         $hydrator = $this->getHydratorForEntity($entity);
 
         if ($hydrator) {
-            return $hydrator->extract($entity);
+            $array = $hydrator->extract($entity);
         }
 
-        if ($entity instanceof JsonSerializable) {
-            return $entity->jsonSerialize();
+        if (false === $array && $entity instanceof JsonSerializable) {
+            $array = $entity->jsonSerialize();
         }
 
-        return (array) $entity;
+        if (false === $array) {
+            $array = (array) $entity;
+        }
+
+        $this->serializedEntities[$entity] = $array;
+
+        return $array;
     }
 
     /**
