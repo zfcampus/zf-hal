@@ -708,11 +708,12 @@ class Hal extends AbstractHelper implements
         }
         $id = ($entityIdentifierName) ? $data[$entityIdentifierName]: null;
 
+        $entityData = $object;
         if (!$renderEmbeddedEntities) {
-            $data = array();
+            $entityData = array();
         }
 
-        $entity   = new Entity($data, $id);
+        $entity   = new Entity($entityData, $id);
         $links    = $entity->getLinks();
         $this->marshalMetadataLinks($metadata, $links);
         if (!$links->has('self')) {

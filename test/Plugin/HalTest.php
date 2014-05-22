@@ -733,6 +733,25 @@ class HalTest extends TestCase
         $this->assertEquals('resource/children', $children->getRoute());
     }
 
+    public function testCreateEntityFromMetadataReturnsSameEntityObject()
+    {
+        $object = new TestAsset\Entity('foo', 'Foo');
+
+        $metadata = new MetadataMap(array(
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
+                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route_name' => 'hostname/resource'
+            ),
+        ));
+
+        $this->plugin->setMetadataMap($metadata);
+        $halEntity = $this->plugin->createEntityFromMetadata($object, $metadata->get('ZFTest\Hal\Plugin\TestAsset\Entity'));
+        $this->assertInstanceof('ZF\Hal\Entity', $halEntity);
+
+        $this->assertSame($object, $halEntity->entity);
+
+    }
+
     /**
      * @group 79
      */
