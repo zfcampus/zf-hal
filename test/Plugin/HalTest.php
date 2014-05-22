@@ -1089,7 +1089,7 @@ class HalTest extends TestCase
     /**
      * Test that the convertEntityToArray() caches serialization results by object.
      *
-     * This is done because if you call createEntity() -- say, from a ZF\Rest\RestController, 
+     * This is done because if you call createEntity() -- say, from a ZF\Rest\RestController,
      * you may end up calling convertEntityToArray() twice -- once to create the HAL
      * entity with the appropriate identifier, and another when creating the serialized
      * representation.

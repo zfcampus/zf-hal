@@ -69,7 +69,7 @@ class Hal extends AbstractHelper implements
 
     /**
      * Map of entities to their ZF\Hal\Entity serializations
-     * 
+     *
      * @var SplObjectStorage
      */
     protected $serializedEntities;
