@@ -176,7 +176,7 @@ class Module
             'route' => array(
                 'name' => 'my/api/docs',
             ),
-        ));
+        )));
     }
 }
 ```
