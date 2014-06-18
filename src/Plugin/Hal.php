@@ -503,6 +503,22 @@ class Hal extends AbstractHelper implements
             if (is_object($value) && $metadataMap->has($value)) {
                 $value = $this->createEntityFromMetadata($value, $metadataMap->get($value), $this->getRenderEmbeddedEntities());
             }
+            
+            if (is_object($value)) {
+                $parents = class_parents($value);
+                foreach ($parents as $parent) {
+                    $class = strtolower($parent);
+                    if (isset($this->hydratorMap[$class])) {
+                        $hydrated = $this->hydratorMap[$class]->extract($value);
+                        foreach ($hydrated as $nestedKey => $nestedValue) {
+                            if (is_object($nestedValue)) {
+                                $hydrated[$nestedKey] = $this->renderEntity(new Entity($nestedValue, null));
+                            }
+                        }
+                        $entity[$key] = $hydrated;
+                    }
+                }
+            }
 
             if ($value instanceof Entity) {
                 $this->extractEmbeddedEntity($entity, $key, $value);
@@ -522,7 +538,10 @@ class Hal extends AbstractHelper implements
             }
         }
 
-        $entity['_links'] = $this->fromResource($halEntity);
+        $links = $this->fromResource($halEntity);
+        if ($links) {
+            $entity['_links'] = $links;
+        }
         return $entity;
     }
 
