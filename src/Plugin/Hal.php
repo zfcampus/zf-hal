@@ -512,14 +512,20 @@ class Hal extends AbstractHelper implements
                         $hydrated = $this->hydratorMap[$class]->extract($value);
                         foreach ($hydrated as $nestedKey => $nestedValue) {
                             if (is_object($nestedValue)) {
-                                $hydrated[$nestedKey] = $this->renderEntity(new Entity($nestedValue, null));
+                                $hydrated[$nestedKey] = $this->renderEntity(
+                                    $this->createEntityFromMetadata(
+                                        $nestedValue,
+                                        $metadataMap->get($nestedValue),
+                                        $this->getRenderEmbeddedEntities()
+                                    )
+                                );
                             }
                         }
                         $entity[$key] = $hydrated;
                     }
                 }
             }
-
+            
             if ($value instanceof Entity) {
                 $this->extractEmbeddedEntity($entity, $key, $value);
             }
