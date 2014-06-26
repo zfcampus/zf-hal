@@ -1051,7 +1051,7 @@ class Hal extends AbstractHelper implements
             }
 
             $id = $this->getIdFromEntity($entity);
-            if (!$id) {
+            if ($id === false) {
                 // Cannot handle entities without an identifier
                 // Return as-is
                 $collection[] = $entity;
