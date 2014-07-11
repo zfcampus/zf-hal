@@ -734,6 +734,49 @@ class HalTest extends TestCase
     }
 
     /**
+     * @group 47
+     */
+    public function testRetainsLinksInjectedViaMetadataDuringCreateEntity()
+    {
+        $object = new TestAsset\Entity('foo', 'Foo');
+        $entity = new Entity($object, 'foo');
+
+        $metadata = new MetadataMap(array(
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
+                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route_name' => 'hostname/resource',
+                'links'      => array(
+                    array(
+                        'rel' => 'describedby',
+                        'url' => 'http://example.com/api/help/resource',
+                    ),
+                    array(
+                        'rel' => 'children',
+                        'route' => array(
+                            'name' => 'resource/children',
+                        ),
+                    ),
+                ),
+            ),
+        ));
+
+        $this->plugin->setMetadataMap($metadata);
+        $entity = $this->plugin->createEntity($object, 'hostname/resource', 'id');
+        $this->assertInstanceof('ZF\Hal\Entity', $entity);
+        $links = $entity->getLinks();
+        $this->assertTrue($links->has('describedby'), 'Missing describedby link');
+        $this->assertTrue($links->has('children'), 'Missing children link');
+
+        $describedby = $links->get('describedby');
+        $this->assertTrue($describedby->hasUrl());
+        $this->assertEquals('http://example.com/api/help/resource', $describedby->getUrl());
+
+        $children = $links->get('children');
+        $this->assertTrue($children->hasRoute());
+        $this->assertEquals('resource/children', $children->getRoute());
+    }
+
+    /**
      * @group 79
      */
     public function testInjectsLinksFromMetadataWhenCreatingCollection()
