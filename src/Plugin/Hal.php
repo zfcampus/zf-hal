@@ -761,7 +761,7 @@ class Hal extends AbstractHelper implements
 
             case (! $entity instanceof Entity):
                 $id = $this->getIdFromEntity($entity);
-                if (!$id) {
+                if ($id === false) {
                     return new ApiProblem(
                         422,
                         'No entity identifier present following entity creation.'
@@ -1052,7 +1052,7 @@ class Hal extends AbstractHelper implements
             }
 
             $id = $this->getIdFromEntity($entity);
-            if (!$id) {
+            if ($id === false) {
                 // Cannot handle entities without an identifier
                 // Return as-is
                 $collection[] = $entity;
