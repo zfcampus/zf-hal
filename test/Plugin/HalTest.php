@@ -1175,4 +1175,22 @@ class HalTest extends TestCase
         $this->assertTrue($serializedEntities->contains($foo));
         $this->assertSame($data, $serializedEntities[$foo]);
     }
+
+    /**
+     * @group 39
+     */
+    public function testCreateEntityPassesNullValueForIdentifierIfNotDiscovered()
+    {
+        $entity = array('foo' => 'bar');
+        $hal    = $this->plugin->createEntity($entity, 'api.foo', 'foo_id');
+        $this->assertInstanceOf('ZF\Hal\Entity', $hal);
+        $this->assertEquals($entity, $hal->entity);
+        $this->assertNull($hal->id);
+
+        $links = $hal->getLinks();
+        $this->assertTrue($links->has('self'));
+        $link = $links->get('self');
+        $params = $link->getRouteParams();
+        $this->assertEquals(array(), $params);
+    }
 }
