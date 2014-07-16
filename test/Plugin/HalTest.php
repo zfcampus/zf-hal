@@ -1177,7 +1177,7 @@ class HalTest extends TestCase
     }
 
     /**
-     * @group zf-rest-31
+     * @group 39
      */
     public function testCreateEntityPassesNullValueForIdentifierIfNotDiscovered()
     {
