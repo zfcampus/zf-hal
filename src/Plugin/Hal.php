@@ -760,13 +760,7 @@ class Hal extends AbstractHelper implements
                 break;
 
             case (! $entity instanceof Entity):
-                $id = $this->getIdFromEntity($entity);
-                if ($id === false) {
-                    return new ApiProblem(
-                        422,
-                        'No entity identifier present following entity creation.'
-                    );
-                }
+                $id = $this->getIdFromEntity($entity) ?: null;
                 $halEntity = new Entity($entity, $id);
                 break;
 
@@ -849,7 +843,9 @@ class Hal extends AbstractHelper implements
 
         $routeParams  = array();
         $routeOptions = array();
-        if ($resource instanceof Entity) {
+        if ($resource instanceof Entity
+            && null !== $resource->id
+        ) {
             $routeParams = array(
                 $routeIdentifier => $resource->id,
             );
