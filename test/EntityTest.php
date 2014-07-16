@@ -72,4 +72,13 @@ class EntityTest extends TestCase
         $secondRetrieval =& $hal->entity;
         $this->assertEquals('baz', $secondRetrieval['foo']);
     }
+
+    /**
+     * @group 39
+     */
+    public function testConstructorAllowsNullIdentifier()
+    {
+        $hal = new Entity(array('foo' => 'bar'), null);
+        $this->assertNull($hal->id);
+    }
 }

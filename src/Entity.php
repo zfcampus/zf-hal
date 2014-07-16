@@ -22,7 +22,7 @@ class Entity implements Link\LinkCollectionAwareInterface
      * @param  mixed $id
      * @throws Exception\InvalidEntityException if entity is not an object or array
      */
-    public function __construct($entity, $id)
+    public function __construct($entity, $id = null)
     {
         if (!is_object($entity) && !is_array($entity)) {
             throw new Exception\InvalidEntityException();
