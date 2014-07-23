@@ -73,6 +73,13 @@ class CollectionTest extends TestCase
         $this->assertEquals(3, $hal->getPageSize());
     }
 
+    public function testPageSizeAllowsNegativeOneAsValue()
+    {
+        $hal = new Collection(array(), 'item/route');
+        $hal->setPageSize(-1);
+        $this->assertEquals(-1, $hal->getPageSize());
+    }
+
     public function testDefaultCollectionNameIsItems()
     {
         $hal = new Collection(array(), 'item/route');
