@@ -305,9 +305,9 @@ class Collection implements Link\LinkCollectionAwareInterface
         }
 
         $size = (int) $size;
-        if ($size < 1) {
+        if ($size < 1 && $size !== -1) {
             throw new Exception\InvalidArgumentException(sprintf(
-                'size must be a positive integer; received "%s"',
+                'size must be a positive integer or -1 (to disable pagination); received "%s"',
                 $size
             ));
         }
