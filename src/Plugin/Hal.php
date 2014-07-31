@@ -910,7 +910,7 @@ class Hal extends AbstractHelper implements
         $link->setRoute($route);
         $link->setRouteParams($params);
         $link->setRouteOptions(ArrayUtils::merge($options, array(
-            'query' => array('page' => 1))
+            'query' => array('page' => null))
         ));
         $links->add($link);
 
