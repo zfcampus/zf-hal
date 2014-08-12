@@ -1081,8 +1081,21 @@ class HalTest extends TestCase
         $this->assertEquals(100, $rendered['total_items']);
         $this->assertEquals(10, $rendered['page_count']);
         $this->assertEquals(10, $rendered['page_size']);
+        return $rendered;
     }
 
+    /**
+     * @group 50
+     * @depends testRenderingPaginatorCollectionRendersPaginationAttributes
+     */
+    public function testRenderingPaginatorCollectionRendersFirstLinkWithoutPageInQueryString($rendered)
+    {
+        $links = $rendered['_links'];
+        $this->assertArrayHasKey('first', $links);
+        $first = $links['first'];
+        $this->assertArrayHasKey('href', $first);
+        $this->assertNotContains('page=1', $first['href']);
+    }
 
     /**
      * @group 14
