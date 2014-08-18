@@ -133,7 +133,7 @@ ZF2 Events
 
 ### Events
 
-#### `ZF\Hal\Plugin\Hal` Event Manager
+#### ZF\Hal\Plugin\Hal Event Manager
 
 The `ZF\Hal\Plugin\Hal` triggers several events during its lifecycle. From the `EventManager`
 instance composed into the HAL plugin, you may attach to the following events:
@@ -183,7 +183,7 @@ class Module
 
 ### Listeners
 
-#### `ZF\Hal\Module::onRender`
+#### ZF\Hal\Module::onRender
 
 This listener is attached to `MvcEvent::EVENT_RENDER` at priority `100`.  If the controller service
 result is a `HalJsonModel`, this listener attaches the `ZF\Hal\JsonStrategy` to the view at
@@ -194,39 +194,39 @@ ZF2 Services
 
 ### Models
 
-#### `ZF\Hal\Collection`
+#### ZF\Hal\Collection
 
 `Collection` is responsible for modeling general collections as HAL collections, and composing
 relational links.
 
-#### `ZF\Hal\Entity`
+#### ZF\Hal\Entity
 
 `Entity` is responsible for modeling general purpose entities and plain objects as HAL entities, and
 composing relational links.
 
-#### `ZF\Hal\Link\Link`
+#### ZF\Hal\Link\Link
 
 `Link` is responsible for modeling a relational link.  The `Link` class also has a static
 `factory()` method that can take an array of information as an argument to produce valid `Link`
 instances.
 
-#### `ZF\Hal\Link\LinkCollection`
+#### ZF\Hal\Link\LinkCollection
 
 `LinkCollection` is a model responsible for aggregating a collection of `Link` instances.
 
-#### `ZF\Hal\Metadata\Metadata`
+#### ZF\Hal\Metadata\Metadata
 
 `Metadata` is responsible for collecting all the necessary dependencies, hydrators and other
 information necessary to create HAL entities, links, or collections.
 
-#### `ZF\Hal\Metadata\MetadataMap`
+#### ZF\Hal\Metadata\MetadataMap
 
 The `MetadataMap` aggregates an array of class name keyed `Metadata` instances to be used in
 producing HAL entities, links, or collections.
 
 ### Controller Plugins
 
-#### `ZF\Hal\Plugin\Hal` (a.k.a. `Hal`)
+#### ZF\Hal\Plugin\Hal (a.k.a. "Hal")
 
 This class operates both as a view helper and as a controller plugin. It is responsible for
 providing controllers the facilities to generate HAL data models, as well as rendering relational
@@ -234,19 +234,19 @@ links and HAL data structures.
 
 ### View Layer
 
-#### `ZF\Hal\View\HalJsonModel`
+#### ZF\Hal\View\HalJsonModel
 
 `HalJsonModel` is a view model that when used as the result of a controller service response
 signifies to the `zf-hal` module that the data within the model should be utilized to
 produce a JSON HAL representation.
 
-#### `ZF\Hal\View\HalJsonRenderer`
+#### ZF\Hal\View\HalJsonRenderer
 
 `HalJsonRenderer` is a view renderer responsible for rendering `HalJsonModel` instances. In turn,
 this renderer will call upon the `Hal` plugin/view helper in order to transform the model content
 (an `Entity` or `Collection`) into a HAL representation.
 
-#### `ZF\Hal\View\HalJsonStrategy`
+#### ZF\Hal\View\HalJsonStrategy
 
 `HalJsonStrategy` is responsible for selecting `HalJsonRenderer` when it identifies a `HalJsonModel`
 as the controller service response.
