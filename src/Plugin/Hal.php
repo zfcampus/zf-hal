@@ -487,7 +487,6 @@ class Hal extends AbstractHelper implements
     {
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('entity' => $halEntity));
         $entity        = $halEntity->entity;
-        $id            = $halEntity->id;
         $entityLinks   = $halEntity->getLinks();
         $metadataMap   = $this->getMetadataMap();
 
