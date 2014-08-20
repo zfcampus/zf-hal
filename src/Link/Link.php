@@ -144,6 +144,7 @@ class Link
      * @param  null|array|Traversable $params
      * @param  null|array|Traversable $options
      * @return self
+     * @throws DomainException
      */
     public function setRoute($route, $params = null, $options = null)
     {
@@ -169,6 +170,7 @@ class Link
      *
      * @param  array|Traversable $options
      * @return self
+     * @throws Exception\InvalidArgumentException
      */
     public function setRouteOptions($options)
     {
@@ -193,6 +195,7 @@ class Link
      *
      * @param  array|Traversable $params
      * @return self
+     * @throws Exception\InvalidArgumentException
      */
     public function setRouteParams($params)
     {
@@ -217,6 +220,8 @@ class Link
      *
      * @param  string $url
      * @return self
+     * @throws DomainException
+     * @throws Exception\InvalidArgumentException
      */
     public function setUrl($url)
     {

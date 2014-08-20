@@ -113,6 +113,7 @@ class Metadata
      *
      * @param  string $class
      * @param  array $options
+     * @param  HydratorPluginManager $hydrators
      * @throws Exception\InvalidArgumentException
      */
     public function __construct($class, array $options = array(), HydratorPluginManager $hydrators = null)
