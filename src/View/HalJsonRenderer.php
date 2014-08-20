@@ -12,8 +12,6 @@ use Zend\View\ViewEvent;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\View\ApiProblemModel;
 use ZF\ApiProblem\View\ApiProblemRenderer;
-use ZF\Hal\Entity;
-use ZF\Hal\Collection;
 
 /**
  * Handles rendering of the following:
