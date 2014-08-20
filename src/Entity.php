@@ -36,6 +36,7 @@ class Entity implements Link\LinkCollectionAwareInterface
      * Retrieve properties
      *
      * @param  string $name
+     * @throws Exception\InvalidArgumentException
      * @return mixed
      */
     public function &__get($name)
