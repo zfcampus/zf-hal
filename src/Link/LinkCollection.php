@@ -47,6 +47,7 @@ class LinkCollection implements Countable, IteratorAggregate
      * @param  Link $link
      * @param  bool $overwrite
      * @return self
+     * @throws Exception\DomainException
      */
     public function add(Link $link, $overwrite = false)
     {

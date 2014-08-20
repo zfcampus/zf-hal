@@ -71,6 +71,7 @@ class MetadataMap
      *
      * @param  array $map
      * @return self
+     * @throws Exception\InvalidArgumentException
      */
     public function setMap(array $map)
     {

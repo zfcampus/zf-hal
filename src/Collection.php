@@ -136,6 +136,7 @@ class Collection implements Link\LinkCollectionAwareInterface
      *
      * @param  string $name
      * @return mixed
+     * @throws \Exception
      */
     public function __get($name)
     {
@@ -227,7 +228,7 @@ class Collection implements Link\LinkCollectionAwareInterface
     /**
      * Set the route identifier name
      *
-     * @param  string $name
+     * @param  string $identifier
      * @return self
      */
     public function setRouteIdentifierName($identifier)
@@ -239,7 +240,7 @@ class Collection implements Link\LinkCollectionAwareInterface
     /**
      * Set the route identifier name
      *
-     * @param  string $name
+     * @param  string $identifier
      * @return self
      */
     public function setEntityIdentifierName($identifier)
