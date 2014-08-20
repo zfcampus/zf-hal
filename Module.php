@@ -71,7 +71,6 @@ class Module
             'ZF\Hal\JsonRenderer' => function ($services) {
                 $helpers            = $services->get('ViewHelperManager');
                 $apiProblemRenderer = $services->get('ZF\ApiProblem\ApiProblemRenderer');
-                $config             = $services->get('Config');
 
                 $renderer = new View\HalJsonRenderer($apiProblemRenderer);
                 $renderer->setHelperPluginManager($helpers);
