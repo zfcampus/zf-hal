@@ -16,7 +16,6 @@ use Zend\Stdlib\Hydrator;
 use Zend\View\HelperPluginManager;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
-use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
@@ -214,7 +213,6 @@ class HalJsonRendererTest extends TestCase
             $item       = $prototype;
             $item['id'] = $id;
             $items[]    = $item;
-
         }
 
         $collection = new Collection($items);
@@ -361,7 +359,6 @@ class HalJsonRendererTest extends TestCase
             $item       = $prototype;
             $item['id'] = $id;
             $items[]    = $item;
-
         }
 
         $collection = new Collection($items, 'resource');
@@ -393,7 +390,6 @@ class HalJsonRendererTest extends TestCase
             $item       = $prototype;
             $item['id'] = $id;
             $items[]    = $item;
-
         }
         $adapter   = new ArrayAdapter($items);
         $paginator = new Paginator($adapter);
@@ -480,7 +476,6 @@ class HalJsonRendererTest extends TestCase
             $item       = $prototype;
             $item['id'] = $id;
             $items[]    = $item;
-
         }
 
         $collection = new Collection($items);
@@ -531,7 +526,6 @@ class HalJsonRendererTest extends TestCase
             $item       = $prototype;
             $item['id'] = $id;
             $items[]    = $item;
-
         }
         $adapter   = new ArrayAdapter($items);
         $paginator = new Paginator($adapter);
@@ -584,7 +578,6 @@ class HalJsonRendererTest extends TestCase
             return false;
         }, 10);
 
-
         $prototype = array('foo' => 'bar');
         $items = array();
         foreach (range(1, 100) as $id) {
@@ -623,5 +616,14 @@ class HalJsonRendererTest extends TestCase
             $this->assertObjectHasAttribute('foo', $item);
             $this->assertEquals('bar', $item->foo);
         }
+    }
+
+    public function testHelperPluginManagerSetterInjectsHalPluginWhenDoesNotRegistered()
+    {
+        $helpers = new HelperPluginManager();
+        $this->renderer->setHelperPluginManager($helpers);
+
+        $halPlugin = $helpers->get('hal');
+        $this->assertInstanceOf('ZF\Hal\Plugin\Hal', $halPlugin);
     }
 }
