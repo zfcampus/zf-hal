@@ -16,7 +16,6 @@ use Zend\Mvc\MvcEvent;
 use Zend\Paginator\Adapter\ArrayAdapter as ArrayPaginator;
 use Zend\Paginator\Paginator;
 use Zend\Uri\Http;
-use Zend\Uri\Uri;
 use Zend\View\Helper\Url as UrlHelper;
 use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use ZF\Hal\Collection;
@@ -39,12 +38,10 @@ class HalTest extends TestCase
         $route2 = new Segment('/help');
         $router->addRoute('docs', $route2);
         $router->addRoute('hostname', array(
-
             'type' => 'hostname',
             'options' => array(
                 'route' => 'localhost.localdomain',
             ),
-
             'child_routes' => array(
                 'resource' => array(
                     'type' => 'segment',
@@ -318,13 +315,11 @@ class HalTest extends TestCase
 
     public function testRendersEmbeddedCollectionsInsideEntitiesBasedOnMetadataMap()
     {
-        $collection = new TestAsset\Collection(
-            array(
-                (object) array('id' => 'foo', 'name' => 'foo'),
-                (object) array('id' => 'bar', 'name' => 'bar'),
-                (object) array('id' => 'baz', 'name' => 'baz'),
-            )
-        );
+        $collection = new TestAsset\Collection(array(
+            (object) array('id' => 'foo', 'name' => 'foo'),
+            (object) array('id' => 'bar', 'name' => 'bar'),
+            (object) array('id' => 'baz', 'name' => 'baz'),
+        ));
 
         $metadata = new MetadataMap(array(
             'ZFTest\Hal\Plugin\TestAsset\Collection' => array(
@@ -369,13 +364,11 @@ class HalTest extends TestCase
 
     public function testRendersEmbeddedCollectionsInsideCollectionsBasedOnMetadataMap()
     {
-        $childCollection = new TestAsset\Collection(
-            array(
-                (object) array('id' => 'foo', 'name' => 'foo'),
-                (object) array('id' => 'bar', 'name' => 'bar'),
-                (object) array('id' => 'baz', 'name' => 'baz'),
-            )
-        );
+        $childCollection = new TestAsset\Collection(array(
+            (object) array('id' => 'foo', 'name' => 'foo'),
+            (object) array('id' => 'bar', 'name' => 'bar'),
+            (object) array('id' => 'baz', 'name' => 'baz'),
+        ));
         $entity = new TestAsset\Entity('spock', 'Spock');
         $entity->first_child = $childCollection;
 
@@ -430,7 +423,6 @@ class HalTest extends TestCase
 
     public function testDoesNotRenderEmbeddedEntitiesInsideCollectionsBasedOnMetadataMapAndRenderEmbeddedEntitiesAsFalse()
     {
-
         $entity = new TestAsset\Entity('spock', 'Spock');
         $entity->first_child  = new TestAsset\EmbeddedEntity('bar', 'Bar');
         $entity->second_child = new TestAsset\EmbeddedEntityWithCustomIdentifier('baz', 'Baz');

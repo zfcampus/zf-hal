@@ -228,18 +228,22 @@ class Hal extends AbstractHelper implements
 
     /**
      * @param ServerUrl $helper
+     * @return self
      */
     public function setServerUrlHelper(ServerUrl $helper)
     {
         $this->serverUrlHelper = $helper;
+        return $this;
     }
 
     /**
      * @param Url $helper
+     * @return self
      */
     public function setUrlHelper(Url $helper)
     {
         $this->urlHelper = $helper;
+        return $this;
     }
 
     /**
@@ -247,7 +251,7 @@ class Hal extends AbstractHelper implements
      *
      * @param  string $class
      * @param  HydratorInterface $hydrator
-     * @return RestfulJsonRenderer
+     * @return self
      */
     public function addHydrator($class, $hydrator)
     {
@@ -269,7 +273,7 @@ class Hal extends AbstractHelper implements
      * Set the default hydrator to use if none specified for a class.
      *
      * @param  HydratorInterface $hydrator
-     * @return RestfulJsonRenderer
+     * @return self
      */
     public function setDefaultHydrator(HydratorInterface $hydrator)
     {
@@ -281,7 +285,8 @@ class Hal extends AbstractHelper implements
      * Set boolean to render embedded eneities or just include _embedded data
      *
      * @deprecated
-     * @var boolean
+     * @param  boolean $value
+     * @return self
      */
     public function setRenderEmbeddedResources($value)
     {
@@ -293,7 +298,8 @@ class Hal extends AbstractHelper implements
     /**
      * Set boolean to render embedded entities or just include _embedded data
      *
-     * @var boolean
+     * @param  boolean $value
+     * @return self
      */
     public function setRenderEmbeddedEntities($value)
     {
@@ -326,7 +332,8 @@ class Hal extends AbstractHelper implements
     /**
      * Set boolean to render embedded collections or just include _embedded data
      *
-     * @var boolean
+     * @param  boolean $value
+     * @return self
      */
     public function setRenderCollections($value)
     {
@@ -486,10 +493,9 @@ class Hal extends AbstractHelper implements
     public function renderEntity(Entity $halEntity, $renderEntity = true)
     {
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('entity' => $halEntity));
-        $entity        = $halEntity->entity;
-        $id            = $halEntity->id;
-        $entityLinks   = $halEntity->getLinks();
-        $metadataMap   = $this->getMetadataMap();
+        $entity      = $halEntity->entity;
+        $entityLinks = $halEntity->getLinks();
+        $metadataMap = $this->getMetadataMap();
 
         if (!is_array($entity)) {
             $entity = $this->convertEntityToArray($entity);
@@ -675,6 +681,7 @@ class Hal extends AbstractHelper implements
      * @deprecated
      * @param  object $object
      * @param  Metadata $metadata
+     * @param  boolean $renderEmbeddedEntities
      * @return Entity|Collection
      */
     public function createResourceFromMetadata($object, Metadata $metadata, $renderEmbeddedEntities = true)
@@ -688,6 +695,7 @@ class Hal extends AbstractHelper implements
      *
      * @param  object $object
      * @param  Metadata $metadata
+     * @param  boolean $renderEmbeddedEntities
      * @return Entity|Collection
      */
     public function createEntityFromMetadata($object, Metadata $metadata, $renderEmbeddedEntities = true)
@@ -706,15 +714,18 @@ class Hal extends AbstractHelper implements
                 $entityIdentifierName
             ));
         }
+
         $id = ($entityIdentifierName) ? $data[$entityIdentifierName]: null;
 
         if (!$renderEmbeddedEntities) {
             $data = array();
         }
 
-        $entity   = new Entity($data, $id);
-        $links    = $entity->getLinks();
+        $entity = new Entity($data, $id);
+        $links  = $entity->getLinks();
+
         $this->marshalMetadataLinks($metadata, $links);
+
         if (!$links->has('self')) {
             $link = $this->marshalSelfLinkFromMetadata($metadata, $object, $id, $metadata->getRouteIdentifierName());
             $links->add($link);
@@ -829,7 +840,7 @@ class Hal extends AbstractHelper implements
      *
      * @param  LinkCollectionAwareInterface $resource
      * @param  string $route
-     * @param  string $identifier
+     * @param  string $routeIdentifier
      */
     public function injectSelfLink(LinkCollectionAwareInterface $resource, $route, $routeIdentifier = 'id')
     {
@@ -869,7 +880,7 @@ class Hal extends AbstractHelper implements
      * Generate HAL links for a paginated collection
      *
      * @param  Collection $halCollection
-     * @return array
+     * @return boolean
      */
     protected function injectPaginationLinks(Collection $halCollection)
     {
