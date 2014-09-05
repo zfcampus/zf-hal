@@ -38,8 +38,8 @@ class EntityTest extends TestCase
 
     public function testPropertiesAreAccessibleAfterConstruction()
     {
-        $entity   = new stdClass;
-        $hal      = new Entity($entity, 'id');
+        $entity = new stdClass;
+        $hal    = new Entity($entity, 'id');
         $this->assertSame($entity, $hal->entity);
         $this->assertEquals('id', $hal->id);
     }
@@ -53,17 +53,17 @@ class EntityTest extends TestCase
 
     public function testLinkCollectionMayBeInjected()
     {
-        $entity   = new stdClass;
-        $hal      = new Entity($entity, 'id', 'route', array('foo' => 'bar'));
-        $links    = new LinkCollection();
+        $entity = new stdClass;
+        $hal    = new Entity($entity, 'id', 'route', array('foo' => 'bar'));
+        $links  = new LinkCollection();
         $hal->setLinks($links);
         $this->assertSame($links, $hal->getLinks());
     }
 
     public function testRetrievingEntityCanReturnByReference()
     {
-        $entity   = array('foo' => 'bar');
-        $hal      = new Entity($entity, 'id');
+        $entity = array('foo' => 'bar');
+        $hal    = new Entity($entity, 'id');
         $this->assertEquals($entity, $hal->entity);
 
         $entity =& $hal->entity;

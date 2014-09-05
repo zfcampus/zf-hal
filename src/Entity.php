@@ -42,8 +42,8 @@ class Entity implements Link\LinkCollectionAwareInterface
     public function &__get($name)
     {
         $names = array(
-            'entity'       => 'entity',
-            'id'           => 'id',
+            'entity' => 'entity',
+            'id'     => 'id',
         );
         $name = strtolower($name);
         if (!in_array($name, array_keys($names))) {

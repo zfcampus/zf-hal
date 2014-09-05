@@ -551,7 +551,7 @@ class Collection implements Link\LinkCollectionAwareInterface
      *
      * @return string
      */
-    public function getRouteidentifierName()
+    public function getRouteIdentifierName()
     {
         return $this->routeIdentifierName;
     }
@@ -561,7 +561,7 @@ class Collection implements Link\LinkCollectionAwareInterface
      *
      * @return string
      */
-    public function getEntityidentifierName()
+    public function getEntityIdentifierName()
     {
         return $this->entityIdentifierName;
     }
