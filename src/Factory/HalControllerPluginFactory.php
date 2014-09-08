@@ -19,7 +19,7 @@ class HalControllerPluginFactory implements FactoryInterface
     {
         $services = $serviceLocator->getServiceLocator();
         $helpers  = $services->get('ViewHelperManager');
-        
+
         return $helpers->get('Hal');
     }
 }

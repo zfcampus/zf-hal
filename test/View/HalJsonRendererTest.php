@@ -16,7 +16,6 @@ use Zend\Stdlib\Hydrator;
 use Zend\View\HelperPluginManager;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
-use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;

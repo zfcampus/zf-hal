@@ -111,7 +111,7 @@ class HalViewHelperFactoryTest extends TestCase
         foreach ($config['zf-hal']['renderer']['hydrators'] as $class => $serviceName) {
             $key = strtolower($class);
             $this->assertArrayHasKey($key, $hydratorMap);
-            
+
             $hydrator = $hydratorMap[$key];
             $this->assertSame(get_class($hydrators->get($serviceName)), get_class($hydrator));
         }

@@ -19,7 +19,7 @@ class HalJsonStrategyFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
         $renderer = $serviceLocator->get('ZF\Hal\JsonRenderer');
-        
+
         return new View\HalJsonStrategy($renderer);
     }
 }
