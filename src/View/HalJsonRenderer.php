@@ -12,7 +12,6 @@ use Zend\View\ViewEvent;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\View\ApiProblemModel;
 use ZF\ApiProblem\View\ApiProblemRenderer;
-use ZF\Hal\Plugin\Hal as HalHelper;
 
 /**
  * Handles rendering of the following:
@@ -55,9 +54,6 @@ class HalJsonRenderer extends JsonRenderer
      */
     public function setHelperPluginManager(HelperPluginManager $helpers)
     {
-        if (!$helpers->has('Hal')) {
-            $this->injectHalHelper($helpers);
-        }
         $this->helpers = $helpers;
     }
 
@@ -128,21 +124,6 @@ class HalJsonRenderer extends JsonRenderer
         }
 
         return parent::render($nameOrModel, $values);
-    }
-
-    /**
-     * Inject the helper manager with the Hal helper
-     *
-     * @param  HelperPluginManager $helpers
-     */
-    protected function injectHalHelper(HelperPluginManager $helpers)
-    {
-        $helper = new HalHelper();
-        $helper
-            ->setView($this)
-            ->setServerUrlHelper($helpers->get('ServerUrl'))
-            ->setUrlHelper($helpers->get('Url'));
-        $helpers->setService('Hal', $helper);
     }
 
     /**

@@ -617,13 +617,4 @@ class HalJsonRendererTest extends TestCase
             $this->assertEquals('bar', $item->foo);
         }
     }
-
-    public function testHelperPluginManagerSetterInjectsHalPluginWhenDoesNotRegistered()
-    {
-        $helpers = new HelperPluginManager();
-        $this->renderer->setHelperPluginManager($helpers);
-
-        $halPlugin = $helpers->get('hal');
-        $this->assertInstanceOf('ZF\Hal\Plugin\Hal', $halPlugin);
-    }
 }
