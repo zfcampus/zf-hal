@@ -154,7 +154,7 @@ class Hal extends AbstractHelper implements
      * Set the event manager instance
      *
      * @param  EventManagerInterface $events
-     * @return self
+     * @return mixed
      */
     public function setEventManager(EventManagerInterface $events)
     {
@@ -280,7 +280,7 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * Set boolean to render embedded eneities or just include _embedded data
+     * Set boolean to render embedded entities or just include _embedded data
      *
      * @deprecated
      * @param  boolean $value
