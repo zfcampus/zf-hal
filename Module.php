@@ -111,13 +111,16 @@ class Module
     {
         return array('factories' => array(
             'Hal' => function ($helpers) {
-                $serverUrlHelper = $helpers->get('ServerUrl');
-                $urlHelper       = $helpers->get('Url');
-
                 $services        = $helpers->getServiceLocator();
                 $config          = $services->get('Config');
                 $metadataMap     = $services->get('ZF\Hal\MetadataMap');
                 $hydrators       = $metadataMap->getHydratorManager();
+
+                $serverUrlHelper = $helpers->get('ServerUrl');
+                if (isset($config['zf-hal']['options']['use_proxy'])) {
+                    $serverUrlHelper->setUseProxy($config['zf-hal']['options']['use_proxy']);
+                }
+                $urlHelper       = $helpers->get('Url');
 
                 $helper          = new Plugin\Hal($hydrators);
                 $helper->setMetadataMap($metadataMap);
