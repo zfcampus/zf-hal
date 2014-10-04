@@ -16,7 +16,6 @@ use Zend\Stdlib\Hydrator;
 use Zend\View\HelperPluginManager;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
-use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
@@ -214,7 +213,6 @@ class HalJsonRendererTest extends TestCase
             $item       = $prototype;
             $item['id'] = $id;
             $items[]    = $item;
-
         }
 
         $collection = new Collection($items);
@@ -258,7 +256,6 @@ class HalJsonRendererTest extends TestCase
             $item       = $prototype;
             $item['id'] = $id;
             $items[]    = $item;
-
         }
         $adapter   = new ArrayAdapter($items);
         $paginator = new Paginator($adapter);
@@ -322,7 +319,6 @@ class HalJsonRendererTest extends TestCase
             $item       = $prototype;
             $item['id'] = $id;
             $items[]    = $item;
-
         }
         $adapter   = new ArrayAdapter($items);
         $paginator = new Paginator($adapter);
@@ -361,7 +357,6 @@ class HalJsonRendererTest extends TestCase
             $item       = $prototype;
             $item['id'] = $id;
             $items[]    = $item;
-
         }
 
         $collection = new Collection($items, 'resource');
@@ -393,7 +388,6 @@ class HalJsonRendererTest extends TestCase
             $item       = $prototype;
             $item['id'] = $id;
             $items[]    = $item;
-
         }
         $adapter   = new ArrayAdapter($items);
         $paginator = new Paginator($adapter);
@@ -480,7 +474,6 @@ class HalJsonRendererTest extends TestCase
             $item       = $prototype;
             $item['id'] = $id;
             $items[]    = $item;
-
         }
 
         $collection = new Collection($items);
@@ -531,7 +524,6 @@ class HalJsonRendererTest extends TestCase
             $item       = $prototype;
             $item['id'] = $id;
             $items[]    = $item;
-
         }
         $adapter   = new ArrayAdapter($items);
         $paginator = new Paginator($adapter);

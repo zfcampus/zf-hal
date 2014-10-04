@@ -16,7 +16,6 @@ use Zend\Mvc\MvcEvent;
 use Zend\Paginator\Adapter\ArrayAdapter as ArrayPaginator;
 use Zend\Paginator\Paginator;
 use Zend\Uri\Http;
-use Zend\Uri\Uri;
 use Zend\View\Helper\Url as UrlHelper;
 use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use ZF\Hal\Collection;
@@ -430,7 +429,6 @@ class HalTest extends TestCase
 
     public function testDoesNotRenderEmbeddedEntitiesInsideCollectionsBasedOnMetadataMapAndRenderEmbeddedEntitiesAsFalse()
     {
-
         $entity = new TestAsset\Entity('spock', 'Spock');
         $entity->first_child  = new TestAsset\EmbeddedEntity('bar', 'Bar');
         $entity->second_child = new TestAsset\EmbeddedEntityWithCustomIdentifier('baz', 'Baz');
