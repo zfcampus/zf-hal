@@ -114,6 +114,12 @@ class Hal extends AbstractHelper implements
      */
     protected $urlHelper;
 
+
+    /**
+     * @var integer
+     */
+    protected $max_depth;
+
     /**
      * @param null|HydratorPluginManager $hydrators
      */
@@ -462,7 +468,7 @@ class Hal extends AbstractHelper implements
      * @return array|ApiProblem Associative array representing the payload to render;
      *     returns ApiProblem if error in pagination occurs
      */
-    public function renderCollection(Collection $halCollection)
+    public function renderCollection(Collection $halCollection, $depth = 0)
     {
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('collection' => $halCollection));
         $collection     = $halCollection->getCollection();
@@ -478,7 +484,7 @@ class Hal extends AbstractHelper implements
         $payload = $halCollection->getAttributes();
         $payload['_links']    = $this->fromResource($halCollection);
         $payload['_embedded'] = array(
-            $collectionName => $this->extractCollection($halCollection),
+            $collectionName => $this->extractCollection($halCollection, $depth + 1),
         );
 
         if ($collection instanceof Paginator) {
@@ -510,7 +516,7 @@ class Hal extends AbstractHelper implements
      * @param  bool $renderResource
      * @return array
      */
-    public function renderResource(Resource $halResource, $renderResource = true)
+    public function renderResource(Resource $halResource, $renderResource = true, $depth = 0)
     {
         trigger_error(sprintf(
             'The method %s is deprecated; please use %s::renderEntity()',
@@ -518,7 +524,7 @@ class Hal extends AbstractHelper implements
             __CLASS__
         ), E_USER_DEPRECATED);
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('resource' => $halResource));
-        return $this->renderEntity($halResource, $renderResource);
+        return $this->renderEntity($halResource, $renderResource, $depth + 1);
     }
 
     /**
@@ -533,18 +539,26 @@ class Hal extends AbstractHelper implements
      * @param  bool $renderEntity
      * @return array
      */
-    public function renderEntity(Entity $halEntity, $renderEntity = true)
+    public function renderEntity(Entity $halEntity, $renderEntity = true, $depth = 0)
     {
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('entity' => $halEntity));
         $entity      = $halEntity->entity;
         $entityLinks = $halEntity->getLinks();
         $metadataMap = $this->getMetadataMap();
 
+        if (!$this->max_depth && is_object($entity) && $metadataMap->has($entity)) {
+            $this->max_depth = $metadataMap->get($entity)->getMaxDepth();
+        }
+
         if (!is_array($entity)) {
             $entity = $this->convertEntityToArray($entity);
         }
 
         if (!$renderEntity) {
+            $entity = array();
+        }
+
+        if ($this->max_depth && $depth > $this->max_depth) {
             $entity = array();
         }
 
@@ -556,12 +570,11 @@ class Hal extends AbstractHelper implements
                     $this->getRenderEmbeddedEntities()
                 );
             }
-
             if ($value instanceof Entity) {
-                $this->extractEmbeddedEntity($entity, $key, $value);
+                $this->extractEmbeddedEntity($entity, $key, $value, $depth + 1);
             }
             if ($value instanceof Collection) {
-                $this->extractEmbeddedCollection($entity, $key, $value);
+                $this->extractEmbeddedCollection($entity, $key, $value, $depth + 1);
             }
             if ($value instanceof Link) {
                 $entityLinks->add($value);
@@ -1024,9 +1037,9 @@ class Hal extends AbstractHelper implements
      * @param  string $key
      * @param  Entity $entity
      */
-    protected function extractEmbeddedEntity(array &$parent, $key, Entity $entity)
+    protected function extractEmbeddedEntity(array &$parent, $key, Entity $entity, $depth = 0)
     {
-        $rendered = $this->renderEntity($entity);
+        $rendered = $this->renderEntity($entity, true, $depth + 1);
         if (!isset($parent['_embedded'])) {
             $parent['_embedded'] = array();
         }
@@ -1045,9 +1058,9 @@ class Hal extends AbstractHelper implements
      * @param  string $key
      * @param  Collection $collection
      */
-    protected function extractEmbeddedCollection(array &$parent, $key, Collection $collection)
+    protected function extractEmbeddedCollection(array &$parent, $key, Collection $collection, $depth = 0)
     {
-        $rendered = $this->extractCollection($collection);
+        $rendered = $this->extractCollection($collection, $depth + 1);
         if (!isset($parent['_embedded'])) {
             $parent['_embedded'] = array();
         }
@@ -1063,7 +1076,7 @@ class Hal extends AbstractHelper implements
      * @param  Collection $halCollection
      * @return array
      */
-    protected function extractCollection(Collection $halCollection)
+    protected function extractCollection(Collection $halCollection, $depth = 0)
     {
         $collection           = array();
         $events               = $this->getEventManager();
@@ -1092,7 +1105,7 @@ class Hal extends AbstractHelper implements
             }
 
             if ($entity instanceof Entity) {
-                $collection[] = $this->renderEntity($entity, $this->getRenderCollections());
+                $collection[] = $this->renderEntity($entity, $this->getRenderCollections(), $depth + 1);
                 continue;
             }
 
@@ -1106,11 +1119,11 @@ class Hal extends AbstractHelper implements
                 }
 
                 if ($value instanceof Entity) {
-                    $this->extractEmbeddedEntity($entity, $key, $value);
+                    $this->extractEmbeddedEntity($entity, $key, $value, $depth + 1);
                 }
 
                 if ($value instanceof Collection) {
-                    $this->extractEmbeddedCollection($entity, $key, $value);
+                    $this->extractEmbeddedCollection($entity, $key, $value, $depth + 1);
                 }
             }
 
