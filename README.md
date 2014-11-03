@@ -93,6 +93,8 @@ Each class in the metadata map may contain one or more of the following configur
 - `route_params` - an array of route parameters to use for link generation.
 - `route_options` - an array of options to pass to the router during link generation.
 - `url` - specific URL to use with this resource, if not using a route.
+- `max_depth` - limit to what nesting level entities and collections are rendered; if the limit is 
+reached, only `self` links will be rendered.
 
 The `links` property is an array of arrays, each with the following structure:
 
