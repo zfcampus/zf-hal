@@ -108,9 +108,11 @@ class Hal extends AbstractHelper implements
 
 
     /**
+     * Maximum number of nesting levels
+     *
      * @var integer
      */
-    protected $max_depth;
+    protected $maxDepth;
 
     /**
      * @param null|HydratorPluginManager $hydrators
@@ -502,8 +504,8 @@ class Hal extends AbstractHelper implements
         $entityLinks   = $halEntity->getLinks();
         $metadataMap   = $this->getMetadataMap();
 
-        if (!$this->max_depth && is_object($entity) && $metadataMap->has($entity)) {
-            $this->max_depth = $metadataMap->get($entity)->getMaxDepth();
+        if (!$this->maxDepth && is_object($entity) && $metadataMap->has($entity)) {
+            $this->maxDepth = $metadataMap->get($entity)->getMaxDepth();
         }
 
         if (!is_array($entity)) {
@@ -514,7 +516,7 @@ class Hal extends AbstractHelper implements
             $entity = array();
         }
 
-        if ($this->max_depth && $depth > $this->max_depth) {
+        if ($this->maxDepth && $depth > $this->maxDepth) {
             $entity = array();
         }
 

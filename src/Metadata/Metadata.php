@@ -103,9 +103,11 @@ class Metadata
     protected $url;
 
     /**
+     * Maximum number of nesting levels
+     *
      * @var integer
      */
-    protected $max_depth;
+    protected $maxDepth;
 
     /**
      * Constructor
@@ -321,7 +323,7 @@ class Metadata
 
     public function getMaxDepth()
     {
-        return $this->max_depth;
+        return $this->maxDepth;
     }
 
     /**
@@ -544,11 +546,11 @@ class Metadata
     }
 
     /**
-     * 
+     * Set the maximum number of nesting levels
      */
-    public function setMaxDepth($max_depth)
+    public function setMaxDepth($maxDepth)
     {
-        $this->max_depth = $max_depth;
+        $this->maxDepth = $maxDepth;
         return $this;
     }
 }
