@@ -1116,7 +1116,8 @@ class Hal extends AbstractHelper implements
             }
 
             if ($entity instanceof Entity) {
-                $collection[] = $this->renderEntity($entity, $this->getRenderCollections(), $depth + 1);
+                // Depth does not increment at this level
+                $collection[] = $this->renderEntity($entity, $this->getRenderCollections(), $depth);
                 continue;
             }
 
