@@ -470,7 +470,7 @@ class Hal extends AbstractHelper implements
      * @return array|ApiProblem Associative array representing the payload to render;
      *     returns ApiProblem if error in pagination occurs
      */
-    public function renderCollection(Collection $halCollection, $depth = 0)
+    public function renderCollection(Collection $halCollection)
     {
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('collection' => $halCollection));
         $collection     = $halCollection->getCollection();
@@ -486,7 +486,7 @@ class Hal extends AbstractHelper implements
         $payload = $halCollection->getAttributes();
         $payload['_links']    = $this->fromResource($halCollection);
         $payload['_embedded'] = array(
-            $collectionName => $this->extractCollection($halCollection, $depth + 1),
+            $collectionName => $this->extractCollection($halCollection),
         );
 
         if ($collection instanceof Paginator) {
@@ -526,6 +526,7 @@ class Hal extends AbstractHelper implements
             __CLASS__
         ), E_USER_DEPRECATED);
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('resource' => $halResource));
+
         return $this->renderEntity($halResource, $renderResource, $depth + 1);
     }
 
@@ -561,7 +562,7 @@ class Hal extends AbstractHelper implements
             $entity = array();
         }
 
-        if ($this->maxDepth && $depth > $this->maxDepth) {
+        if ($this->maxDepth and $depth > $this->maxDepth) {
             $entity = array();
         }
 
@@ -1044,10 +1045,13 @@ class Hal extends AbstractHelper implements
      */
     protected function extractEmbeddedEntity(array &$parent, $key, Entity $entity, $depth = 0)
     {
-        $rendered = $this->renderEntity($entity, true, $depth + 1);
+        // No need to increment depth for this call
+        $rendered = $this->renderEntity($entity, true, $depth);
+
         if (!isset($parent['_embedded'])) {
             $parent['_embedded'] = array();
         }
+
         $parent['_embedded'][$key] = $rendered;
         unset($parent[$key]);
     }
@@ -1066,9 +1070,11 @@ class Hal extends AbstractHelper implements
     protected function extractEmbeddedCollection(array &$parent, $key, Collection $collection, $depth = 0)
     {
         $rendered = $this->extractCollection($collection, $depth + 1);
+
         if (!isset($parent['_embedded'])) {
             $parent['_embedded'] = array();
         }
+
         $parent['_embedded'][$key] = $rendered;
         unset($parent[$key]);
     }
