@@ -785,7 +785,7 @@ class Hal extends AbstractHelper implements
         $id = ($entityIdentifierName) ? $data[$entityIdentifierName]: null;
 
         if (!$renderEmbeddedEntities) {
-            $entity = new Entity([], $id);
+            $entity = new Entity(array(), $id);
         } else {
             $entity = new Entity($object, $id);
         }
