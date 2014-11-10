@@ -550,7 +550,7 @@ class Hal extends AbstractHelper implements
             $entity = array();
         }
 
-        if ($this->maxDepth and $depth > $this->maxDepth) {
+        if (isset($this->maxDepth) && $depth >= $this->maxDepth) {
             $entity = array();
         }
 
@@ -836,8 +836,7 @@ class Hal extends AbstractHelper implements
 
             case ($entity instanceof Entity):
             default:
-                $halEntity = $entity;
-                // nothing special to do
+                $halEntity = $entity; // as is
                 break;
         }
 
