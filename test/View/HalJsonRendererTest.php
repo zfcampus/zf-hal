@@ -48,7 +48,11 @@ class HalJsonRendererTest extends TestCase
     {
         $this->assertIsEntity($entity);
         $links = $entity->_links;
-        $this->assertObjectHasAttribute($relation, $links, sprintf('HAL links do not contain relation "%s"', $relation));
+        $this->assertObjectHasAttribute(
+            $relation,
+            $links,
+            sprintf('HAL links do not contain relation "%s"', $relation)
+        );
         $link = $links->{$relation};
         $this->assertInstanceOf('stdClass', $link, sprintf('Relational links for "%s" are malformed', $relation));
     }
@@ -57,7 +61,15 @@ class HalJsonRendererTest extends TestCase
     {
         $this->assertEntityHasRelationalLink($relation, $entity);
         $link = $entity->_links->{$relation};
-        $this->assertObjectHasAttribute('href', $link, sprintf('%s relational link does not have an href attribute; received %s', $relation, var_export($link, 1)));
+        $this->assertObjectHasAttribute(
+            'href',
+            $link,
+            sprintf(
+                '%s relational link does not have an href attribute; received %s',
+                $relation,
+                var_export($link, 1)
+            )
+        );
         $href = $link->href;
         $this->assertContains($match, $href);
     }
@@ -66,7 +78,15 @@ class HalJsonRendererTest extends TestCase
     {
         $this->assertEntityHasRelationalLink($relation, $entity);
         $link = $entity->_links->{$relation};
-        $this->assertObjectHasAttribute('href', $link, sprintf('%s relational link does not have an href attribute; received %s', $relation, var_export($link, 1)));
+        $this->assertObjectHasAttribute(
+            'href',
+            $link,
+            sprintf(
+                '%s relational link does not have an href attribute; received %s',
+                $relation,
+                var_export($link, 1)
+            )
+        );
         $href = $link->href;
         $this->assertEquals($match, $href);
     }

@@ -109,8 +109,12 @@ class Link
                 ));
             }
             $name    = $routeInfo['name'];
-            $params  = isset($routeInfo['params']) && is_array($routeInfo['params']) ? $routeInfo['params'] : array();
-            $options = isset($routeInfo['options']) && is_array($routeInfo['options']) ? $routeInfo['options'] : array();
+            $params  = isset($routeInfo['params']) && is_array($routeInfo['params'])
+                ? $routeInfo['params']
+                : array();
+            $options = isset($routeInfo['options']) && is_array($routeInfo['options'])
+                ? $routeInfo['options']
+                : array();
             $link->setRoute($name, $params, $options);
             return $link;
         }

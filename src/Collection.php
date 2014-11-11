@@ -340,7 +340,11 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function setResourceLinks(Link\LinkCollection $links)
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::setEntityLinks', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::setEntityLinks',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->setEntityLinks($links);
     }
 
@@ -367,7 +371,11 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function setResourceRoute($route)
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::setEntityRoute', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::setEntityRoute',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->setEntityRoute($route);
     }
 
@@ -406,7 +414,11 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function setResourceRouteOptions($options)
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::setEntityRouteOptions', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::setEntityRouteOptions',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->setEntityRouteOptions($options);
     }
 
@@ -445,7 +457,11 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function setResourceRouteParams($params)
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::setEntityRouteParams', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::setEntityRouteParams',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->setEntityRouteParams($params);
     }
 
@@ -482,7 +498,11 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function getResourceLinks()
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::getEntityLinks', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::getEntityLinks',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->getEntityLinks();
     }
 
@@ -586,7 +606,11 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function getResourceRoute()
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::getEntityRoute', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::getEntityRoute',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->getEntityRoute();
     }
 
@@ -610,7 +634,11 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function getResourceRouteOptions()
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::getEntityRouteOptions', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::getEntityRouteOptions',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->getEntityRouteOptions();
     }
 
@@ -634,7 +662,11 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function getResourceRouteParams()
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::getEntityRouteParams', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::getEntityRouteParams',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->getEntityRouteParams();
     }
 

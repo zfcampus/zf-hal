@@ -78,11 +78,7 @@ class MetadataMap
         $hydrators = $this->getHydratorManager();
         foreach ($map as $class => $options) {
             $metadata = $options;
-            if (is_array($metadata)) {
-                $metadata = new Metadata($class, $options, $hydrators);
-            }
-
-            if (!$metadata instanceof Metadata) {
+            if (! is_array($metadata) && ! $metadata instanceof Metadata) {
                 throw new Exception\InvalidArgumentException(sprintf(
                     '%s expects each map to be an array or a ZF\Hal\Metadata instance; received "%s"',
                     __METHOD__,
@@ -124,6 +120,8 @@ class MetadataMap
     /**
      * Retrieve the metadata for a given class
      *
+     * Lazy-loads the Metadata instance if one is not present for a matching class.
+     *
      * @param  object|string $class Object or classname for which to retrieve metadata
      * @return Metadata
      */
@@ -136,7 +134,7 @@ class MetadataMap
         }
 
         if (isset($this->map[$className])) {
-            return $this->map[$className];
+            return $this->getMetadataInstance($className);
         }
 
         if (get_parent_class($className)) {
@@ -144,5 +142,21 @@ class MetadataMap
         }
 
         return false;
+    }
+
+    /**
+     * Retrieve a metadata instance.
+     * 
+     * @param string $class 
+     * @return Metadata
+     */
+    private function getMetadataInstance($class)
+    {
+        if ($this->map[$class] instanceof Metadata) {
+            return $this->map[$class];
+        }
+
+        $this->map[$class] = new Metadata($class, $this->map[$class], $this->getHydratorManager());
+        return $this->map[$class];
     }
 }
