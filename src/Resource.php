@@ -18,7 +18,11 @@ class Resource extends Entity
      */
     public function __construct($resource, $id)
     {
-        trigger_error(sprintf('%s is deprecated; please use %s\Entity instead', __CLASS__, __NAMESPACE__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s\Entity instead',
+            __CLASS__,
+            __NAMESPACE__
+        ), E_USER_DEPRECATED);
         parent::__construct($resource, $id);
     }
 }

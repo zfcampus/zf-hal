@@ -428,6 +428,7 @@ class HalTest extends TestCase
         }
     }
 
+    // @codingStandardsIgnoreStart
     public function testDoesNotRenderEmbeddedEntitiesInsideCollectionsBasedOnMetadataMapAndRenderEmbeddedEntitiesAsFalse()
     {
 
@@ -488,6 +489,7 @@ class HalTest extends TestCase
             $this->assertArrayNotHasKey('id', $contact);
         }
     }
+    // @codingStandardsIgnoreEnd
 
     public function testWillNotAllowInjectingASelfRelationMultipleTimes()
     {
@@ -718,7 +720,10 @@ class HalTest extends TestCase
         ));
 
         $this->plugin->setMetadataMap($metadata);
-        $entity = $this->plugin->createEntityFromMetadata($object, $metadata->get('ZFTest\Hal\Plugin\TestAsset\Entity'));
+        $entity = $this->plugin->createEntityFromMetadata(
+            $object,
+            $metadata->get('ZFTest\Hal\Plugin\TestAsset\Entity')
+        );
         $this->assertInstanceof('ZF\Hal\Entity', $entity);
         $links = $entity->getLinks();
         $this->assertTrue($links->has('describedby'));
@@ -807,8 +812,8 @@ class HalTest extends TestCase
 
         $collection = $this->plugin->createCollectionFromMetadata(
             $set,
-            $metadata->get('ZFTest\Hal\Plugin\TestAsset\Collection'
-        ));
+            $metadata->get('ZFTest\Hal\Plugin\TestAsset\Collection')
+        );
         $this->assertInstanceof('ZF\Hal\Collection', $collection);
         $links = $collection->getLinks();
         $this->assertTrue($links->has('describedby'));
@@ -858,7 +863,10 @@ class HalTest extends TestCase
         ));
 
         $this->plugin->setMetadataMap($metadata);
-        $entity = $this->plugin->createEntityFromMetadata($object, $metadata->get('ZFTest\Hal\Plugin\TestAsset\Entity'));
+        $entity = $this->plugin->createEntityFromMetadata(
+            $object,
+            $metadata->get('ZFTest\Hal\Plugin\TestAsset\Entity')
+        );
         $this->assertInstanceof('ZF\Hal\Entity', $entity);
 
         $links = $entity->getLinks();

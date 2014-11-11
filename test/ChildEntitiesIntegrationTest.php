@@ -237,7 +237,10 @@ class ChildEntitiesIntegrationTest extends TestCase
             $this->assertObjectHasAttribute('_links', $child);
             $this->assertObjectHasAttribute('self', $child->_links);
             $this->assertObjectHasAttribute('href', $child->_links->self);
-            $this->assertRegex('#^http://localhost.localdomain/api/parent/anakin/child/[^/]+$#', $child->_links->self->href);
+            $this->assertRegex(
+                '#^http://localhost.localdomain/api/parent/anakin/child/[^/]+$#',
+                $child->_links->self->href
+            );
         }
     }
 
@@ -334,7 +337,10 @@ class ChildEntitiesIntegrationTest extends TestCase
             $this->assertObjectHasAttribute('_links', $child);
             $this->assertObjectHasAttribute('self', $child->_links);
             $this->assertObjectHasAttribute('href', $child->_links->self);
-            $this->assertRegex('#^http://localhost.localdomain/api/parent/anakin/child/[^/]+$#', $child->_links->self->href);
+            $this->assertRegex(
+                '#^http://localhost.localdomain/api/parent/anakin/child/[^/]+$#',
+                $child->_links->self->href
+            );
         }
     }
 }
