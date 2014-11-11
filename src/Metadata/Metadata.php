@@ -167,8 +167,11 @@ class Metadata
             if (method_exists($this, $method)) {
                 $this->$method($value);
             } else {
-                throw new Exception\InvalidArgumentException(
-                    "Unhandled option passed to Metadata constructor: $method " . $key);
+                throw new Exception\InvalidArgumentException(sprintf(
+                    'Unhandled option passed to Metadata constructor: %s %s',
+                    $method,
+                    $key
+                ));
             }
         }
 
@@ -270,7 +273,10 @@ class Metadata
      */
     public function getResourceRoute()
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::getEntityRoute', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->getEntityRoute();
     }
 
@@ -481,7 +487,11 @@ class Metadata
      */
     public function setResourceRoute($route)
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::setEntityRoute', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::setEntityRoute',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->setEntityRoute($route);
     }
 

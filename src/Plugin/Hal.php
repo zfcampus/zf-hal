@@ -255,9 +255,15 @@ class Hal extends AbstractHelper implements
     {
         if (!$hydrator instanceof HydratorInterface) {
             if (!$this->hydrators->has((string) $hydrator)) {
+                $type = gettype($hydrator);
+                if (is_object($hydrator)) {
+                    $type = get_class($hydrator);
+                } elseif (is_string($hydrator)) {
+                    $type = $hydrator;
+                }
                 throw new Exception\InvalidArgumentException(sprintf(
                     'Invalid hydrator instance or name provided; received "%s"',
-                    (is_object($hydrator) ? get_class($hydrator) : (is_string($hydrator) ? $hydrator : gettype($hydrator)))
+                    $type
                 ));
             }
             $hydrator = $this->hydrators->get($hydrator);
@@ -288,7 +294,11 @@ class Hal extends AbstractHelper implements
      */
     public function setRenderEmbeddedResources($value)
     {
-        trigger_error(sprintf('%s has been deprecated; please use %s::setRenderEmbeddedEntities', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s has been deprecated; please use %s::setRenderEmbeddedEntities',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         $this->renderEmbeddedEntities = $value;
         return $this;
     }
@@ -313,7 +323,11 @@ class Hal extends AbstractHelper implements
      */
     public function getRenderEmbeddedResources()
     {
-        trigger_error(sprintf('%s has been deprecated; please use %s::getRenderEmbeddedEntities', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s has been deprecated; please use %s::getRenderEmbeddedEntities',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->renderEmbeddedEntities;
     }
 
@@ -360,7 +374,11 @@ class Hal extends AbstractHelper implements
      */
     public function getHydratorForResource($resource)
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::getHydratorForEntity', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::getHydratorForEntity',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return self::getHydratorForEntity($resource);
     }
 
@@ -426,7 +444,8 @@ class Hal extends AbstractHelper implements
      * </code>
      *
      * @param  Collection $halCollection
-     * @return array|ApiProblem Associative array representing the payload to render; returns ApiProblem if error in pagination occurs
+     * @return array|ApiProblem Associative array representing the payload to render;
+     *     returns ApiProblem if error in pagination occurs
      */
     public function renderCollection(Collection $halCollection)
     {
@@ -448,9 +467,15 @@ class Hal extends AbstractHelper implements
         );
 
         if ($collection instanceof Paginator) {
-            $payload['page_count']  = isset($payload['page_count'])  ? $payload['page_count']  : $collection->count();
-            $payload['page_size']   = isset($payload['page_size'])   ? $payload['page_size']   : $halCollection->getPageSize();
-            $payload['total_items'] = isset($payload['total_items']) ? $payload['total_items'] : (int) $collection->getTotalItemCount();
+            $payload['page_count']  = isset($payload['page_count'])
+                ? $payload['page_count']
+                : $collection->count();
+            $payload['page_size']   = isset($payload['page_size'])
+                ? $payload['page_size']
+                : $halCollection->getPageSize();
+            $payload['total_items'] = isset($payload['total_items'])
+                ? $payload['total_items']
+                : (int) $collection->getTotalItemCount();
         } elseif (is_array($collection) || $collection instanceof Countable) {
             $payload['total_items'] = isset($payload['total_items']) ? $payload['total_items'] : count($collection);
         }
@@ -472,7 +497,11 @@ class Hal extends AbstractHelper implements
      */
     public function renderResource(Resource $halResource, $renderResource = true)
     {
-        trigger_error(sprintf('The method %s is deprecated; please use %s::renderEntity()', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            'The method %s is deprecated; please use %s::renderEntity()',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('resource' => $halResource));
         return $this->renderEntity($halResource, $renderResource);
     }
@@ -506,7 +535,11 @@ class Hal extends AbstractHelper implements
 
         foreach ($entity as $key => $value) {
             if (is_object($value) && $metadataMap->has($value)) {
-                $value = $this->createEntityFromMetadata($value, $metadataMap->get($value), $this->getRenderEmbeddedEntities());
+                $value = $this->createEntityFromMetadata(
+                    $value,
+                    $metadataMap->get($value),
+                    $this->getRenderEmbeddedEntities()
+                );
             }
 
             if ($value instanceof Entity) {
@@ -686,7 +719,11 @@ class Hal extends AbstractHelper implements
      */
     public function createResourceFromMetadata($object, Metadata $metadata, $renderEmbeddedEntities = true)
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::createEntityFromMetadata', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::createEntityFromMetadata',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->createEntityFromMetadata($object, $metadata, $renderEmbeddedEntities);
     }
 
@@ -745,7 +782,11 @@ class Hal extends AbstractHelper implements
      */
     public function createResource($resource, $route, $routeIdentifierName)
     {
-        trigger_error(sprintf('%s is deprecated; use %s::createEntity instead', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; use %s::createEntity instead',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->createEntity($resource, $route, $routeIdentifierName);
     }
 
@@ -910,8 +951,8 @@ class Hal extends AbstractHelper implements
         $link->setRoute($route);
         $link->setRouteParams($params);
         $link->setRouteOptions(ArrayUtils::merge($options, array(
-            'query' => array('page' => $page))
-        ));
+            'query' => array('page' => $page),
+        )));
         $links->add($link, true);
 
         // first link
@@ -919,8 +960,8 @@ class Hal extends AbstractHelper implements
         $link->setRoute($route);
         $link->setRouteParams($params);
         $link->setRouteOptions(ArrayUtils::merge($options, array(
-            'query' => array('page' => null))
-        ));
+            'query' => array('page' => null),
+        )));
         $links->add($link);
 
         // last link
@@ -928,8 +969,8 @@ class Hal extends AbstractHelper implements
         $link->setRoute($route);
         $link->setRouteParams($params);
         $link->setRouteOptions(ArrayUtils::merge($options, array(
-            'query' => array('page' => $count))
-        ));
+            'query' => array('page' => $count),
+        )));
         $links->add($link);
 
         // prev link
@@ -938,8 +979,8 @@ class Hal extends AbstractHelper implements
             $link->setRoute($route);
             $link->setRouteParams($params);
             $link->setRouteOptions(ArrayUtils::merge($options, array(
-                'query' => array('page' => $prev))
-            ));
+                'query' => array('page' => $prev),
+            )));
             $links->add($link);
         }
 
@@ -949,8 +990,8 @@ class Hal extends AbstractHelper implements
             $link->setRoute($route);
             $link->setRouteParams($params);
             $link->setRouteOptions(ArrayUtils::merge($options, array(
-                'query' => array('page' => $next))
-            ));
+                'query' => array('page' => $next),
+            )));
             $links->add($link);
         }
 
