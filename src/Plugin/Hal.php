@@ -541,7 +541,29 @@ class Hal extends AbstractHelper implements
                     $this->getRenderEmbeddedEntities()
                 );
             }
-
+            
+            if (is_object($value)) {
+                $parents = class_parents($value);
+                foreach ($parents as $parent) {
+                    $class = strtolower($parent);
+                    if (isset($this->hydratorMap[$class])) {
+                        $hydrated = $this->hydratorMap[$class]->extract($value);
+                        foreach ($hydrated as $nestedKey => $nestedValue) {
+                            if (is_object($nestedValue)) {
+                                $hydrated[$nestedKey] = $this->renderEntity(
+                                    $this->createEntityFromMetadata(
+                                        $nestedValue,
+                                        $metadataMap->get($nestedValue),
+                                        $this->getRenderEmbeddedEntities()
+                                    )
+                                );
+                            }
+                        }
+                        $entity[$key] = $hydrated;
+                    }
+                }
+            }
+            
             if ($value instanceof Entity) {
                 $this->extractEmbeddedEntity($entity, $key, $value);
             }
@@ -560,7 +582,10 @@ class Hal extends AbstractHelper implements
             }
         }
 
-        $entity['_links'] = $this->fromResource($halEntity);
+        $links = $this->fromResource($halEntity);
+        if ($links) {
+            $entity['_links'] = $links;
+        }
         return $entity;
     }
 
