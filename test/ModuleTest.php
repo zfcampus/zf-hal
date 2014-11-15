@@ -124,4 +124,34 @@ class ModuleTest extends TestCase
             $this->assertSame(get_class($hydrators->get($serviceName)), get_class($hydrator));
         }
     }
+
+    public function testOptionUseProxyIfPresentInConfig()
+    {
+        $options = array(
+            'zf-hal' => array(
+                'options' => array(
+                    'use_proxy' => true,
+                ),
+            ),
+        );
+
+        $services = $this->setupServiceManager();
+        $config   = $services->get('Config');
+        $services->setAllowOverride(true);
+        $services->setService('Config', ArrayUtils::merge($config, $options));
+
+        $helpers   = $services->get('ViewHelperManager');
+        $halPlugin = $helpers->get('Hal');
+
+        $serverUrlPlugin = $helpers->get('ServerUrl');
+
+        $r            = new ReflectionObject($serverUrlPlugin);
+        $useProxyProp = $r->getProperty('useProxy');
+        $useProxyProp->setAccessible(true);
+
+        $useProxy = $useProxyProp->getValue($serverUrlPlugin);
+
+        $this->assertInternalType('boolean', $useProxy);
+        $this->assertTrue($useProxy);
+    }
 }
