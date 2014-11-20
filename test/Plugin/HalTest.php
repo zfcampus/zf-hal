@@ -16,7 +16,6 @@ use Zend\Mvc\MvcEvent;
 use Zend\Paginator\Adapter\ArrayAdapter as ArrayPaginator;
 use Zend\Paginator\Paginator;
 use Zend\Uri\Http;
-use Zend\Uri\Uri;
 use Zend\View\Helper\Url as UrlHelper;
 use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use ZF\Hal\Collection;

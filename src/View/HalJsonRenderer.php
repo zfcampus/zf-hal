@@ -54,9 +54,6 @@ class HalJsonRenderer extends JsonRenderer
      */
     public function setHelperPluginManager(HelperPluginManager $helpers)
     {
-        if (!$helpers->has('Hal')) {
-            $this->injectHalHelper($helpers);
-        }
         $this->helpers = $helpers;
     }
 
@@ -127,20 +124,6 @@ class HalJsonRenderer extends JsonRenderer
         }
 
         return parent::render($nameOrModel, $values);
-    }
-
-    /**
-     * Inject the helper manager with the Hal helper
-     *
-     * @param  HelperPluginManager $helpers
-     */
-    protected function injectHalHelper(HelperPluginManager $helpers)
-    {
-        $helper = new HalHelper();
-        $helper->setView($this);
-        $helper->setServerUrlHelper($helpers->get('ServerUrl'));
-        $helper->setUrlHelper($helpers->get('Url'));
-        $helpers->setService('Hal', $helper);
     }
 
     /**
