@@ -49,4 +49,21 @@ return array(
             ),
         ),
     ),
+    'service_manager' => array(
+        'factories' => array(
+            'ZF\Hal\JsonRenderer' => 'ZF\Hal\Factory\HalJsonRendererFactory',
+            'ZF\Hal\JsonStrategy' => 'ZF\Hal\Factory\HalJsonStrategyFactory',
+            'ZF\Hal\MetadataMap'  => 'ZF\Hal\Factory\MetadataMapFactory',
+        ),
+    ),
+    'view_helpers' => array(
+        'factories' => array(
+            'Hal' => 'ZF\Hal\Factory\HalPluginFactory',
+        ),
+    ),
+    'controller_plugins' => array(
+        'factories' => array(
+            'Hal' => 'ZF\Hal\Factory\HalPluginFactory',
+        ),
+    ),
 );
