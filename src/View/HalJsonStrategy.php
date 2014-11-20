@@ -20,8 +20,14 @@ use Zend\View\ViewEvent;
  */
 class HalJsonStrategy extends JsonStrategy
 {
+    /**
+     * @var string
+     */
     protected $contentType = 'application/json';
 
+    /**
+     * @param HalJsonRenderer $renderer
+     */
     public function __construct(HalJsonRenderer $renderer)
     {
         $this->renderer = $renderer;

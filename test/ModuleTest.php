@@ -6,14 +6,12 @@
 
 namespace ZFTest\Hal;
 
-use ZF\Hal\Module;
-use PHPUnit_Framework_TestCase as TestCase;
-use ReflectionObject;
-use Zend\Mvc\MvcEvent;
-use Zend\Mvc\Router\RouteMatch;
-use Zend\ServiceManager\Config;
 use Zend\ServiceManager\ServiceManager;
-use Zend\Stdlib\ArrayUtils;
+use Zend\View\View;
+use ZF\Hal\Module;
+use ZF\Hal\View\HalJsonModel;
+use PHPUnit_Framework_TestCase as TestCase;
+use stdClass;
 
 class ModuleTest extends TestCase
 {
@@ -22,106 +20,57 @@ class ModuleTest extends TestCase
         $this->module = new Module;
     }
 
-    public function setupServiceManager()
+    public function testOnRenderWhenMvcEventResultIsNotHalJsonModel()
     {
-        $options = array('service_manager' => array(
-            'factories' => array(
-                // Consumed by ZF\Hal\JsonRenderer service
-                'ViewHelperManager'       => 'Zend\Mvc\Service\ViewHelperManagerFactory',
-                'ControllerPluginManager' => 'Zend\Mvc\Service\ControllerPluginManagerFactory',
-            ),
-        ));
-        $config = ArrayUtils::merge($options['service_manager'], $this->module->getServiceConfig());
-        $config['view_helpers']       = $this->module->getViewHelperConfig();
-        $config['controller_plugins'] = $this->module->getControllerPluginConfig();
+        $mvcEvent = $this->getMock('Zend\Mvc\MvcEvent');
+        $mvcEvent
+            ->expects($this->once())
+            ->method('getResult')
+            ->will($this->returnValue(new stdClass()));
+        $mvcEvent
+            ->expects($this->never())
+            ->method('getTarget');
 
-        $services       = new ServiceManager();
-        $servicesConfig = new Config($config);
-        $servicesConfig->configureServiceManager($services);
-        $services->setService('Config', $config);
-
-        $event = new MvcEvent();
-        $event->setRouteMatch(new RouteMatch(array()));
-
-        $router = $this->getMock('Zend\Mvc\Router\RouteStackInterface');
-        $services->setService('HttpRouter', $router);
-
-        $app = $this->getMockBuilder('Zend\Mvc\Application')
-                    ->disableOriginalConstructor()
-                    ->getMock();
-        $app->expects($this->once())
-            ->method('getMvcEvent')
-            ->will($this->returnValue($event));
-        $services->setService('application', $app);
-
-        $helpers = $services->get('ViewHelperManager');
-        $helpersConfig = new Config($config['view_helpers']);
-        $helpersConfig->configureServiceManager($helpers);
-
-        $plugins = $services->get('ControllerPluginManager');
-        $pluginsConfig = new Config($config['controller_plugins']);
-        $pluginsConfig->configureServiceManager($plugins);
-
-        return $services;
+        $this->module->onRender($mvcEvent);
     }
 
-    public function testJsonRendererFactoryInjectsDefaultHydratorIfPresentInConfig()
+    public function testOnRenderAttachesJsonStrategy()
     {
-        $options = array(
-            'zf-hal' => array(
-                'renderer' => array(
-                    'default_hydrator' => 'ObjectProperty',
-                ),
-            ),
-        );
+        $halJsonStrategy = $this->getMockBuilder('ZF\Hal\View\HalJsonStrategy')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $services = $this->setupServiceManager();
-        $config   = $services->get('Config');
-        $services->setAllowOverride(true);
-        $services->setService('Config', ArrayUtils::merge($config, $options));
+        $view = new View();
 
-        $helpers = $services->get('ViewHelperManager');
-        $plugin  = $helpers->get('Hal');
-        $this->assertAttributeInstanceOf('Zend\Stdlib\Hydrator\ObjectProperty', 'defaultHydrator', $plugin);
-    }
+        $eventManager = $this->getMock('Zend\EventManager\EventManager');
+        $eventManager
+            ->expects($this->once())
+            ->method('attach')
+            ->with($halJsonStrategy, 200);
 
-    public function testJsonRendererFactoryInjectsHydratorMappingsIfPresentInConfig()
-    {
-        $options = array(
-            'zf-hal' => array(
-                'renderer' => array(
-                    'hydrators' => array(
-                        'Some\MadeUp\Component'            => 'ClassMethods',
-                        'Another\MadeUp\Component'         => 'Reflection',
-                        'StillAnother\MadeUp\Component'    => 'ArraySerializable',
-                        'A\Component\With\SharedHydrators' => 'Reflection',
-                    ),
-                ),
-            ),
-        );
+        $view->setEventManager($eventManager);
 
-        $services = $this->setupServiceManager();
-        $config   = $services->get('Config');
-        $services->setAllowOverride(true);
-        $services->setService('Config', ArrayUtils::merge($config, $options));
+        $serviceManager = new ServiceManager();
+        $serviceManager
+            ->setService('ZF\Hal\JsonStrategy', $halJsonStrategy)
+            ->setService('View', $view);
 
-        $helpers = $services->get('ViewHelperManager');
-        $plugin  = $helpers->get('Hal');
+        $application = $this->getMock('Zend\Mvc\ApplicationInterface');
+        $application
+            ->expects($this->once())
+            ->method('getServiceManager')
+            ->will($this->returnValue($serviceManager));
 
-        $r             = new ReflectionObject($plugin);
-        $hydratorsProp = $r->getProperty('hydratorMap');
-        $hydratorsProp->setAccessible(true);
-        $hydratorMap = $hydratorsProp->getValue($plugin);
+        $mvcEvent = $this->getMock('Zend\Mvc\MvcEvent');
+        $mvcEvent
+            ->expects($this->at(0))
+            ->method('getResult')
+            ->will($this->returnValue(new HalJsonModel()));
+        $mvcEvent
+            ->expects($this->at(1))
+            ->method('getTarget')
+            ->will($this->returnValue($application));
 
-        $hydrators   = $plugin->getHydratorManager();
-
-        $this->assertInternalType('array', $hydratorMap);
-
-        foreach ($options['zf-hal']['renderer']['hydrators'] as $class => $serviceName) {
-            $key = strtolower($class);
-            $this->assertArrayHasKey($key, $hydratorMap);
-            $hydrator = $hydratorMap[$key];
-            $this->assertSame(get_class($hydrators->get($serviceName)), get_class($hydrator));
-        }
+        $this->module->onRender($mvcEvent);
     }
 }

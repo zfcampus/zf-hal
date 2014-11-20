@@ -229,18 +229,22 @@ class Hal extends AbstractHelper implements
 
     /**
      * @param ServerUrl $helper
+     * @return self
      */
     public function setServerUrlHelper(ServerUrl $helper)
     {
         $this->serverUrlHelper = $helper;
+        return $this;
     }
 
     /**
      * @param Url $helper
+     * @return self
      */
     public function setUrlHelper(Url $helper)
     {
         $this->urlHelper = $helper;
+        return $this;
     }
 
     /**
@@ -521,9 +525,9 @@ class Hal extends AbstractHelper implements
     public function renderEntity(Entity $halEntity, $renderEntity = true)
     {
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('entity' => $halEntity));
-        $entity        = $halEntity->entity;
-        $entityLinks   = $halEntity->getLinks();
-        $metadataMap   = $this->getMetadataMap();
+        $entity      = $halEntity->entity;
+        $entityLinks = $halEntity->getLinks();
+        $metadataMap = $this->getMetadataMap();
 
         if (!is_array($entity)) {
             $entity = $this->convertEntityToArray($entity);
@@ -752,15 +756,18 @@ class Hal extends AbstractHelper implements
                 $entityIdentifierName
             ));
         }
+
         $id = ($entityIdentifierName) ? $data[$entityIdentifierName]: null;
 
         if (!$renderEmbeddedEntities) {
             $data = array();
         }
 
-        $entity   = new Entity($data, $id);
-        $links    = $entity->getLinks();
+        $entity = new Entity($data, $id);
+        $links  = $entity->getLinks();
+
         $this->marshalMetadataLinks($metadata, $links);
+
         if (!$links->has('self')) {
             $link = $this->marshalSelfLinkFromMetadata($metadata, $object, $id, $metadata->getRouteIdentifierName());
             $links->add($link);
@@ -919,7 +926,7 @@ class Hal extends AbstractHelper implements
      * Generate HAL links for a paginated collection
      *
      * @param  Collection $halCollection
-     * @return array
+     * @return boolean
      */
     protected function injectPaginationLinks(Collection $halCollection)
     {
