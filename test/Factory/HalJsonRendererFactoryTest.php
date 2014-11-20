@@ -20,10 +20,6 @@ class HalJsonRendererFactoryTest extends TestCase
         $viewHelperManager = $this->getMockBuilder('Zend\View\HelperPluginManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $viewHelperManager
-            ->expects($this->once())
-            ->method('has')
-            ->will($this->returnValue(true));
 
         $services->setService('ViewHelperManager', $viewHelperManager);
 
