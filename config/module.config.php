@@ -37,6 +37,10 @@ return array(
             // ),
             // repeat as needed for each resource/collection type
         ),
+        'options' => array(
+            // Needed for generate valid _link url when you use a proxy
+            'use_proxy' => false,
+        ),
     ),
     // Creates a "HalJson" selector for zfcampus/zf-content-negotiation
     'zf-content-negotiation' => array(
