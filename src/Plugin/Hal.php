@@ -154,7 +154,7 @@ class Hal extends AbstractHelper implements
      * Set the event manager instance
      *
      * @param  EventManagerInterface $events
-     * @return mixed
+     * @return self
      */
     public function setEventManager(EventManagerInterface $events)
     {
