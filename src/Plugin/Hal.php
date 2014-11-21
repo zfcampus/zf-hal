@@ -102,6 +102,13 @@ class Hal extends AbstractHelper implements
     protected $serverUrlHelper;
 
     /**
+     * Server url
+     *
+     * @var string
+     */
+    protected $serverUrlString;
+
+    /**
      * @var Url
      */
     protected $urlHelper;
@@ -631,9 +638,9 @@ class Hal extends AbstractHelper implements
         $representation = $linkDefinition->getProps();
 
         if ($linkDefinition->hasUrl()) {
-            return array_merge($representation, array(
-                'href' => $linkDefinition->getUrl(),
-            ));
+            $representation['href'] = $linkDefinition->getUrl();
+
+            return $representation;
         }
 
         $reuseMatchedParams = true;
@@ -652,14 +659,11 @@ class Hal extends AbstractHelper implements
         );
 
         if (substr($path, 0, 4) == 'http') {
-            return array_merge($representation, array(
-                'href' => $path,
-            ));
+            $representation['href'] = $path;
+        } else {
+            $representation['href'] = $this->getServerUrl() . $path;
         }
-
-        return array_merge($representation, array(
-            'href' => call_user_func($this->serverUrlHelper, $path),
-        ));
+        return $representation;
     }
 
     /**
@@ -1184,6 +1188,19 @@ class Hal extends AbstractHelper implements
         }
 
         return false;
+    }
+
+    /**
+     * Return server url
+     *
+     * @return string
+     */
+    protected function getServerUrl()
+    {
+        if ($this->serverUrlString === null) {
+            $this->serverUrlString = call_user_func($this->serverUrlHelper);
+        }
+        return $this->serverUrlString;
     }
 
     /**
