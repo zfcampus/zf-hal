@@ -667,20 +667,6 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * Return server url
-     *
-     * @return string
-     */
-    protected function getServerUrl()
-    {
-        if ($this->serverUrlString === null)
-        {
-            $this->serverUrlString = call_user_func($this->serverUrlHelper);
-        }
-        return $this->serverUrlString;
-    }
-
-    /**
      * Generate HAL links from a LinkCollection
      *
      * @param  LinkCollection $collection
@@ -1202,6 +1188,19 @@ class Hal extends AbstractHelper implements
         }
 
         return false;
+    }
+
+    /**
+     * Return server url
+     *
+     * @return string
+     */
+    protected function getServerUrl()
+    {
+        if ($this->serverUrlString === null) {
+            $this->serverUrlString = call_user_func($this->serverUrlHelper);
+        }
+        return $this->serverUrlString;
     }
 
     /**
