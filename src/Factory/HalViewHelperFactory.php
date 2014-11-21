@@ -19,13 +19,16 @@ class HalViewHelperFactory implements FactoryInterface
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-        $serverUrlHelper = $serviceLocator->get('ServerUrl');
-        $urlHelper       = $serviceLocator->get('Url');
-
         $services        = $serviceLocator->getServiceLocator();
         $config          = $services->get('Config');
         $metadataMap     = $services->get('ZF\Hal\MetadataMap');
         $hydrators       = $metadataMap->getHydratorManager();
+
+        $serverUrlHelper = $serviceLocator->get('ServerUrl');
+        if (isset($config['zf-hal']['options']['use_proxy'])) {
+            $serverUrlHelper->setUseProxy($config['zf-hal']['options']['use_proxy']);
+        }
+        $urlHelper       = $serviceLocator->get('Url');
 
         $helper = new Plugin\Hal($hydrators);
         $helper

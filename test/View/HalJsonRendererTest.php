@@ -276,7 +276,6 @@ class HalJsonRendererTest extends TestCase
             $item       = $prototype;
             $item['id'] = $id;
             $items[]    = $item;
-
         }
         $adapter   = new ArrayAdapter($items);
         $paginator = new Paginator($adapter);
@@ -340,7 +339,6 @@ class HalJsonRendererTest extends TestCase
             $item       = $prototype;
             $item['id'] = $id;
             $items[]    = $item;
-
         }
         $adapter   = new ArrayAdapter($items);
         $paginator = new Paginator($adapter);

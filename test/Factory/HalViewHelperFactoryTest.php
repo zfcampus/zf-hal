@@ -33,13 +33,13 @@ class HalViewHelperFactoryTest extends TestCase
         $this->pluginManager = $this->getMock('Zend\ServiceManager\AbstractPluginManager');
 
         $this->pluginManager
-            ->expects($this->at(0))
+            ->expects($this->at(1))
             ->method('get')
             ->with('ServerUrl')
             ->will($this->returnValue(new ServerUrl()));
 
         $this->pluginManager
-            ->expects($this->at(1))
+            ->expects($this->at(2))
             ->method('get')
             ->with('Url')
             ->will($this->returnValue(new Url()));
@@ -115,5 +115,37 @@ class HalViewHelperFactoryTest extends TestCase
             $hydrator = $hydratorMap[$key];
             $this->assertSame(get_class($hydrators->get($serviceName)), get_class($hydrator));
         }
+    }
+
+    /**
+     * @group fail
+     */
+    public function testOptionUseProxyIfPresentInConfig()
+    {
+        $options = array(
+            'zf-hal' => array(
+                'options' => array(
+                    'use_proxy' => true,
+                ),
+            ),
+        );
+
+        $this->setupPluginManager($options);
+
+        $factory = new HalViewHelperFactory();
+        $halPlugin = $factory->createService($this->pluginManager);
+
+        $r = new ReflectionObject($halPlugin);
+        $p = $r->getProperty('serverUrlHelper');
+        $p->setAccessible(true);
+        $serverUrlPlugin = $p->getValue($halPlugin);
+        $this->assertInstanceOf('Zend\View\Helper\ServerUrl', $serverUrlPlugin);
+
+        $r = new ReflectionObject($serverUrlPlugin);
+        $p = $r->getProperty('useProxy');
+        $p->setAccessible(true);
+        $useProxy = $p->getValue($serverUrlPlugin);
+        $this->assertInternalType('boolean', $useProxy);
+        $this->assertTrue($useProxy);
     }
 }

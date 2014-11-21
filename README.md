@@ -109,6 +109,13 @@ array(
 // repeat as needed for any additional relational links
 ```
 
+#### Key: `options`
+
+The options key is used to configure general options of the Hal plugin.
+For now we have only one option available who contains the following configuration key:
+
+- `use_proxy` - boolean; set to `true` when you are using a proxy (for using HTTP_X_FORWARDED_PROTO, HTTP_X_FORWARDED_HOST, and HTTP_X_FORWARDED_PROTO instead of SSL HTTPS, HTTP_HOST, SERVER_PORT)
+
 ### System Configuration
 
 The following configuration is present to ensure the proper functioning of this module in
