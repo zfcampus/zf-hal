@@ -290,7 +290,7 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * Set boolean to render embedded eneities or just include _embedded data
+     * Set boolean to render embedded entities or just include _embedded data
      *
      * @deprecated
      * @param  boolean $value
