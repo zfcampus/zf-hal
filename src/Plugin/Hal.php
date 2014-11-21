@@ -405,18 +405,21 @@ class Hal extends AbstractHelper implements
      */
     public function getHydratorForEntity($entity)
     {
-        $metadataMap = $this->getMetadataMap();
-        if ($metadataMap->has($entity)) {
-            $metadata = $metadataMap->get($entity);
-            $hydrator = $metadata->getHydrator();
-            if ($hydrator instanceof HydratorInterface) {
-                return $hydrator;
-            }
+        $class = get_class($entity);
+        $classLower = strtolower($class);
+
+        if (isset($this->hydratorMap[$classLower])) {
+            return $this->hydratorMap[$classLower];
         }
 
-        $class = strtolower(get_class($entity));
-        if (isset($this->hydratorMap[$class])) {
-            return $this->hydratorMap[$class];
+        $metadataMap = $this->getMetadataMap();
+        if ($metadataMap->has($entity)) {
+            $metadata = $metadataMap->get($class);
+            $hydrator = $metadata->getHydrator();
+            if ($hydrator instanceof HydratorInterface) {
+                $this->addHydrator($class, $hydrator);
+                return $hydrator;
+            }
         }
 
         if ($this->defaultHydrator instanceof HydratorInterface) {
