@@ -8,6 +8,7 @@ namespace ZF\Hal\Plugin;
 
 use ArrayObject;
 use Closure;
+use Countable;
 use JsonSerializable;
 use SplObjectStorage;
 use Zend\EventManager\EventManager;
