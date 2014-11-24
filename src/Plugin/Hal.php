@@ -567,7 +567,7 @@ class Hal extends AbstractHelper implements
                 unset($entity[$key]);
             }
             if ($value instanceof LinkCollection) {
-                array_walk_recursive($value, function ($link, $rel) use ($entityLinks) {
+                array_walk_recursive($value, function ($link) use ($entityLinks) {
                     $entityLinks->add($link);
                 });
                 unset($entity[$key]);
