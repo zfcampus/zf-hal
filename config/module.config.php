@@ -62,12 +62,12 @@ return array(
     ),
     'view_helpers' => array(
         'factories' => array(
-            'Hal' => 'ZF\Hal\Factory\HalPluginFactory',
+            'Hal' => 'ZF\Hal\Factory\HalViewHelperFactory',
         ),
     ),
     'controller_plugins' => array(
         'factories' => array(
-            'Hal' => 'ZF\Hal\Factory\HalPluginFactory',
+            'Hal' => 'ZF\Hal\Factory\HalControllerPluginFactory',
         ),
     ),
 );
