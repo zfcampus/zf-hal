@@ -242,7 +242,7 @@ class Link
             throw new Exception\InvalidArgumentException(sprintf(
                 'Received invalid URL: %s',
                 $e->getMessage()
-            ), $e->getCode, $e);
+            ), $e->getCode(), $e);
         }
 
         if (!$uri->isValid()) {
