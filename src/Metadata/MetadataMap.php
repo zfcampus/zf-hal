@@ -75,7 +75,6 @@ class MetadataMap
      */
     public function setMap(array $map)
     {
-        $hydrators = $this->getHydratorManager();
         foreach ($map as $class => $options) {
             $metadata = $options;
             if (! is_array($metadata) && ! $metadata instanceof Metadata) {
