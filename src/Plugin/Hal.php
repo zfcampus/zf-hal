@@ -495,7 +495,14 @@ class Hal extends AbstractHelper implements
             $payload['total_items'] = isset($payload['total_items']) ? $payload['total_items'] : count($collection);
         }
 
-        return $payload;
+        $payload = new ArrayObject($payload);
+        $this->getEventManager()->trigger(
+            __FUNCTION__ . '.post',
+            $this,
+            array('payload' => $payload, 'collection' => $halCollection)
+        );
+
+        return (array) $payload;
     }
 
     /**
@@ -576,7 +583,15 @@ class Hal extends AbstractHelper implements
         }
 
         $entity['_links'] = $this->fromResource($halEntity);
-        return $entity;
+
+        $payload = new ArrayObject($entity);
+        $this->getEventManager()->trigger(
+            __FUNCTION__ . '.post',
+            $this,
+            array('payload' => $payload, 'entity' => $halEntity)
+        );
+
+        return (array) $payload;
     }
 
     /**

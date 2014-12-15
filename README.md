@@ -146,7 +146,9 @@ The `ZF\Hal\Plugin\Hal` triggers several events during its lifecycle. From the `
 instance composed into the HAL plugin, you may attach to the following events:
 
 - `renderCollection`
+- `renderCollection.post`
 - `renderEntity`
+- `renderEntity.post`
 - `createLink`
 - `renderCollection.entity`
 - `getIdFromEntity`
