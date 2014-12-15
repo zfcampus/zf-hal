@@ -898,12 +898,13 @@ class HalTest extends TestCase
         $rendered = $this->plugin->renderEntity($entity);
         $this->assertContains('/users/matthew', $rendered['_links']['self']['href']);
 
-        $this->plugin->getEventManager()->attach('renderEntity.post', function ($e) {
+        $that = $this;
+        $this->plugin->getEventManager()->attach('renderEntity.post', function ($e) use ($that) {
             $payload = $e->getParam('payload');
             $entity = $e->getParam('entity');
 
-            $this->assertInstanceOf('ArrayObject', $payload);
-            $this->assertInstanceOf('ZF\Hal\Entity', $entity);
+            $that->assertInstanceOf('ArrayObject', $payload);
+            $that->assertInstanceOf('ZF\Hal\Entity', $entity);
 
             $payload['post'] = true;
         });
@@ -940,12 +941,13 @@ class HalTest extends TestCase
         $this->assertArrayHasKey('injected', $rendered);
         $this->assertTrue($rendered['injected']);
 
-        $this->plugin->getEventManager()->attach('renderCollection.post', function ($e) {
+        $that = $this;
+        $this->plugin->getEventManager()->attach('renderCollection.post', function ($e) use ($that) {
             $collection = $e->getParam('collection');
             $payload = $e->getParam('payload');
 
-            $this->assertInstanceOf('ArrayObject', $payload);
-            $this->assertInstanceOf('ZF\Hal\Collection', $collection);
+            $that->assertInstanceOf('ArrayObject', $payload);
+            $that->assertInstanceOf('ZF\Hal\Collection', $collection);
 
             $payload['_post'] = true;
         });
