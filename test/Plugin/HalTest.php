@@ -877,7 +877,7 @@ class HalTest extends TestCase
     /**
      * @group 79
      */
-    public function testRenderEntityTriggersEvent()
+    public function testRenderEntityTriggersEvents()
     {
         $entity = new Entity(
             (object) array(
@@ -897,12 +897,26 @@ class HalTest extends TestCase
 
         $rendered = $this->plugin->renderEntity($entity);
         $this->assertContains('/users/matthew', $rendered['_links']['self']['href']);
+
+        $this->plugin->getEventManager()->attach('renderEntity.post', function ($e) {
+            $payload = $e->getParam('payload');
+            $entity = $e->getParam('entity');
+
+            $this->assertInstanceOf('ArrayObject', $payload);
+            $this->assertInstanceOf('ZF\Hal\Entity', $entity);
+
+            $payload['post'] = true;
+        });
+
+        $rendered = $this->plugin->renderEntity($entity);
+        $this->assertArrayHasKey('post', $rendered);
+        $this->assertTrue($rendered['post']);
     }
 
     /**
      * @group 79
      */
-    public function testRenderCollectionTriggersEvent()
+    public function testRenderCollectionTriggersEvents()
     {
         $collection = new Collection(
             array(
@@ -925,6 +939,20 @@ class HalTest extends TestCase
         $rendered = $this->plugin->renderCollection($collection);
         $this->assertArrayHasKey('injected', $rendered);
         $this->assertTrue($rendered['injected']);
+
+        $this->plugin->getEventManager()->attach('renderCollection.post', function ($e) {
+            $collection = $e->getParam('collection');
+            $payload = $e->getParam('payload');
+
+            $this->assertInstanceOf('ArrayObject', $payload);
+            $this->assertInstanceOf('ZF\Hal\Collection', $collection);
+
+            $payload['_post'] = true;
+        });
+
+        $rendered = $this->plugin->renderCollection($collection);
+        $this->assertArrayHasKey('_post', $rendered);
+        $this->assertTrue($rendered['_post']);
     }
 
     public function matchUrl($url)
