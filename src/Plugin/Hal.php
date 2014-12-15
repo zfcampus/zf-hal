@@ -502,7 +502,7 @@ class Hal extends AbstractHelper implements
             array('payload' => $payload, 'collection' => $halCollection)
         );
 
-        return $payload;
+        return (array) $payload;
     }
 
     /**
@@ -591,7 +591,7 @@ class Hal extends AbstractHelper implements
             array('payload' => $payload, 'entity' => $halEntity)
         );
 
-        return $payload;
+        return (array) $payload;
     }
 
     /**
