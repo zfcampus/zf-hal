@@ -790,9 +790,7 @@ class Hal extends AbstractHelper implements
             $entity = new Entity($object, $id);
         }
 
-        $entity = new Entity($data, $id);
         $links  = $entity->getLinks();
-
         $this->marshalMetadataLinks($metadata, $links);
 
         if (!$links->has('self')) {
