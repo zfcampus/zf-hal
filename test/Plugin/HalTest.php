@@ -877,7 +877,7 @@ class HalTest extends TestCase
     /**
      * @group 79
      */
-    public function testRenderEntityTriggersEvent()
+    public function testRenderEntityTriggersEvents()
     {
         $entity = new Entity(
             (object) array(
@@ -897,12 +897,27 @@ class HalTest extends TestCase
 
         $rendered = $this->plugin->renderEntity($entity);
         $this->assertContains('/users/matthew', $rendered['_links']['self']['href']);
+
+        $that = $this;
+        $this->plugin->getEventManager()->attach('renderEntity.post', function ($e) use ($that) {
+            $payload = $e->getParam('payload');
+            $entity = $e->getParam('entity');
+
+            $that->assertInstanceOf('ArrayObject', $payload);
+            $that->assertInstanceOf('ZF\Hal\Entity', $entity);
+
+            $payload['post'] = true;
+        });
+
+        $rendered = $this->plugin->renderEntity($entity);
+        $this->assertArrayHasKey('post', $rendered);
+        $this->assertTrue($rendered['post']);
     }
 
     /**
      * @group 79
      */
-    public function testRenderCollectionTriggersEvent()
+    public function testRenderCollectionTriggersEvents()
     {
         $collection = new Collection(
             array(
@@ -925,6 +940,21 @@ class HalTest extends TestCase
         $rendered = $this->plugin->renderCollection($collection);
         $this->assertArrayHasKey('injected', $rendered);
         $this->assertTrue($rendered['injected']);
+
+        $that = $this;
+        $this->plugin->getEventManager()->attach('renderCollection.post', function ($e) use ($that) {
+            $collection = $e->getParam('collection');
+            $payload = $e->getParam('payload');
+
+            $that->assertInstanceOf('ArrayObject', $payload);
+            $that->assertInstanceOf('ZF\Hal\Collection', $collection);
+
+            $payload['_post'] = true;
+        });
+
+        $rendered = $this->plugin->renderCollection($collection);
+        $this->assertArrayHasKey('_post', $rendered);
+        $this->assertTrue($rendered['_post']);
     }
 
     public function matchUrl($url)
