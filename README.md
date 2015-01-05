@@ -190,6 +190,36 @@ class Module
 }
 ```
 
+Notes on individual events:
+
+- `renderCollection` defines one parameter, `collection`, which is the
+  `ZF\Hal\Collection` being rendered.
+- `renderCollection.post` defines two parameters: `collection`, which is the
+  `ZF\Hal\Collection` being rendered, and `payload`, an `ArrayObject`
+  representation of the collection, including the page count, size, and total
+  items, and links.
+- `renderEntity` defines one parameter, `entity`, which is the
+  `ZF\Hal\Entity` being rendered.
+- `renderEntity.post` defines two parameters: `entity`, which is the
+  `ZF\Hal\Entity` being rendered, and `payload`, an `ArrayObject`
+  representation of the entity, including links.
+- `createLink` defines the following event parameters:
+  - `route`, the route name to use when generating the link, if any.
+  - `id`, the entity identifier value to use when generating the link, if any.
+  - `entity`, the entity for which the link is being generated, if any.
+  - `params`, any additional routing parameters to use when generating the link.
+- `renderCollection.entity` defines the following event parameters:
+  - `collection`, the `ZF\Hal\Collection` to which the entity belongs.
+  - `entity`, the current entity being rendered; this may or may not be a
+    `ZF\Hal\Entity`.
+  - `route`, the route name for the current entity.
+  - `routeParams`, route parameters to use when generating links for the current
+    entity.
+  - `routeOptions`, route options to use when generating links for the current
+    entity.
+- `getIdFromEntity` defines one parameter, `entity`, which is an array or object
+  from which an identifier needs to be extracted.
+
 ### Listeners
 
 #### ZF\Hal\Module::onRender
