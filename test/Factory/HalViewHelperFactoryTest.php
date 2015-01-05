@@ -13,6 +13,7 @@ use Zend\Stdlib\Hydrator\HydratorPluginManager;
 use Zend\View\Helper\ServerUrl;
 use Zend\View\Helper\Url;
 use ZF\Hal\Factory\HalViewHelperFactory;
+use ZF\Hal\Plugin;
 
 class HalViewHelperFactoryTest extends TestCase
 {
@@ -21,6 +22,15 @@ class HalViewHelperFactoryTest extends TestCase
         $services = new ServiceManager();
 
         $services->setService('Config', $config);
+
+        $controllerPluginManager = $this->getMock('Zend\ServiceManager\AbstractPluginManager');
+        $controllerPluginManager
+            ->expects($this->once())
+            ->method('get')
+            ->with('Hal')
+            ->will($this->returnValue(new Plugin\Hal()));
+
+        $services->setService('ControllerPluginManager', $controllerPluginManager);
 
         $metadataMap = $this->getMock('ZF\Hal\Metadata\MetadataMap');
         $metadataMap
