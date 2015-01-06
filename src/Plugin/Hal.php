@@ -114,13 +114,12 @@ class Hal extends AbstractHelper implements
      */
     protected $urlHelper;
 
-
     /**
      * Maximum number of nesting levels
      *
      * @var integer
      */
-    protected $maxDepth;
+    protected $maxDepth = 0;
 
     /**
      * @param null|HydratorPluginManager $hydrators
@@ -562,7 +561,7 @@ class Hal extends AbstractHelper implements
             $entity = array();
         }
 
-        if ($this->maxDepth and $depth > $this->maxDepth) {
+        if ($this->maxDepth && $depth > $this->maxDepth) {
             $entity = array();
         }
 
@@ -774,7 +773,7 @@ class Hal extends AbstractHelper implements
         $data = $this->convertEntityToArray($object);
 
         $entityIdentifierName = $metadata->getEntityIdentifierName();
-        if ($entityIdentifierName and !isset($data[$entityIdentifierName])) {
+        if ($entityIdentifierName && !isset($data[$entityIdentifierName])) {
             throw new Exception\RuntimeException(sprintf(
                 'Unable to determine entity identifier for object of type "%s"; no fields matching "%s"',
                 get_class($object),

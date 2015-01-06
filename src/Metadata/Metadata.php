@@ -327,6 +327,11 @@ class Metadata
         return $this->url;
     }
 
+    /**
+     * Set the maximum nesting level for embedded resources
+     *
+     * @return int 
+     */
     public function getMaxDepth()
     {
         return $this->maxDepth;
@@ -557,6 +562,9 @@ class Metadata
 
     /**
      * Set the maximum number of nesting levels
+     *
+     * @param integer $maxDepth
+     * @return self
      */
     public function setMaxDepth($maxDepth)
     {
