@@ -505,7 +505,6 @@ class Hal extends AbstractHelper implements
         $entityLinks   = $halEntity->getLinks();
         $metadataMap   = $this->getMetadataMap();
 
-
         if (!$this->maxDepth && is_object($entity) && $metadataMap->has($entity)) {
             $this->maxDepth = $metadataMap->get($entity)->getMaxDepth();
         }
@@ -545,6 +544,7 @@ class Hal extends AbstractHelper implements
         }
 
         $entity['_links'] = $this->fromResource($halEntity);
+
         return $entity;
     }
 
@@ -778,7 +778,6 @@ class Hal extends AbstractHelper implements
     public function createEntity($entity, $route, $routeIdentifierName)
     {
         $metadataMap = $this->getMetadataMap();
-
         switch (true) {
             case (is_object($entity) && $metadataMap->has($entity)):
                 $generatedEntity = $this->createEntityFromMetadata($entity, $metadataMap->get($entity));
@@ -1082,6 +1081,7 @@ class Hal extends AbstractHelper implements
             }
 
             $id = $this->getIdFromEntity($entity);
+
             if ($id === false) {
                 // Cannot handle entities without an identifier
                 // Return as-is
@@ -1093,6 +1093,10 @@ class Hal extends AbstractHelper implements
                 $links = $eventParams['entity']->getLinks();
             } else {
                 $links = new LinkCollection();
+            }
+
+            if (isset($entity['links']) && $entity['links'] instanceof LinkCollection) {
+                $links = $entity['links'];
             }
 
             $selfLink = new Link('self');
