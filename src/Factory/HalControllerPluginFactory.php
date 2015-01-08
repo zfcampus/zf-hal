@@ -17,9 +17,6 @@ class HalControllerPluginFactory implements FactoryInterface
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-        $services = $serviceLocator->getServiceLocator();
-        $helpers  = $services->get('ViewHelperManager');
-
-        return $helpers->get('Hal');
+        return $serviceLocator->get('ZF\Hal\Plugin\Hal');
     }
 }
