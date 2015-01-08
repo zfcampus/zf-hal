@@ -58,6 +58,7 @@ return array(
             'ZF\Hal\JsonRenderer' => 'ZF\Hal\Factory\HalJsonRendererFactory',
             'ZF\Hal\JsonStrategy' => 'ZF\Hal\Factory\HalJsonStrategyFactory',
             'ZF\Hal\MetadataMap'  => 'ZF\Hal\Factory\MetadataMapFactory',
+            'ZF\Hal\Plugin\Hal'  => 'ZF\Hal\Factory\HalPluginFactory',
         ),
     ),
     'view_helpers' => array(
