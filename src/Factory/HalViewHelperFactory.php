@@ -9,7 +9,6 @@ namespace ZF\Hal\Factory;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use ZF\Hal\Exception;
-use ZF\Hal\Plugin;
 
 class HalViewHelperFactory implements FactoryInterface
 {
