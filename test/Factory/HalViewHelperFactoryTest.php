@@ -23,15 +23,6 @@ class HalViewHelperFactoryTest extends TestCase
 
         $services->setService('Config', $config);
 
-        $controllerPluginManager = $this->getMock('Zend\ServiceManager\AbstractPluginManager');
-        $controllerPluginManager
-            ->expects($this->once())
-            ->method('get')
-            ->with('Hal')
-            ->will($this->returnValue(new Plugin\Hal()));
-
-        $services->setService('ControllerPluginManager', $controllerPluginManager);
-
         $metadataMap = $this->getMock('ZF\Hal\Metadata\MetadataMap');
         $metadataMap
             ->expects($this->once())
