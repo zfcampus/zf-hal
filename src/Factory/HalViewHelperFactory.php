@@ -30,8 +30,7 @@ class HalViewHelperFactory implements FactoryInterface
         }
         $urlHelper       = $serviceLocator->get('Url');
 
-        /** @var Plugin\Hal $helper */
-        $helper = $services->get('ControllerPluginManager')->get('Hal');
+        $helper = new Plugin\Hal($hydrators);
         $helper
             ->setMetadataMap($metadataMap)
             ->setServerUrlHelper($serverUrlHelper)
