@@ -13,6 +13,7 @@ use Zend\Stdlib\Hydrator\HydratorPluginManager;
 use Zend\View\Helper\ServerUrl;
 use Zend\View\Helper\Url;
 use ZF\Hal\Factory\HalViewHelperFactory;
+use ZF\Hal\Plugin;
 
 class HalViewHelperFactoryTest extends TestCase
 {
