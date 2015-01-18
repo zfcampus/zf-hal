@@ -479,6 +479,9 @@ class Hal extends AbstractHelper implements
             $payload['total_items'] = isset($payload['total_items'])
                 ? $payload['total_items']
                 : (int) $collection->getTotalItemCount();
+            $payload['page'] = ($payload['page_count'] > 0)
+                ? $halCollection->getPage()
+                : 0;
         } elseif (is_array($collection) || $collection instanceof Countable) {
             $payload['total_items'] = isset($payload['total_items']) ? $payload['total_items'] : count($collection);
         }
