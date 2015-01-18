@@ -490,6 +490,7 @@ class Hal extends AbstractHelper implements
         );
 
         if ($collection instanceof Paginator) {
+            $payload['page'] = $halCollection->getPage();
             $payload['page_count']  = isset($payload['page_count'])
                 ? $payload['page_count']
                 : $collection->count();
