@@ -1073,12 +1073,14 @@ class HalTest extends TestCase
         $expected = array(
             '_links',
             '_embedded',
+            'page',
             'page_count',
             'page_size',
             'total_items',
         );
         $this->assertEquals($expected, array_keys($rendered));
         $this->assertEquals(100, $rendered['total_items']);
+        $this->assertEquals(3, $rendered['page']);
         $this->assertEquals(10, $rendered['page_count']);
         $this->assertEquals(10, $rendered['page_size']);
         return $rendered;
