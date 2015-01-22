@@ -261,25 +261,13 @@ class Hal extends AbstractHelper implements
      * @param  string $class
      * @param  HydratorInterface $hydrator
      * @return self
-     * @throws Exception\InvalidArgumentException
      */
     public function addHydrator($class, $hydrator)
     {
         if (!$hydrator instanceof HydratorInterface) {
-            if (!$this->hydrators->has((string) $hydrator)) {
-                $type = gettype($hydrator);
-                if (is_object($hydrator)) {
-                    $type = get_class($hydrator);
-                } elseif (is_string($hydrator)) {
-                    $type = $hydrator;
-                }
-                throw new Exception\InvalidArgumentException(sprintf(
-                    'Invalid hydrator instance or name provided; received "%s"',
-                    $type
-                ));
-            }
             $hydrator = $this->hydrators->get($hydrator);
         }
+
         $class = strtolower($class);
         $this->hydratorMap[$class] = $hydrator;
         return $this;
