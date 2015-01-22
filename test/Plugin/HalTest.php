@@ -30,6 +30,11 @@ use ZF\Hal\Plugin\Hal as HalHelper;
  */
 class HalTest extends TestCase
 {
+    /**
+     * @var HalHelper
+     */
+    protected $plugin;
+
     public function setUp()
     {
         $this->router = $router = new TreeRouteStack();
@@ -1235,5 +1240,15 @@ class HalTest extends TestCase
         $link = $links->get('self');
         $params = $link->getRouteParams();
         $this->assertEquals(array(), $params);
+    }
+
+    public function testAddHydratorDoesntFailWithAutoInvokables()
+    {
+        $this->plugin->addHydrator('stdClass', 'ZFTest\Hal\Plugin\TestAsset\DummyHydrator');
+
+        $this->assertInstanceOf(
+            'ZFTest\Hal\Plugin\TestAsset\DummyHydrator',
+            $this->plugin->getHydratorForEntity(new \stdClass)
+        );
     }
 }
