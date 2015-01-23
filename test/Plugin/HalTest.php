@@ -1250,6 +1250,7 @@ class HalTest extends TestCase
         $this->plugin->setMetadataMap($metadata);
 
         $rendered = $this->plugin->renderEntity($entity);
+
         $this->assertRelationalLinkContains('/resource/foo', 'self', $rendered);
 
         $this->assertArrayHasKey('_embedded', $rendered);
@@ -1259,12 +1260,16 @@ class HalTest extends TestCase
 
         $first = $embed['first_child'];
         $this->assertInternalType('array', $first);
+        $this->assertArrayHasKey('id', $first);
         $this->assertRelationalLinkContains('/embedded/bar', 'self', $first);
         $this->assertArrayHasKey('_embedded', $first);
 
         $childEmbed = $first['_embedded'];
         $this->assertArrayHasKey('parent', $childEmbed);
         $backreference = $embed['first_child']['_embedded']['parent'];
+        $this->assertArrayHasKey('id', $backreference);
+        $this->assertArrayHasKey('name', $backreference);
         $this->assertArrayNotHasKey('_embedded', $backreference);
+        $this->assertArrayNotHasKey('first_child', $backreference);
     }
 }

@@ -541,26 +541,26 @@ class Hal extends AbstractHelper implements
             $this->maxDepth = $metadataMap->get($entity)->getMaxDepth();
         }
 
-        if (!is_array($entity)) {
-            $entity = $this->convertEntityToArray($entity);
-        }
-
         if (!$renderEntity) {
             $entity = array();
         }
 
-        if (isset($this->maxDepth) && $depth >= $this->maxDepth) {
-            $entity = array();
+        if (!is_array($entity)) {
+            $entity = $this->convertEntityToArray($entity);
         }
 
+        $renderEmbedded = ! isset($this->maxDepth) || $depth < $this->maxDepth;
+
         foreach ($entity as $key => $value) {
+
             if (is_object($value) && $metadataMap->has($value)) {
                 $value = $this->createEntityFromMetadata(
                     $value,
                     $metadataMap->get($value),
-                    $this->getRenderEmbeddedEntities()
+                    $this->getRenderEmbeddedEntities() && $renderEmbedded
                 );
             }
+
             if ($value instanceof Entity) {
                 $this->extractEmbeddedEntity($entity, $key, $value, $depth + 1);
             }
@@ -1029,6 +1029,12 @@ class Hal extends AbstractHelper implements
      */
     protected function extractEmbeddedEntity(array &$parent, $key, Entity $entity, $depth = 0)
     {
+        unset($parent[$key]);
+
+        if (isset($this->maxDepth) && $depth > $this->maxDepth) {
+            return;
+        }
+
         // No need to increment depth for this call
         $rendered = $this->renderEntity($entity, true, $depth);
 
@@ -1037,7 +1043,6 @@ class Hal extends AbstractHelper implements
         }
 
         $parent['_embedded'][$key] = $rendered;
-        unset($parent[$key]);
     }
 
     /**
@@ -1053,6 +1058,12 @@ class Hal extends AbstractHelper implements
      */
     protected function extractEmbeddedCollection(array &$parent, $key, Collection $collection, $depth = 0)
     {
+        unset($parent[$key]);
+
+        if (isset($this->maxDepth) && $depth > $this->maxDepth) {
+            return;
+        }
+
         $rendered = $this->extractCollection($collection, $depth + 1);
 
         if (!isset($parent['_embedded'])) {
@@ -1060,7 +1071,6 @@ class Hal extends AbstractHelper implements
         }
 
         $parent['_embedded'][$key] = $rendered;
-        unset($parent[$key]);
     }
 
     /**
