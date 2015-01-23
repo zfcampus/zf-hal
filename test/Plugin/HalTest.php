@@ -1221,4 +1221,43 @@ class HalTest extends TestCase
             $this->plugin->getHydratorForEntity(new \stdClass)
         );
     }
+
+    public function testRendersEmbeddedEntitiesWithBackReferences()
+    {
+        $object = new TestAsset\Entity('foo', 'Foo');
+        $object->first_child  = new TestAsset\EmbeddedEntityWithBackReference('bar', $object);
+        $entity = new Entity($object, 'foo');
+        $self = new Link('self');
+        $self->setRoute('hostname/resource', array('id' => 'foo'));
+        $entity->getLinks()->add($self);
+
+        $metadata = new MetadataMap(array(
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
+                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route_name' => 'hostname/resource',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
+            ),
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithBackReference' => array(
+                'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route'    => 'hostname/embedded',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
+            ),
+        ));
+
+        $this->plugin->setMetadataMap($metadata);
+
+        $rendered = $this->plugin->renderEntity($entity);
+        $this->assertRelationalLinkContains('/resource/foo', 'self', $rendered);
+
+        $this->assertArrayHasKey('_embedded', $rendered);
+        $embed = $rendered['_embedded'];
+        $this->assertEquals(1, count($embed));
+        $this->assertArrayHasKey('first_child', $embed);
+
+        $first = $embed['first_child'];
+        $this->assertInternalType('array', $first);
+        $this->assertRelationalLinkContains('/embedded/bar', 'self', $first);
+    }
 }
