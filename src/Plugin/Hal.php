@@ -765,7 +765,7 @@ class Hal extends AbstractHelper implements
         $this->marshalMetadataLinks($metadata, $links);
 
         if (!$links->has('self')) {
-            $link = $this->marshalSelfLinkFromMetadata($metadata, $object, $id, $metadata->getRouteIdentifierName());
+            $link = $this->marshalLinkFromMetadata($metadata, $object, $id, $metadata->getRouteIdentifierName());
             $links->add($link);
         }
 
@@ -870,7 +870,7 @@ class Hal extends AbstractHelper implements
         if (!$links->has('self')
             && ($metadata->hasUrl() || $metadata->hasRoute())
         ) {
-            $link = $this->marshalSelfLinkFromMetadata($metadata, $object);
+            $link = $this->marshalLinkFromMetadata($metadata, $object);
             $links->add($link);
         }
 
@@ -1234,12 +1234,13 @@ class Hal extends AbstractHelper implements
      * @param  object $object
      * @param  null|string $id
      * @param  null|string $routeIdentifierName
+     * @param  string $relation
      * @return Link
      * @throws Exception\RuntimeException
      */
-    protected function marshalSelfLinkFromMetadata(Metadata $metadata, $object, $id = null, $routeIdentifierName = null)
+    protected function marshalLinkFromMetadata(Metadata $metadata, $object, $id = null, $routeIdentifierName = null, $relation = 'self')
     {
-        $link = new Link('self');
+        $link = new Link($relation);
         if ($metadata->hasUrl()) {
             $link->setUrl($metadata->getUrl());
             return $link;
