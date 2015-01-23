@@ -1237,6 +1237,7 @@ class HalTest extends TestCase
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
+                'max_depth' => 2,
             ),
             'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithBackReference' => array(
                 'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
@@ -1259,5 +1260,11 @@ class HalTest extends TestCase
         $first = $embed['first_child'];
         $this->assertInternalType('array', $first);
         $this->assertRelationalLinkContains('/embedded/bar', 'self', $first);
+        $this->assertArrayHasKey('_embedded', $first);
+
+        $childEmbed = $first['_embedded'];
+        $this->assertArrayHasKey('parent', $childEmbed);
+        $backreference = $embed['first_child']['_embedded']['parent'];
+        $this->assertArrayNotHasKey('_embedded', $backreference);
     }
 }
