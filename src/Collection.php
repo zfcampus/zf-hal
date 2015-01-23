@@ -131,11 +131,6 @@ class Collection implements Link\LinkCollectionAwareInterface
         }
     }
 
-    public function setCollection($collection)
-    {
-        $this->collection = $collection;
-    }
-
     /**
      * Proxy to properties to allow read access
      *
