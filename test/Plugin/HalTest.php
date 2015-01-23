@@ -7,6 +7,8 @@
 namespace ZFTest\Hal\Plugin;
 
 use PHPUnit_Framework_TestCase as TestCase;
+use RecursiveArrayIterator;
+use RecursiveIteratorIterator;
 use ReflectionObject;
 use Zend\Http\Request;
 use Zend\Mvc\Router\Http\TreeRouteStack;
@@ -1224,6 +1226,45 @@ class HalTest extends TestCase
 
     public function testRendersEmbeddedEntitiesWithBackReferences()
     {
+        $root = $this->renderCircularEntityGraph(0);
+
+        $this->assertArrayHasKey('id', $root);
+        $this->assertArrayHasKey('_embedded', $root);
+        $embed = $root['_embedded'];
+        $this->assertCount(1, $embed);
+        $this->assertArrayHasKey('first_child', $embed);
+        $this->assertRelationalLinkContains('/resource/foo', 'self', $root);
+
+        $child = $embed['first_child'];
+        $this->assertInternalType('array', $child);
+        $this->assertArrayNotHasKey('id', $child);
+        $this->assertArrayNotHasKey('_embedded', $child);
+        $this->assertCount(1, $child);
+        $this->assertRelationalLinkContains('/embedded/bar', 'self', $child);
+
+        $root = $this->renderCircularEntityGraph(1);
+
+        $this->assertArrayHasKey('id', $root);
+        $this->assertArrayHasKey('_embedded', $root);
+        $embed = $root['_embedded'];
+        $this->assertCount(1, $embed);
+        $this->assertArrayHasKey('first_child', $embed);
+
+        $child = $embed['first_child'];
+        $this->assertInternalType('array', $child);
+        $this->assertArrayHasKey('id', $child);
+        $this->assertArrayHasKey('_embedded', $child);
+
+        $childEmbed = $child['_embedded'];
+
+        $this->assertArrayHasKey('parent', $childEmbed);
+        $backReference = $embed['first_child']['_embedded']['parent'];
+        $this->assertCount(1, $backReference);
+        $this->assertRelationalLinkContains('/resource/foo', 'self', $backReference);
+    }
+
+    protected function renderCircularEntityGraph($depth)
+    {
         $object = new TestAsset\Entity('foo', 'Foo');
         $object->first_child  = new TestAsset\EmbeddedEntityWithBackReference('bar', $object);
         $entity = new Entity($object, 'foo');
@@ -1237,7 +1278,7 @@ class HalTest extends TestCase
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
-                'max_depth' => 2,
+                'max_depth' => $depth,
             ),
             'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithBackReference' => array(
                 'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
@@ -1249,27 +1290,6 @@ class HalTest extends TestCase
 
         $this->plugin->setMetadataMap($metadata);
 
-        $rendered = $this->plugin->renderEntity($entity);
-
-        $this->assertRelationalLinkContains('/resource/foo', 'self', $rendered);
-
-        $this->assertArrayHasKey('_embedded', $rendered);
-        $embed = $rendered['_embedded'];
-        $this->assertEquals(1, count($embed));
-        $this->assertArrayHasKey('first_child', $embed);
-
-        $first = $embed['first_child'];
-        $this->assertInternalType('array', $first);
-        $this->assertArrayHasKey('id', $first);
-        $this->assertRelationalLinkContains('/embedded/bar', 'self', $first);
-        $this->assertArrayHasKey('_embedded', $first);
-
-        $childEmbed = $first['_embedded'];
-        $this->assertArrayHasKey('parent', $childEmbed);
-        $backreference = $embed['first_child']['_embedded']['parent'];
-        $this->assertArrayHasKey('id', $backreference);
-        $this->assertArrayHasKey('name', $backreference);
-        $this->assertArrayNotHasKey('_embedded', $backreference);
-        $this->assertArrayNotHasKey('first_child', $backreference);
+        return $this->plugin->renderEntity($entity);
     }
 }
