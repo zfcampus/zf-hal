@@ -1224,7 +1224,7 @@ class HalTest extends TestCase
         );
     }
 
-    public function testRendersEmbeddedEntitiesWithBackReferences()
+    public function testMaxDepthOnEmbeddedEntitiesWithBackReferences()
     {
         $root = $this->renderCircularEntityGraph(0);
 
@@ -1291,5 +1291,66 @@ class HalTest extends TestCase
         $this->plugin->setMetadataMap($metadata);
 
         return $this->plugin->renderEntity($entity);
+    }
+
+    public function testMaxDepthOnCollectionsWithBackReferences()
+    {
+        $object1 = new TestAsset\Entity('foo', 'Foo');
+        $object1->first_child  = new TestAsset\EmbeddedEntityWithBackReference('bar', $object1);
+        $object2 = new TestAsset\Entity('bar', 'Bar');
+        $object3 = new TestAsset\Entity('baz', 'Baz');
+
+        $collection = new TestAsset\Collection(array(
+            $object1,
+            $object2,
+            $object3,
+        ));
+
+        $metadata = new MetadataMap(array(
+            'ZFTest\Hal\Plugin\TestAsset\Collection' => array(
+                'is_collection'       => true,
+                'collection_name'     => 'collection',
+                'route_name'          => 'hostname/contacts',
+                'entity_route_name'   => 'hostname/embedded',
+                'max_depth'           => 1,
+            ),
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
+                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route_name' => 'hostname/resource',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
+            ),
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithBackReference' => array(
+                'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route'    => 'hostname/embedded',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
+            ),
+        ));
+
+        $this->plugin->setMetadataMap($metadata);
+
+        $halCollection = $this->plugin->createCollection($collection);
+        $rendered = $this->plugin->renderCollection($halCollection);
+
+        $this->assertRelationalLinkContains('/contacts', 'self', $rendered);
+        $this->assertArrayHasKey('_embedded', $rendered);
+        $this->assertInternalType('array', $rendered['_embedded']);
+        $this->assertArrayHasKey('collection', $rendered['_embedded']);
+
+        $renderedCollection = $rendered['_embedded']['collection'];
+
+        foreach ($renderedCollection as $entity) {
+            $this->assertRelationalLinkContains('/resource/', 'self', $entity);
+            if ($entity['id'] === 'foo') {
+                $this->assertArrayHasKey('_embedded', $entity);
+                $this->assertCount(1, $entity['_embedded']);
+                $this->assertArrayHasKey('first_child', $entity['_embedded']);
+                $this->assertCount(1, $entity['_embedded']['first_child']);
+                $this->assertRelationalLinkContains('/embedded/bar', 'self', $child);
+            }
+        }
+
+        print_r($rendered);
     }
 }
