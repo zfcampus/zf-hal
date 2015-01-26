@@ -471,6 +471,12 @@ class Hal extends AbstractHelper implements
             }
         }
 
+        $metadataMap = $this->getMetadataMap();
+
+        if (!$this->maxDepth && is_object($collection) && $metadataMap->has($collection)) {
+            $this->maxDepth = $metadataMap->get($collection)->getMaxDepth();
+        }
+
         $payload = $halCollection->getAttributes();
         $payload['_links']    = $this->fromResource($halCollection);
         $payload['_embedded'] = array(

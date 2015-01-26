@@ -1333,6 +1333,8 @@ class HalTest extends TestCase
         $halCollection = $this->plugin->createCollection($collection);
         $rendered = $this->plugin->renderCollection($halCollection);
 
+        print_r($rendered);
+
         $this->assertRelationalLinkContains('/contacts', 'self', $rendered);
         $this->assertArrayHasKey('_embedded', $rendered);
         $this->assertInternalType('array', $rendered['_embedded']);
@@ -1346,11 +1348,14 @@ class HalTest extends TestCase
                 $this->assertArrayHasKey('_embedded', $entity);
                 $this->assertCount(1, $entity['_embedded']);
                 $this->assertArrayHasKey('first_child', $entity['_embedded']);
-                $this->assertCount(1, $entity['_embedded']['first_child']);
+                $child = $entity['_embedded']['first_child'];
                 $this->assertRelationalLinkContains('/embedded/bar', 'self', $child);
+                $this->assertCount(1, $child['_embedded']);
+                $this->assertArrayHasKey('parent', $child['_embedded']);
+                $backReference = $child['_embedded']['parent'];
+                $this->assertCount(1, $backReference);
+                $this->assertRelationalLinkContains('/resource/foo', 'self', $backReference);
             }
         }
-
-        print_r($rendered);
     }
 }
