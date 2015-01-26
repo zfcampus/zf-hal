@@ -114,7 +114,6 @@ class Hal extends AbstractHelper implements
      */
     protected $urlHelper;
 
-
     /**
      * Maximum number of nesting levels
      *
@@ -576,7 +575,15 @@ class Hal extends AbstractHelper implements
                 if (isset($this->entityReferenceStack[$childEntityHash]) && ! $this->maxDepth) {
                     throw new Exception\CircularReferenceException(sprintf(
                         "Circular reference detected: %s -> %s. %s.",
-                        implode(' -> ', array_map(function($v) { return get_class($v); }, $this->entityReferenceStack)),
+                        implode(
+                            ' -> ',
+                            array_map(
+                                function ($v) {
+                                    return get_class($v);
+                                },
+                                $this->entityReferenceStack
+                            )
+                        ),
                         get_class($value),
                         "Either set a 'max_depth' metadata attribute or remove the reference"
                     ));
