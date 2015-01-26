@@ -7,8 +7,6 @@
 namespace ZFTest\Hal\Plugin;
 
 use PHPUnit_Framework_TestCase as TestCase;
-use RecursiveArrayIterator;
-use RecursiveIteratorIterator;
 use ReflectionObject;
 use Zend\Http\Request;
 use Zend\Mvc\Router\Http\TreeRouteStack;
