@@ -123,6 +123,13 @@ class Hal extends AbstractHelper implements
     protected $maxDepth;
 
     /**
+     * Entities spl hash stack for circular reference detection
+     *
+     * @var array
+     */
+    protected $entityReferenceStack = array();
+
+    /**
      * @param null|HydratorPluginManager $hydrators
      */
     public function __construct(HydratorPluginManager $hydrators = null)
@@ -543,8 +550,13 @@ class Hal extends AbstractHelper implements
         $entityLinks = $halEntity->getLinks();
         $metadataMap = $this->getMetadataMap();
 
-        if (!$this->maxDepth && is_object($entity) && $metadataMap->has($entity)) {
-            $this->maxDepth = $metadataMap->get($entity)->getMaxDepth();
+        if (is_object($entity)) {
+            $entityHash = spl_object_hash($entity);
+            $this->entityReferenceStack[$entityHash] = $entity;
+
+            if (! $this->maxDepth && $metadataMap->has($entity)) {
+                $this->maxDepth = $metadataMap->get($entity)->getMaxDepth();
+            }
         }
 
         $limitReached = isset($this->maxDepth) && $depth > $this->maxDepth;
@@ -558,8 +570,20 @@ class Hal extends AbstractHelper implements
         }
 
         foreach ($entity as $key => $value) {
-
             if (is_object($value) && $metadataMap->has($value)) {
+                $childEntityHash = spl_object_hash($value);
+
+                if (isset($this->entityReferenceStack[$childEntityHash]) && ! $this->maxDepth) {
+                    throw new Exception\CircularReferenceException(sprintf(
+                        "Circular reference detected: %s -> %s. %s.",
+                        implode(' -> ', array_map(function($v) { return get_class($v); }, $this->entityReferenceStack)),
+                        get_class($value),
+                        "Either set a 'max_depth' metadata attribute or remove the reference"
+                    ));
+                }
+
+                $this->entityReferenceStack[$childEntityHash] = $value;
+
                 $value = $this->createEntityFromMetadata(
                     $value,
                     $metadataMap->get($value),
@@ -583,9 +607,17 @@ class Hal extends AbstractHelper implements
                 });
                 unset($entity[$key]);
             }
+
+            if (isset($childEntityHash)) {
+                unset($this->entityReferenceStack[$childEntityHash]);
+            }
         }
 
         $entity['_links'] = $this->fromResource($halEntity);
+
+        if (isset($entityHash)) {
+            unset($this->entityReferenceStack[$entityHash]);
+        }
 
         return $entity;
     }

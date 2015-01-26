@@ -1359,7 +1359,11 @@ class HalTest extends TestCase
 
     public function testCircularReferenceDetection()
     {
-        $this->setExpectedException('\ZF\Hal\Exception\CircularReferenceException');
+        $this->setExpectedException(
+            'ZF\Hal\Exception\CircularReferenceException',
+            'Circular reference detected: ZFTest\Hal\Plugin\TestAsset\Entity -> ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithBackReference -> ZFTest\Hal\Plugin\TestAsset\Entity'
+        );
+
         $this->renderCircularEntityGraph(null);
     }
 }
