@@ -1369,4 +1369,12 @@ class HalTest extends TestCase
 
         $this->renderCircularEntityGraph(null);
     }
+
+    public function testMaxDepthIsResetBetweenCalls()
+    {
+        $result1 = $this->renderCircularEntityGraph(0);
+        $result2 = $this->renderCircularEntityGraph(1);
+
+        $this->assertNotEquals(count($result1, COUNT_RECURSIVE), count($result2, COUNT_RECURSIVE));
+    }
 }

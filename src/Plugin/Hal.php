@@ -479,7 +479,7 @@ class Hal extends AbstractHelper implements
 
         $metadataMap = $this->getMetadataMap();
 
-        if (!$this->maxDepth && is_object($collection) && $metadataMap->has($collection)) {
+        if ($this->maxDepth === null && is_object($collection) && $metadataMap->has($collection)) {
             $this->maxDepth = $metadataMap->get($collection)->getMaxDepth();
         }
 
@@ -553,7 +553,7 @@ class Hal extends AbstractHelper implements
             $entityHash = spl_object_hash($entity);
             $this->entityReferenceStack[$entityHash] = get_class($entity);
 
-            if (! $this->maxDepth && $metadataMap->has($entity)) {
+            if ($this->maxDepth === null && $metadataMap->has($entity)) {
                 $this->maxDepth = $metadataMap->get($entity)->getMaxDepth();
             }
         }
@@ -572,7 +572,7 @@ class Hal extends AbstractHelper implements
             if (is_object($value) && $metadataMap->has($value)) {
                 $childEntityHash = spl_object_hash($value);
 
-                if (isset($this->entityReferenceStack[$childEntityHash]) && ! $this->maxDepth) {
+                if (isset($this->entityReferenceStack[$childEntityHash]) && $this->maxDepth === null) {
                     $message = sprintf(
                         "Circular reference detected: %s -> %s. %s.",
                         implode(' -> ', $this->entityReferenceStack),
@@ -616,6 +616,11 @@ class Hal extends AbstractHelper implements
         }
 
         $entity['_links'] = $this->fromResource($halEntity);
+
+        if ($limitReached) {
+            // reset the maxDepth so that the same instance of the plugin may be used again on a different metadata map
+            $this->maxDepth = null;
+        }
 
         if (isset($entityHash)) {
             unset($this->entityReferenceStack[$entityHash]);
