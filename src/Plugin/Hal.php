@@ -126,7 +126,7 @@ class Hal extends AbstractHelper implements
      *
      * @var array
      */
-    protected $entityReferenceStack = array();
+    protected $entityHashStack = array();
 
     /**
      * @param null|HydratorPluginManager $hydrators
@@ -551,7 +551,7 @@ class Hal extends AbstractHelper implements
 
         if (is_object($entity)) {
             $entityHash = spl_object_hash($entity);
-            $this->entityReferenceStack[$entityHash] = get_class($entity);
+            $this->entityHashStack[$entityHash] = get_class($entity);
 
             if ($this->maxDepth === null && $metadataMap->has($entity)) {
                 $this->maxDepth = $metadataMap->get($entity)->getMaxDepth();
@@ -572,19 +572,19 @@ class Hal extends AbstractHelper implements
             if (is_object($value) && $metadataMap->has($value)) {
                 $childEntityHash = spl_object_hash($value);
 
-                if (isset($this->entityReferenceStack[$childEntityHash]) && $this->maxDepth === null) {
+                if (isset($this->entityHashStack[$childEntityHash]) && $this->maxDepth === null) {
                     $message = sprintf(
                         "Circular reference detected: %s -> %s. %s.",
-                        implode(' -> ', $this->entityReferenceStack),
+                        implode(' -> ', $this->entityHashStack),
                         get_class($value),
                         "Either set a 'max_depth' metadata attribute or remove the reference"
                     );
                     // we need to clear the stack, as the exception may be caught and the plugin may be invoked again
-                    $this->entityReferenceStack = array();
+                    $this->entityHashStack = array();
                     throw new Exception\CircularReferenceException($message);
                 }
 
-                $this->entityReferenceStack[$childEntityHash] = get_class($value);
+                $this->entityHashStack[$childEntityHash] = get_class($value);
 
                 $value = $this->createEntityFromMetadata(
                     $value,
@@ -611,7 +611,7 @@ class Hal extends AbstractHelper implements
             }
 
             if (isset($childEntityHash)) {
-                unset($this->entityReferenceStack[$childEntityHash]);
+                unset($this->entityHashStack[$childEntityHash]);
             }
         }
 
@@ -623,7 +623,7 @@ class Hal extends AbstractHelper implements
         }
 
         if (isset($entityHash)) {
-            unset($this->entityReferenceStack[$entityHash]);
+            unset($this->entityHashStack[$entityHash]);
         }
 
         return $entity;
