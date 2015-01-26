@@ -551,7 +551,7 @@ class Hal extends AbstractHelper implements
 
         if (is_object($entity)) {
             $entityHash = spl_object_hash($entity);
-            $this->entityReferenceStack[$entityHash] = $entity;
+            $this->entityReferenceStack[$entityHash] = get_class($entity);
 
             if (! $this->maxDepth && $metadataMap->has($entity)) {
                 $this->maxDepth = $metadataMap->get($entity)->getMaxDepth();
@@ -573,23 +573,18 @@ class Hal extends AbstractHelper implements
                 $childEntityHash = spl_object_hash($value);
 
                 if (isset($this->entityReferenceStack[$childEntityHash]) && ! $this->maxDepth) {
-                    throw new Exception\CircularReferenceException(sprintf(
+                    $message = sprintf(
                         "Circular reference detected: %s -> %s. %s.",
-                        implode(
-                            ' -> ',
-                            array_map(
-                                function ($v) {
-                                    return get_class($v);
-                                },
-                                $this->entityReferenceStack
-                            )
-                        ),
+                        implode(' -> ', $this->entityReferenceStack),
                         get_class($value),
                         "Either set a 'max_depth' metadata attribute or remove the reference"
-                    ));
+                    );
+                    // we need to clear the stack, as the exception may be caught and the plugin may be invoked again
+                    $this->entityReferenceStack = array();
+                    throw new Exception\CircularReferenceException($message);
                 }
 
-                $this->entityReferenceStack[$childEntityHash] = $value;
+                $this->entityReferenceStack[$childEntityHash] = get_class($value);
 
                 $value = $this->createEntityFromMetadata(
                     $value,
