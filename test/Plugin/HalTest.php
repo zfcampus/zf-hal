@@ -1342,11 +1342,13 @@ class HalTest extends TestCase
 
         foreach ($renderedCollection as $entity) {
             $this->assertRelationalLinkContains('/resource/', 'self', $entity);
+            $this->assertArrayHasKey('id', $entity);
             if ($entity['id'] === 'foo') {
                 $this->assertArrayHasKey('_embedded', $entity);
                 $this->assertCount(1, $entity['_embedded']);
                 $this->assertArrayHasKey('first_child', $entity['_embedded']);
                 $child = $entity['_embedded']['first_child'];
+                $this->assertArrayHasKey('id', $child);
                 $this->assertRelationalLinkContains('/embedded/bar', 'self', $child);
                 $this->assertCount(1, $child['_embedded']);
                 $this->assertArrayHasKey('parent', $child['_embedded']);
