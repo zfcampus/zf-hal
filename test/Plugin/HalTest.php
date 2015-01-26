@@ -1333,8 +1333,6 @@ class HalTest extends TestCase
         $halCollection = $this->plugin->createCollection($collection);
         $rendered = $this->plugin->renderCollection($halCollection);
 
-        print_r($rendered);
-
         $this->assertRelationalLinkContains('/contacts', 'self', $rendered);
         $this->assertArrayHasKey('_embedded', $rendered);
         $this->assertInternalType('array', $rendered['_embedded']);
