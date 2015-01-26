@@ -1356,4 +1356,10 @@ class HalTest extends TestCase
             }
         }
     }
+
+    public function testCircularReferenceDetection()
+    {
+        $this->setExpectedException('\ZF\Hal\Exception\CircularReferenceException');
+        $this->renderCircularEntityGraph(null);
+    }
 }
