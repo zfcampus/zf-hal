@@ -519,7 +519,7 @@ class Collection implements Link\LinkCollectionAwareInterface
     /**
      * Collection
      *
-     * @return string
+     * @return array|Traversable|\Zend\Paginator\Paginator
      */
     public function getCollection()
     {
