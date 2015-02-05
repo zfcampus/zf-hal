@@ -115,13 +115,6 @@ class Hal extends AbstractHelper implements
     protected $urlHelper;
 
     /**
-     * Maximum number of nesting levels
-     *
-     * @var integer
-     */
-    protected $maxDepth;
-
-    /**
      * Entities spl hash stack for circular reference detection
      *
      * @var array
@@ -479,14 +472,13 @@ class Hal extends AbstractHelper implements
 
         $metadataMap = $this->getMetadataMap();
 
-        if ($this->maxDepth === null && is_object($collection) && $metadataMap->has($collection)) {
-            $this->maxDepth = $metadataMap->get($collection)->getMaxDepth();
-        }
+        $maxDepth = is_object($collection) && $metadataMap->has($collection) ?
+            $metadataMap->get($collection)->getMaxDepth() : null;
 
         $payload = $halCollection->getAttributes();
         $payload['_links']    = $this->fromResource($halCollection);
         $payload['_embedded'] = array(
-            $collectionName => $this->extractCollection($halCollection),
+            $collectionName => $this->extractCollection($halCollection, 0, $maxDepth),
         );
 
         if ($collection instanceof Paginator) {
@@ -540,9 +532,11 @@ class Hal extends AbstractHelper implements
      *
      * @param  Entity $halEntity
      * @param  bool $renderEntity
+     * @param  int $depth           depth of the current rendering recursion
+     * @param  int $maxDepth        maximum rendering depth for the current metadata
      * @return array
      */
-    public function renderEntity(Entity $halEntity, $renderEntity = true, $depth = 0)
+    public function renderEntity(Entity $halEntity, $renderEntity = true, $depth = 0, $maxDepth = null)
     {
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('entity' => $halEntity));
         $entity      = $halEntity->entity;
@@ -550,17 +544,28 @@ class Hal extends AbstractHelper implements
         $metadataMap = $this->getMetadataMap();
 
         if (is_object($entity)) {
-            $entityHash = spl_object_hash($entity);
-            $this->entityHashStack[$entityHash] = get_class($entity);
+            if ($maxDepth === null && $metadataMap->has($entity)) {
+                $maxDepth = $metadataMap->get($entity)->getMaxDepth();
+            }
 
-            if ($this->maxDepth === null && $metadataMap->has($entity)) {
-                $this->maxDepth = $metadataMap->get($entity)->getMaxDepth();
+            if ($maxDepth === null) {
+                $entityHash = spl_object_hash($entity);
+
+                if (isset($this->entityHashStack[$entityHash])) {
+                    // we need to clear the stack, as the exception may be caught and the plugin may be invoked again
+                    $this->entityHashStack = array();
+                    throw new Exception\CircularReferenceException(sprintf(
+                        "Circular reference detected in '%s'. %s",
+                        get_class($entity),
+                        "Either set a 'max_depth' metadata attribute or remove the reference"
+                    ));
+                }
+
+                $this->entityHashStack[$entityHash] = get_class($entity);
             }
         }
 
-        $limitReached = isset($this->maxDepth) && $depth > $this->maxDepth;
-
-        if (!$renderEntity || $limitReached) {
+        if (!$renderEntity || ($maxDepth !== null && $depth > $maxDepth)) {
             $entity = array();
         }
 
@@ -570,22 +575,6 @@ class Hal extends AbstractHelper implements
 
         foreach ($entity as $key => $value) {
             if (is_object($value) && $metadataMap->has($value)) {
-                $childEntityHash = spl_object_hash($value);
-
-                if (isset($this->entityHashStack[$childEntityHash]) && $this->maxDepth === null) {
-                    $message = sprintf(
-                        "Circular reference detected: %s -> %s. %s.",
-                        implode(' -> ', $this->entityHashStack),
-                        get_class($value),
-                        "Either set a 'max_depth' metadata attribute or remove the reference"
-                    );
-                    // we need to clear the stack, as the exception may be caught and the plugin may be invoked again
-                    $this->entityHashStack = array();
-                    throw new Exception\CircularReferenceException($message);
-                }
-
-                $this->entityHashStack[$childEntityHash] = get_class($value);
-
                 $value = $this->createEntityFromMetadata(
                     $value,
                     $metadataMap->get($value),
@@ -594,10 +583,10 @@ class Hal extends AbstractHelper implements
             }
 
             if ($value instanceof Entity) {
-                $this->extractEmbeddedEntity($entity, $key, $value, $depth + 1);
+                $this->extractEmbeddedEntity($entity, $key, $value, $depth + 1, $maxDepth);
             }
             if ($value instanceof Collection) {
-                $this->extractEmbeddedCollection($entity, $key, $value, $depth + 1);
+                $this->extractEmbeddedCollection($entity, $key, $value, $depth + 1, $maxDepth);
             }
             if ($value instanceof Link) {
                 $entityLinks->add($value);
@@ -609,18 +598,9 @@ class Hal extends AbstractHelper implements
                 });
                 unset($entity[$key]);
             }
-
-            if (isset($childEntityHash)) {
-                unset($this->entityHashStack[$childEntityHash]);
-            }
         }
 
         $entity['_links'] = $this->fromResource($halEntity);
-
-        if ($limitReached) {
-            // reset the maxDepth so that the same instance of the plugin may be used again on a different metadata map
-            $this->maxDepth = null;
-        }
 
         if (isset($entityHash)) {
             unset($this->entityHashStack[$entityHash]);
@@ -807,7 +787,7 @@ class Hal extends AbstractHelper implements
         $data = $this->convertEntityToArray($object);
 
         $entityIdentifierName = $metadata->getEntityIdentifierName();
-        if ($entityIdentifierName and !isset($data[$entityIdentifierName])) {
+        if ($entityIdentifierName && ! isset($data[$entityIdentifierName])) {
             throw new Exception\RuntimeException(sprintf(
                 'Unable to determine entity identifier for object of type "%s"; no fields matching "%s"',
                 get_class($object),
@@ -818,12 +798,12 @@ class Hal extends AbstractHelper implements
         $id = ($entityIdentifierName) ? $data[$entityIdentifierName]: null;
 
         if (!$renderEmbeddedEntities) {
-            $data = array();
+            $object = array();
         }
 
-        $entity = new Entity($data, $id);
+        $halEntity = new Entity($object, $id);
 
-        $links = $entity->getLinks();
+        $links = $halEntity->getLinks();
         $this->marshalMetadataLinks($metadata, $links);
 
         if (!$links->has('self')) {
@@ -831,7 +811,7 @@ class Hal extends AbstractHelper implements
             $links->add($link);
         }
 
-        return $entity;
+        return $halEntity;
     }
 
     /**
@@ -1071,11 +1051,13 @@ class Hal extends AbstractHelper implements
      * @param  array $parent
      * @param  string $key
      * @param  Entity $entity
+     * @param  int $depth           depth of the current rendering recursion
+     * @param  int $maxDepth        maximum rendering depth for the current metadata
      */
-    protected function extractEmbeddedEntity(array &$parent, $key, Entity $entity, $depth = 0)
+    protected function extractEmbeddedEntity(array &$parent, $key, Entity $entity, $depth = 0, $maxDepth = null)
     {
         // No need to increment depth for this call
-        $rendered = $this->renderEntity($entity, true, $depth);
+        $rendered = $this->renderEntity($entity, true, $depth, $maxDepth);
 
         if (!isset($parent['_embedded'])) {
             $parent['_embedded'] = array();
@@ -1092,13 +1074,20 @@ class Hal extends AbstractHelper implements
      * Removes the key from the parent representation, and creates a
      * representation for the key in the _embedded object.
      *
-     * @param  array $parent
-     * @param  string $key
+     * @param  array      $parent
+     * @param  string     $key
      * @param  Collection $collection
+     * @param  int        $depth        depth of the current rendering recursion
+     * @param  int        $maxDepth     maximum rendering depth for the current metadata
      */
-    protected function extractEmbeddedCollection(array &$parent, $key, Collection $collection, $depth = 0)
-    {
-        $rendered = $this->extractCollection($collection, $depth + 1);
+    protected function extractEmbeddedCollection(
+        array &$parent,
+        $key,
+        Collection $collection,
+        $depth = 0,
+        $maxDepth = null
+    ) {
+        $rendered = $this->extractCollection($collection, $depth + 1, $maxDepth);
 
         if (!isset($parent['_embedded'])) {
             $parent['_embedded'] = array();
@@ -1114,9 +1103,11 @@ class Hal extends AbstractHelper implements
      * @todo   Remove 'resource' from event parameters for 1.0.0
      * @todo   Remove trigger of 'renderCollection.resource' for 1.0.0
      * @param  Collection $halCollection
+     * @param  int $depth                   depth of the current rendering recursion
+     * @param  int $maxDepth                maximum rendering depth for the current metadata
      * @return array
      */
-    protected function extractCollection(Collection $halCollection, $depth = 0)
+    protected function extractCollection(Collection $halCollection, $depth = 0, $maxDepth = null)
     {
         $collection           = array();
         $events               = $this->getEventManager();
@@ -1146,7 +1137,7 @@ class Hal extends AbstractHelper implements
 
             if ($entity instanceof Entity) {
                 // Depth does not increment at this level
-                $collection[] = $this->renderEntity($entity, $this->getRenderCollections(), $depth);
+                $collection[] = $this->renderEntity($entity, $this->getRenderCollections(), $depth, $maxDepth);
                 continue;
             }
 
@@ -1160,11 +1151,11 @@ class Hal extends AbstractHelper implements
                 }
 
                 if ($value instanceof Entity) {
-                    $this->extractEmbeddedEntity($entity, $key, $value, $depth + 1);
+                    $this->extractEmbeddedEntity($entity, $key, $value, $depth + 1, $maxDepth);
                 }
 
                 if ($value instanceof Collection) {
-                    $this->extractEmbeddedCollection($entity, $key, $value, $depth + 1);
+                    $this->extractEmbeddedCollection($entity, $key, $value, $depth + 1, $maxDepth);
                 }
             }
 

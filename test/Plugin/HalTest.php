@@ -1260,10 +1260,7 @@ class HalTest extends TestCase
                 null,
                 array(
                     'class'   => 'ZF\Hal\Exception\CircularReferenceException',
-                    'message' => 'Circular reference detected: '
-                        . 'ZFTest\Hal\Plugin\TestAsset\Entity -> '
-                        . 'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithBackReference -> '
-                        . 'ZFTest\Hal\Plugin\TestAsset\Entity',
+                    'message' => 'Circular reference detected in \'ZFTest\Hal\Plugin\TestAsset\Entity\'',
                 )
             ),
             array(
@@ -1423,7 +1420,7 @@ class HalTest extends TestCase
     {
         return array(
             array(
-                function() {
+                function () {
                     $object1 = new TestAsset\Entity('foo', 'Foo');
                     $object1->first_child  = new TestAsset\EmbeddedEntityWithBackReference('bar', $object1);
                     $object2 = new TestAsset\Entity('bar', 'Bar');
@@ -1441,11 +1438,11 @@ class HalTest extends TestCase
                 null,
                 array(
                     'class'   => 'ZF\Hal\Exception\CircularReferenceException',
-                    'message' => 'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithBackReference',
+                    'message' => 'Circular reference detected in \'ZFTest\Hal\Plugin\TestAsset\Entity\'',
                 )
             ),
             array(
-                function() {
+                function () {
                     $object1 = new TestAsset\Entity('foo', 'Foo');
                     $object1->first_child  = new TestAsset\EmbeddedEntityWithBackReference('bar', $object1);
                     $object2 = new TestAsset\Entity('bar', 'Bar');
@@ -1524,6 +1521,92 @@ class HalTest extends TestCase
                     'total_items' => 3,
                 ),
             ),
+            array(
+                function () {
+                    $object1 = new TestAsset\Entity('foo', 'Foo');
+                    $object2 = new TestAsset\Entity('bar', 'Bar');
+
+                    $collection = new TestAsset\Collection(array(
+                        $object1,
+                        $object2,
+                    ));
+                    $object1->first_child = $collection;
+
+                    return $collection;
+                },
+                $this->createNestedCollectionMetadataMap(),
+                null,
+                array(
+                    'class'   => 'ZF\Hal\Exception\CircularReferenceException',
+                    'message' => 'Circular reference detected in \'ZFTest\Hal\Plugin\TestAsset\Entity\'',
+                )
+            ),
+            array(
+                function () {
+                    $object1 = new TestAsset\Entity('foo', 'Foo');
+                    $object2 = new TestAsset\Entity('bar', 'Bar');
+
+                    $collection = new TestAsset\Collection(array(
+                        $object1,
+                        $object2,
+                    ));
+                    $object1->first_child = $collection;
+
+                    return $collection;
+                },
+                $this->createNestedCollectionMetadataMap(1),
+                array(
+                    '_links' => array(
+                        'self' => array(
+                            'href' => 'http://localhost.localdomain/contacts',
+                        ),
+                    ),
+                    '_embedded' => array(
+                        'collection' => array(
+                            array(
+                                'id'           => 'foo',
+                                'name'         => 'Foo',
+                                'second_child' => null,
+                                '_embedded'    => array(
+                                    'first_child' => array(
+                                        array(
+                                            '_links' => array(
+                                                'self' => array(
+                                                    'href' => 'http://localhost.localdomain/resource/foo',
+                                                ),
+                                            ),
+                                        ),
+                                        array(
+                                            '_links' => array(
+                                                'self' => array(
+                                                    'href' => 'http://localhost.localdomain/resource/bar',
+                                                ),
+                                            ),
+                                        )
+                                    ),
+                                ),
+                                '_links'       => array(
+                                    'self' => array(
+                                        'href' => 'http://localhost.localdomain/resource/foo',
+                                    ),
+                                ),
+                            ),
+                            array(
+                                'id'           => 'bar',
+                                'name'         => 'Bar',
+                                'first_child'  => null,
+                                'second_child' => null,
+                                '_links'       => array(
+                                    'self' => array(
+                                        'href' => 'http://localhost.localdomain/resource/bar',
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                    'total_items' => 2,
+                ),
+            )
         );
     }
 
