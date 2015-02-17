@@ -1251,4 +1251,417 @@ class HalTest extends TestCase
             $this->plugin->getHydratorForEntity(new \stdClass)
         );
     }
+
+    /**
+     * @param Entity      $entity
+     * @param MetadataMap $metadataMap
+     * @param array       $expectedResult
+     * @param array       $exception
+     *
+     * @dataProvider renderEntityMaxDepthProvider
+     */
+    public function testRenderEntityMaxDepth($entity, $metadataMap, $expectedResult, $exception = null)
+    {
+        $this->plugin->setMetadataMap($metadataMap);
+
+        if ($exception) {
+            $this->setExpectedException($exception['class'], $exception['message']);
+        }
+
+        $result = $this->plugin->renderEntity($entity);
+
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function renderEntityMaxDepthProvider()
+    {
+        return array(
+            /**
+             * array(
+             *     $entity,
+             *     $metadataMap,
+             *     $expectedResult,
+             *     $exception,
+             * )
+             */
+            array(
+                $this->createNestedEntity(),
+                $this->createNestedMetadataMap(),
+                null,
+                array(
+                    'class'   => 'ZF\Hal\Exception\CircularReferenceException',
+                    'message' => 'Circular reference detected in \'ZFTest\Hal\Plugin\TestAsset\Entity\'',
+                )
+            ),
+            array(
+                $this->createNestedEntity(),
+                $this->createNestedMetadataMap(1),
+                array(
+                    'id' => 'foo',
+                    'name' => 'Foo',
+                    'second_child' => null,
+                    '_embedded' => array(
+                        'first_child' => array(
+                            'id' => 'bar',
+                            '_embedded' => array(
+                                'parent' => array(
+                                    '_links' => array(
+                                        'self' => array(
+                                            'href' => 'http://localhost.localdomain/resource/foo'
+                                        ),
+                                    ),
+                                )
+                            ),
+                            '_links' => array(
+                                'self' => array(
+                                    'href' => 'http://localhost.localdomain/embedded/bar'
+                                ),
+                            ),
+                        ),
+                    ),
+                    '_links' => array(
+                        'self' => array(
+                            'href' => 'http://localhost.localdomain/resource/foo'
+                        ),
+                    ),
+                )
+            ),
+            array(
+                $this->createNestedEntity(),
+                $this->createNestedMetadataMap(2),
+                array(
+                    'id' => 'foo',
+                    'name' => 'Foo',
+                    'second_child' => null,
+                    '_embedded' => array(
+                        'first_child' => array(
+                            'id' => 'bar',
+                            '_embedded' => array(
+                                'parent' => array(
+                                    'id' => 'foo',
+                                    'name' => 'Foo',
+                                    'second_child' => null,
+                                    '_embedded' => array(
+                                        'first_child' => array(
+                                            '_links' => array(
+                                                'self' => array(
+                                                    'href' => 'http://localhost.localdomain/embedded/bar'
+                                                ),
+                                            ),
+                                        ),
+                                    ),
+                                    '_links' => array(
+                                        'self' => array(
+                                            'href' => 'http://localhost.localdomain/resource/foo'
+                                        ),
+                                    ),
+                                )
+                            ),
+                            '_links' => array(
+                                'self' => array(
+                                    'href' => 'http://localhost.localdomain/embedded/bar'
+                                ),
+                            ),
+                        ),
+                    ),
+                    '_links' => array(
+                        'self' => array(
+                            'href' => 'http://localhost.localdomain/resource/foo'
+                        ),
+                    ),
+                )
+            )
+        );
+    }
+
+    protected function createNestedEntity()
+    {
+        $object = new TestAsset\Entity('foo', 'Foo');
+        $object->first_child  = new TestAsset\EmbeddedEntityWithBackReference('bar', $object);
+        $entity = new Entity($object, 'foo');
+        $self = new Link('self');
+        $self->setRoute('hostname/resource', array('id' => 'foo'));
+        $entity->getLinks()->add($self);
+
+        return $entity;
+    }
+
+    protected function createNestedMetadataMap($maxDepth = null)
+    {
+        return new MetadataMap(array(
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
+                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route_name' => 'hostname/resource',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
+                'max_depth' => $maxDepth,
+            ),
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithBackReference' => array(
+                'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route'    => 'hostname/embedded',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
+            ),
+        ));
+    }
+
+    public function testSubsequentRenderEntityCalls()
+    {
+        $entity = $this->createNestedEntity();
+        $metadataMap1 = $this->createNestedMetadataMap(0);
+        $metadataMap2 = $this->createNestedMetadataMap(1);
+
+        $this->plugin->setMetadataMap($metadataMap1);
+        $result1 = $this->plugin->renderEntity($entity);
+
+        $this->plugin->setMetadataMap($metadataMap2);
+        $result2 = $this->plugin->renderEntity($entity);
+
+        $this->assertNotEquals($result1, $result2);
+    }
+
+    /**
+     * @param $collection
+     * @param $metadataMap
+     * @param $expectedResult
+     * @param $exception
+     *
+     * @dataProvider renderCollectionWithMaxDepthProvider
+     */
+    public function testRenderCollectionWithMaxDepth($collection, $metadataMap, $expectedResult, $exception = null)
+    {
+        $this->plugin->setMetadataMap($metadataMap);
+
+        if ($exception) {
+            $this->setExpectedException($exception['class'], $exception['message']);
+        }
+
+        if (is_callable($collection)) {
+            $collection = $collection();
+        }
+
+        $halCollection = $this->plugin->createCollection($collection);
+        $result = $this->plugin->renderCollection($halCollection);
+
+        $this->assertEquals($expectedResult, $result);
+    }
+
+    public function renderCollectionWithMaxDepthProvider()
+    {
+        return array(
+            array(
+                function () {
+                    $object1 = new TestAsset\Entity('foo', 'Foo');
+                    $object1->first_child  = new TestAsset\EmbeddedEntityWithBackReference('bar', $object1);
+                    $object2 = new TestAsset\Entity('bar', 'Bar');
+                    $object3 = new TestAsset\Entity('baz', 'Baz');
+
+                    $collection = new TestAsset\Collection(array(
+                        $object1,
+                        $object2,
+                        $object3
+                    ));
+
+                    return $collection;
+                },
+                $this->createNestedCollectionMetadataMap(),
+                null,
+                array(
+                    'class'   => 'ZF\Hal\Exception\CircularReferenceException',
+                    'message' => 'Circular reference detected in \'ZFTest\Hal\Plugin\TestAsset\Entity\'',
+                )
+            ),
+            array(
+                function () {
+                    $object1 = new TestAsset\Entity('foo', 'Foo');
+                    $object1->first_child  = new TestAsset\EmbeddedEntityWithBackReference('bar', $object1);
+                    $object2 = new TestAsset\Entity('bar', 'Bar');
+                    $object3 = new TestAsset\Entity('baz', 'Baz');
+
+                    $collection = new TestAsset\Collection(array(
+                        $object1,
+                        $object2,
+                        $object3
+                    ));
+
+                    return $collection;
+                },
+                $this->createNestedCollectionMetadataMap(1),
+                array(
+                    '_links' => array(
+                        'self' => array(
+                            'href' => 'http://localhost.localdomain/contacts',
+                        ),
+                    ),
+                    '_embedded' => array(
+                        'collection' => array(
+                            array(
+                                'id'           => 'foo',
+                                'name'         => 'Foo',
+                                'second_child' => null,
+                                '_embedded'    => array(
+                                    'first_child' => array(
+                                        'id'        => 'bar',
+                                        '_embedded' => array(
+                                            'parent' => array(
+                                                '_links' => array(
+                                                    'self' => array(
+                                                        'href' => 'http://localhost.localdomain/resource/foo',
+                                                    ),
+                                                ),
+                                            ),
+                                        ),
+                                        '_links'    => array(
+                                            'self' => array(
+                                                'href' => 'http://localhost.localdomain/embedded/bar',
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                                '_links'       => array(
+                                    'self' => array(
+                                        'href' => 'http://localhost.localdomain/resource/foo',
+                                    ),
+                                ),
+                            ),
+                            array(
+                                'id'           => 'bar',
+                                'name'         => 'Bar',
+                                'first_child'  => null,
+                                'second_child' => null,
+                                '_links'       => array(
+                                    'self' => array(
+                                        'href' => 'http://localhost.localdomain/resource/bar',
+                                    ),
+                                ),
+                            ),
+                            array(
+                                'id'           => 'baz',
+                                'name'         => 'Baz',
+                                'first_child'  => null,
+                                'second_child' => null,
+                                '_links'       => array(
+                                    'self' => array(
+                                        'href' => 'http://localhost.localdomain/resource/baz',
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                    'total_items' => 3,
+                ),
+            ),
+            array(
+                function () {
+                    $object1 = new TestAsset\Entity('foo', 'Foo');
+                    $object2 = new TestAsset\Entity('bar', 'Bar');
+
+                    $collection = new TestAsset\Collection(array(
+                        $object1,
+                        $object2,
+                    ));
+                    $object1->first_child = $collection;
+
+                    return $collection;
+                },
+                $this->createNestedCollectionMetadataMap(),
+                null,
+                array(
+                    'class'   => 'ZF\Hal\Exception\CircularReferenceException',
+                    'message' => 'Circular reference detected in \'ZFTest\Hal\Plugin\TestAsset\Entity\'',
+                )
+            ),
+            array(
+                function () {
+                    $object1 = new TestAsset\Entity('foo', 'Foo');
+                    $object2 = new TestAsset\Entity('bar', 'Bar');
+
+                    $collection = new TestAsset\Collection(array(
+                        $object1,
+                        $object2,
+                    ));
+                    $object1->first_child = $collection;
+
+                    return $collection;
+                },
+                $this->createNestedCollectionMetadataMap(1),
+                array(
+                    '_links' => array(
+                        'self' => array(
+                            'href' => 'http://localhost.localdomain/contacts',
+                        ),
+                    ),
+                    '_embedded' => array(
+                        'collection' => array(
+                            array(
+                                'id'           => 'foo',
+                                'name'         => 'Foo',
+                                'second_child' => null,
+                                '_embedded'    => array(
+                                    'first_child' => array(
+                                        array(
+                                            '_links' => array(
+                                                'self' => array(
+                                                    'href' => 'http://localhost.localdomain/resource/foo',
+                                                ),
+                                            ),
+                                        ),
+                                        array(
+                                            '_links' => array(
+                                                'self' => array(
+                                                    'href' => 'http://localhost.localdomain/resource/bar',
+                                                ),
+                                            ),
+                                        )
+                                    ),
+                                ),
+                                '_links'       => array(
+                                    'self' => array(
+                                        'href' => 'http://localhost.localdomain/resource/foo',
+                                    ),
+                                ),
+                            ),
+                            array(
+                                'id'           => 'bar',
+                                'name'         => 'Bar',
+                                'first_child'  => null,
+                                'second_child' => null,
+                                '_links'       => array(
+                                    'self' => array(
+                                        'href' => 'http://localhost.localdomain/resource/bar',
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                    'total_items' => 2,
+                ),
+            )
+        );
+    }
+
+    protected function createNestedCollectionMetadataMap($maxDepth = null)
+    {
+        return new MetadataMap(array(
+            'ZFTest\Hal\Plugin\TestAsset\Collection' => array(
+                'is_collection'       => true,
+                'collection_name'     => 'collection',
+                'route_name'          => 'hostname/contacts',
+                'entity_route_name'   => 'hostname/embedded',
+                'max_depth'           => $maxDepth,
+            ),
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
+                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route_name' => 'hostname/resource',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
+            ),
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithBackReference' => array(
+                'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route'    => 'hostname/embedded',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
+            ),
+        ));
+    }
 }
