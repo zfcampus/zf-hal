@@ -902,21 +902,6 @@ class HalTest extends TestCase
 
         $rendered = $this->plugin->renderEntity($entity);
         $this->assertContains('/users/matthew', $rendered['_links']['self']['href']);
-
-        $that = $this;
-        $this->plugin->getEventManager()->attach('renderEntity.post', function ($e) use ($that) {
-            $payload = $e->getParam('payload');
-            $entity = $e->getParam('entity');
-
-            $that->assertInstanceOf('ArrayObject', $payload);
-            $that->assertInstanceOf('ZF\Hal\Entity', $entity);
-
-            $payload['post'] = true;
-        });
-
-        $rendered = $this->plugin->renderEntity($entity);
-        $this->assertArrayHasKey('post', $rendered);
-        $this->assertTrue($rendered['post']);
     }
 
     /**
