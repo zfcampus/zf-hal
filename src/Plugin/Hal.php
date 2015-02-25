@@ -34,6 +34,7 @@ use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Link\LinkCollectionAwareInterface;
 use ZF\Hal\Metadata\Metadata;
 use ZF\Hal\Metadata\MetadataMap;
+use Countable;
 
 /**
  * Generate links for use with HAL payloads
