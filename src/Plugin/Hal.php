@@ -1288,7 +1288,7 @@ class Hal extends AbstractHelper implements
         }
 
         if (false === $array) {
-            $array = (array) $entity;
+            $array = get_object_vars($entity);
         }
 
         $this->serializedEntities[$entity] = $array;
