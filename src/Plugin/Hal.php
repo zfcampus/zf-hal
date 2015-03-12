@@ -18,7 +18,7 @@ use Zend\Mvc\Controller\Plugin\PluginInterface as ControllerPluginInterface;
 use Zend\Paginator\Paginator;
 use Zend\Stdlib\ArrayUtils;
 use Zend\Stdlib\DispatchableInterface;
-use Zend\Stdlib\Hydrator\HydratorInterface;
+use Zend\Stdlib\Extractor\ExtractionInterface;
 use Zend\Stdlib\Hydrator\HydratorPluginManager;
 use Zend\View\Helper\AbstractHelper;
 use Zend\View\Helper\ServerUrl;
@@ -50,7 +50,7 @@ class Hal extends AbstractHelper implements
     /**
      * Default hydrator to use if no hydrator found for a specific entity class.
      *
-     * @var HydratorInterface
+     * @var ExtractionInterface
      */
     protected $defaultHydrator;
 
@@ -266,12 +266,12 @@ class Hal extends AbstractHelper implements
      * Map an entity class to a specific hydrator instance
      *
      * @param  string $class
-     * @param  HydratorInterface $hydrator
+     * @param  ExtractionInterface $hydrator
      * @return self
      */
     public function addHydrator($class, $hydrator)
     {
-        if (!$hydrator instanceof HydratorInterface) {
+        if (!$hydrator instanceof ExtractionInterface) {
             $hydrator = $this->hydrators->get($hydrator);
         }
 
@@ -283,10 +283,10 @@ class Hal extends AbstractHelper implements
     /**
      * Set the default hydrator to use if none specified for a class.
      *
-     * @param  HydratorInterface $hydrator
+     * @param  ExtractionInterface $hydrator
      * @return self
      */
-    public function setDefaultHydrator(HydratorInterface $hydrator)
+    public function setDefaultHydrator(ExtractionInterface $hydrator)
     {
         $this->defaultHydrator = $hydrator;
         return $this;
@@ -377,7 +377,7 @@ class Hal extends AbstractHelper implements
      *
      * @deprecated
      * @param  object $resource
-     * @return HydratorInterface|false
+     * @return ExtractionInterface|false
      */
     public function getHydratorForResource($resource)
     {
@@ -397,7 +397,7 @@ class Hal extends AbstractHelper implements
      * Otherwise, a boolean false is returned.
      *
      * @param  object $entity
-     * @return HydratorInterface|false
+     * @return ExtractionInterface|false
      */
     public function getHydratorForEntity($entity)
     {
@@ -412,13 +412,13 @@ class Hal extends AbstractHelper implements
         if ($metadataMap->has($entity)) {
             $metadata = $metadataMap->get($class);
             $hydrator = $metadata->getHydrator();
-            if ($hydrator instanceof HydratorInterface) {
+            if ($hydrator instanceof ExtractionInterface) {
                 $this->addHydrator($class, $hydrator);
                 return $hydrator;
             }
         }
 
-        if ($this->defaultHydrator instanceof HydratorInterface) {
+        if ($this->defaultHydrator instanceof ExtractionInterface) {
             return $this->defaultHydrator;
         }
 
