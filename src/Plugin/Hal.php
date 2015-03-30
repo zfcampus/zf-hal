@@ -1310,8 +1310,13 @@ class Hal extends AbstractHelper implements
      * @return Link
      * @throws Exception\RuntimeException
      */
-    protected function marshalLinkFromMetadata(Metadata $metadata, $object, $id = null, $routeIdentifierName = null, $relation = 'self')
-    {
+    protected function marshalLinkFromMetadata(
+        Metadata $metadata,
+        $object,
+        $id = null,
+        $routeIdentifierName = null,
+        $relation = 'self'
+    ) {
         $link = new Link($relation);
         if ($metadata->hasUrl()) {
             $link->setUrl($metadata->getUrl());
