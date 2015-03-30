@@ -14,6 +14,8 @@ class Entity
     public $first_child;
     public $second_child;
 
+    protected $doNotExportMe = "some secret data";
+
     public function __construct($id, $name)
     {
         $this->id   = $id;
