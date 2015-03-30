@@ -416,7 +416,7 @@ class Metadata
                 $type = gettype($hydrator);
             }
             throw new Exception\InvalidArgumentException(sprintf(
-                'Hydrator class must implement Zend\Stdlib\Hydrator\Hydrator; received "%s"',
+                'Hydrator class must implement Zend\Stdlib\Hydrator\HydratorInterface; received "%s"',
                 $type
             ));
         }
