@@ -1212,6 +1212,18 @@ class HalTest extends TestCase
     }
 
     /**
+     * @group 91
+     */
+    public function testConvertEntityToArrayOnlyConvertsPublicProperties()
+    {
+        $foo = new TestAsset\Entity('foo', 'Foo Bar');
+        $entity = $this->plugin->createEntity($foo, 'resource', 'foo_id');
+        $data = $this->plugin->renderEntity($entity);
+
+        $this->assertFalse(array_key_exists('doNotExportMe', $data));
+    }
+
+    /**
      * @group 39
      */
     public function testCreateEntityPassesNullValueForIdentifierIfNotDiscovered()
