@@ -40,8 +40,8 @@ class EntityTest extends TestCase
     {
         $entity = new stdClass;
         $hal    = new Entity($entity, 'id');
-        $this->assertSame($entity, $hal->entity);
-        $this->assertEquals('id', $hal->id);
+        $this->assertSame($entity, $hal->getEntity());
+        $this->assertEquals('id', $hal->getId());
     }
 
     public function testComposesLinkCollectionByDefault()
@@ -64,12 +64,12 @@ class EntityTest extends TestCase
     {
         $entity = array('foo' => 'bar');
         $hal    = new Entity($entity, 'id');
-        $this->assertEquals($entity, $hal->entity);
+        $this->assertEquals($entity, $hal->getEntity());
 
-        $entity =& $hal->entity;
+        $entity =& $hal->getEntity();
         $entity['foo'] = 'baz';
 
-        $secondRetrieval =& $hal->entity;
+        $secondRetrieval =& $hal->getEntity();
         $this->assertEquals('baz', $secondRetrieval['foo']);
     }
 
@@ -79,6 +79,6 @@ class EntityTest extends TestCase
     public function testConstructorAllowsNullIdentifier()
     {
         $hal = new Entity(array('foo' => 'bar'), null);
-        $this->assertNull($hal->id);
+        $this->assertNull($hal->getId());
     }
 }
