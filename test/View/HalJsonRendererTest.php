@@ -260,7 +260,7 @@ class HalJsonRendererTest extends TestCase
 
             $this->assertRelationalLinkEquals('http://localhost.localdomain/resource/' . $id, 'self', $item);
             $this->assertObjectHasAttribute('id', $item, var_export($item, 1));
-            $this->assertEquals($id, $item->id);
+            $this->assertEquals($id, $item->getId());
             $this->assertObjectHasAttribute('foo', $item);
             $this->assertEquals('bar', $item->foo);
         }
@@ -312,7 +312,7 @@ class HalJsonRendererTest extends TestCase
 
             $this->assertRelationalLinkEquals('http://localhost.localdomain/resource/' . $id, 'self', $item);
             $this->assertObjectHasAttribute('id', $item, var_export($item, 1));
-            $this->assertEquals($id, $item->id);
+            $this->assertEquals($id, $item->getId());
             $this->assertObjectHasAttribute('foo', $item);
             $this->assertEquals('bar', $item->foo);
         }
@@ -468,7 +468,7 @@ class HalJsonRendererTest extends TestCase
         $user = $embedded->user;
         $this->assertRelationalLinkContains('/user/matthew', 'self', $user);
         $user = (array) $user;
-        foreach ($child->entity as $key => $value) {
+        foreach ($child->getEntity() as $key => $value) {
             $this->assertArrayHasKey($key, $user);
             $this->assertEquals($value, $user[$key]);
         }
@@ -517,7 +517,7 @@ class HalJsonRendererTest extends TestCase
             $user = $embedded->user;
             $this->assertRelationalLinkContains('/user/matthew', 'self', $user);
             $user = (array) $user;
-            foreach ($child->entity as $key => $value) {
+            foreach ($child->getEntity() as $key => $value) {
                 $this->assertArrayHasKey($key, $user);
                 $this->assertEquals($value, $user[$key]);
             }
@@ -571,7 +571,7 @@ class HalJsonRendererTest extends TestCase
             $user = $embedded->user;
             $this->assertRelationalLinkContains('/user/matthew', 'self', $user);
             $user = (array) $user;
-            foreach ($child->entity as $key => $value) {
+            foreach ($child->getEntity() as $key => $value) {
                 $this->assertArrayHasKey($key, $user);
                 $this->assertEquals($value, $user[$key]);
             }
