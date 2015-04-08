@@ -8,6 +8,9 @@ namespace ZF\Hal;
 
 class Entity implements Link\LinkCollectionAwareInterface
 {
+    /**
+     * @var mixed
+     */
     protected $id;
 
     /**
@@ -15,6 +18,9 @@ class Entity implements Link\LinkCollectionAwareInterface
      */
     protected $links;
 
+    /**
+     * @var object|array 
+     */
     protected $entity;
 
     /**
@@ -41,19 +47,23 @@ class Entity implements Link\LinkCollectionAwareInterface
      */
     public function &__get($name)
     {
-        $names = array(
-            'entity' => 'entity',
-            'id'     => 'id',
-        );
-        $name = strtolower($name);
-        if (!in_array($name, array_keys($names))) {
-            throw new Exception\InvalidArgumentException(sprintf(
-                'Invalid property name "%s"',
-                $name
-            ));
-        }
-        $prop = $names[$name];
-        return $this->{$prop};
+        throw new \Exception('Direct query of values is deprecated.  Use getters.');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return object|array
+     */
+    public function getEntity()
+    {
+        return $this->entity;
     }
 
     /**
