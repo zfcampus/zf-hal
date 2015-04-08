@@ -849,7 +849,7 @@ class Hal extends AbstractHelper implements
         switch (true) {
             case (is_object($entity) && $metadataMap->has($entity)):
                 $generatedEntity = $this->createEntityFromMetadata($entity, $metadataMap->get($entity));
-                $halEntity = new Entity($entity, $generatedEntity->id);
+                $halEntity = new Entity($entity, $generatedEntity->getId());
                 $halEntity->setLinks($generatedEntity->getLinks());
                 break;
 
@@ -937,10 +937,10 @@ class Hal extends AbstractHelper implements
         $routeParams  = array();
         $routeOptions = array();
         if ($resource instanceof Entity
-            && null !== $resource->id
+            && null !== $resource->getId()
         ) {
             $routeParams = array(
-                $routeIdentifier => $resource->id,
+                $routeIdentifier => $resource->getId(),
             );
         }
         if ($resource instanceof Collection) {
