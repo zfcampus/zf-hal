@@ -539,7 +539,7 @@ class Hal extends AbstractHelper implements
     public function renderEntity(Entity $halEntity, $renderEntity = true, $depth = 0, $maxDepth = null)
     {
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('entity' => $halEntity));
-        $entity      = $halEntity->entity;
+        $entity      = $halEntity->getEntity();
         $entityLinks = $halEntity->getLinks();
         $metadataMap = $this->getMetadataMap();
 
