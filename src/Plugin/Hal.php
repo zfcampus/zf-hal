@@ -544,6 +544,7 @@ class Hal extends AbstractHelper implements
      * @param  bool $renderEntity
      * @param  int $depth           depth of the current rendering recursion
      * @param  int $maxDepth        maximum rendering depth for the current metadata
+     * @throws Exception\CircularReferenceException
      * @return array
      */
     public function renderEntity(Entity $halEntity, $renderEntity = true, $depth = 0, $maxDepth = null)
