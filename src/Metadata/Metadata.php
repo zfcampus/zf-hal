@@ -6,7 +6,7 @@
 
 namespace ZF\Hal\Metadata;
 
-use Zend\Stdlib\Hydrator\HydratorInterface;
+use Zend\Stdlib\Extractor\ExtractionInterface;
 use Zend\Stdlib\Hydrator\HydratorPluginManager;
 use ZF\Hal\Exception;
 use Zend\Filter\FilterChain;
@@ -30,7 +30,7 @@ class Metadata
     /**
      * Hydrator to use when extracting object of this class
      *
-     * @var HydratorInterface
+     * @var ExtractionInterface
      */
     protected $hydrator;
 
@@ -214,7 +214,7 @@ class Metadata
     /**
      * Retrieve the hydrator to associate with this class, if any
      *
-     * @return null|HydratorInterface
+     * @return null|ExtractionInterface
      */
     public function getHydrator()
     {
@@ -392,9 +392,9 @@ class Metadata
     /**
      * Set the hydrator to use with this class
      *
-     * @param  string|HydratorInterface $hydrator
+     * @param  string|ExtractionInterface $hydrator
      * @return self
-     * @throws Exception\InvalidArgumentException if the class or hydrator does not implement HydratorInterface
+     * @throws Exception\InvalidArgumentException if the class or hydrator does not implement ExtractionInterface
      */
     public function setHydrator($hydrator)
     {
@@ -407,7 +407,7 @@ class Metadata
                 $hydrator = new $hydrator();
             }
         }
-        if (!$hydrator instanceof HydratorInterface) {
+        if (!$hydrator instanceof ExtractionInterface) {
             if (is_object($hydrator)) {
                 $type = get_class($hydrator);
             } elseif (is_string($hydrator)) {
@@ -416,7 +416,7 @@ class Metadata
                 $type = gettype($hydrator);
             }
             throw new Exception\InvalidArgumentException(sprintf(
-                'Hydrator class must implement Zend\Stdlib\Hydrator\HydratorInterface; received "%s"',
+                'Hydrator class must implement Zend\Stdlib\Extractor\ExtractionInterface; received "%s"',
                 $type
             ));
         }
