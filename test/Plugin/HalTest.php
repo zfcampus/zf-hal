@@ -882,7 +882,7 @@ class HalTest extends TestCase
     /**
      * @group 79
      */
-    public function testRenderEntityTriggersEvent()
+    public function testRenderEntityTriggersEvents()
     {
         $entity = new Entity(
             (object) array(
@@ -907,7 +907,7 @@ class HalTest extends TestCase
     /**
      * @group 79
      */
-    public function testRenderCollectionTriggersEvent()
+    public function testRenderCollectionTriggersEvents()
     {
         $collection = new Collection(
             array(
@@ -930,6 +930,21 @@ class HalTest extends TestCase
         $rendered = $this->plugin->renderCollection($collection);
         $this->assertArrayHasKey('injected', $rendered);
         $this->assertTrue($rendered['injected']);
+
+        $that = $this;
+        $this->plugin->getEventManager()->attach('renderCollection.post', function ($e) use ($that) {
+            $collection = $e->getParam('collection');
+            $payload = $e->getParam('payload');
+
+            $that->assertInstanceOf('ArrayObject', $payload);
+            $that->assertInstanceOf('ZF\Hal\Collection', $collection);
+
+            $payload['_post'] = true;
+        });
+
+        $rendered = $this->plugin->renderCollection($collection);
+        $this->assertArrayHasKey('_post', $rendered);
+        $this->assertTrue($rendered['_post']);
     }
 
     public function matchUrl($url)
@@ -1081,9 +1096,11 @@ class HalTest extends TestCase
             'page_count',
             'page_size',
             'total_items',
+            'page',
         );
         $this->assertEquals($expected, array_keys($rendered));
         $this->assertEquals(100, $rendered['total_items']);
+        $this->assertEquals(3, $rendered['page']);
         $this->assertEquals(10, $rendered['page_count']);
         $this->assertEquals(10, $rendered['page_size']);
         return $rendered;
@@ -1192,6 +1209,18 @@ class HalTest extends TestCase
         $this->assertInstanceOf('SplObjectStorage', $serializedEntities);
         $this->assertTrue($serializedEntities->contains($foo));
         $this->assertSame($data, $serializedEntities[$foo]);
+    }
+
+    /**
+     * @group 91
+     */
+    public function testConvertEntityToArrayOnlyConvertsPublicProperties()
+    {
+        $foo = new TestAsset\Entity('foo', 'Foo Bar');
+        $entity = $this->plugin->createEntity($foo, 'resource', 'foo_id');
+        $data = $this->plugin->renderEntity($entity);
+
+        $this->assertFalse(array_key_exists('doNotExportMe', $data));
     }
 
     /**
