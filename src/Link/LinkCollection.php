@@ -116,4 +116,15 @@ class LinkCollection implements Countable, IteratorAggregate
         unset($this->links[$relation]);
         return true;
     }
+    
+    /**
+     * Remove all links
+     *
+     * @return self
+     */
+    public function clear()
+    {
+        $this->links = array();
+        return $this;
+    }
 }

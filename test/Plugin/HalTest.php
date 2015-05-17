@@ -879,6 +879,25 @@ class HalTest extends TestCase
         $this->assertEquals('closure-param', $params['test-2']);
     }
 
+    public function testRenderEntityTwice()
+    {
+        $link = new Link('resource');
+        $link->setRoute('resource', array('id' => 'user'));
+
+        $entity = new Entity(
+            (object) array(
+                'id'   => 'user',
+                'name' => 'matthew',
+                'resource' => $link,
+            ),
+            'user'
+        );
+
+        $rendered1 = $this->plugin->renderEntity($entity);
+        $rendered2 = $this->plugin->renderEntity($entity);
+        $this->assertEquals($rendered1, $rendered2);
+    }
+
     /**
      * @group 79
      */
