@@ -552,6 +552,10 @@ class Hal extends AbstractHelper implements
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('entity' => $halEntity));
         $entity      = $halEntity->entity;
         $entityLinks = $halEntity->getLinks();
+
+        // $entityLinks is modified during rendering, so keep a backup to prevent side effects.
+        $entityLinksBackup = clone($entityLinks);
+
         $metadataMap = $this->getMetadataMap();
 
         if (is_object($entity)) {
@@ -615,6 +619,12 @@ class Hal extends AbstractHelper implements
 
         if (isset($entityHash)) {
             unset($this->entityHashStack[$entityHash]);
+        }
+
+        // Restore $entityLinks to its original state
+        $entityLinks->clear();
+        foreach ($entityLinksBackup as $link) {
+            $entityLinks->add($link);
         }
 
         return $entity;
