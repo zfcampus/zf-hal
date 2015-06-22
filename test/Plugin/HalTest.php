@@ -8,9 +8,7 @@ namespace ZFTest\Hal\Plugin;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use ReflectionObject;
-use Zend\Http\Request;
 use Zend\Mvc\Router\Http\TreeRouteStack;
-use Zend\Mvc\Router\RouteMatch;
 use Zend\Mvc\Router\Http\Segment;
 use Zend\Mvc\MvcEvent;
 use Zend\Paginator\Adapter\ArrayAdapter as ArrayPaginator;
@@ -947,61 +945,46 @@ class HalTest extends TestCase
         $this->assertTrue($rendered['_post']);
     }
 
-    public function matchUrl($url)
+    public function testFromLinkShouldUseLinkExtractor()
     {
-        $url     = 'http://localhost.localdomain' . $url;
-        $request = new Request();
-        $request->setUri($url);
+        $extraction = true;
 
-        $match = $this->router->match($request);
-        if ($match instanceof RouteMatch) {
-            $this->urlHelper->setRouteMatch($match);
-        }
+        $linkExtractor = $this->getMockBuilder('ZF\Hal\Extractor\LinkExtractor')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $linkExtractor
+            ->expects($this->once())
+            ->method('extract')
+            ->will($this->returnValue($extraction));
 
-        return $match;
+        $this->plugin->setLinkExtractor($linkExtractor);
+
+        $link = new Link('foo');
+
+        $result = $this->plugin->fromLink($link);
+
+        $this->assertEquals($extraction, $result);
     }
 
-    /**
-     * @group 95
-     */
-    public function testPassingFalseReuseParamsOptionShouldOmitMatchedParametersInGeneratedLink()
+    public function testFromLinkCollectionShouldUseLinkCollectionExtractor()
     {
-        $matches = $this->matchUrl('/resource/foo');
-        $this->assertEquals('foo', $matches->getParam('id', false));
+        $extraction = true;
 
-        $link = Link::factory(array(
-            'rel' => 'resource',
-            'route' => array(
-                'name' => 'hostname/resource',
-                'options' => array(
-                    'reuse_matched_params' => false,
-                ),
-            ),
-        ));
-        $result = $this->plugin->fromLink($link);
-        $expected = array(
-            'href' => 'http://localhost.localdomain/resource',
-        );
-        $this->assertEquals($expected, $result);
-    }
+        $linkCollectionExtractor = $this->getMockBuilder('ZF\Hal\Extractor\LinkCollectionExtractor')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $linkCollectionExtractor
+            ->expects($this->once())
+            ->method('extract')
+            ->will($this->returnValue($extraction));
 
-    public function testFromLinkShouldComposeAnyPropertiesInLink()
-    {
-        $link = Link::factory(array(
-            'rel'   => 'resource',
-            'url'   => 'http://api.example.com/foo?version=2',
-            'props' => array(
-                'version' => 2,
-                'latest'  => true,
-            ),
-        ));
-        $result = $this->plugin->fromLink($link);
-        $expected = array(
-            'href'    => 'http://api.example.com/foo?version=2',
-            'version' => 2,
-            'latest'  => true,
-        );
-        $this->assertEquals($expected, $result);
+        $this->plugin->setLinkCollectionExtractor($linkCollectionExtractor);
+
+        $linkCollection = new LinkCollection();
+
+        $result = $this->plugin->fromLinkCollection($linkCollection);
+
+        $this->assertEquals($extraction, $result);
     }
 
     public function testCreateCollectionShouldUseCollectionRouteMetadataWhenInjectingSelfLink()
