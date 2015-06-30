@@ -145,8 +145,8 @@ class MetadataMap
 
     /**
      * Retrieve a metadata instance.
-     * 
-     * @param string $class 
+     *
+     * @param string $class
      * @return Metadata
      */
     private function getMetadataInstance($class)
