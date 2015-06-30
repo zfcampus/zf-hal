@@ -13,7 +13,7 @@ interface LinkCollectionAwareInterface
      * @return mixed
      */
     public function setLinks(LinkCollection $links);
-    
+
     /**
      * @return LinkCollection
      */
