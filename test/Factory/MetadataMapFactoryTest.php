@@ -57,12 +57,14 @@ class MetadataMapFactoryTest extends TestCase
                         'route'    => 'hostname/embedded',
                         'route_identifier_name' => 'id',
                         'entity_identifier_name' => 'id',
+                        'force_self_link' => true, // same as previous
                     ),
                     'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithCustomIdentifier' => array(
                         'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
                         'route'           => 'hostname/embedded_custom',
                         'route_identifier_name' => 'custom_id',
                         'entity_identifier_name' => 'custom_id',
+                        'force_self_link' => false,
                     ),
                 ),
             ),

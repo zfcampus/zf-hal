@@ -75,6 +75,14 @@ class Metadata
     protected $links = array();
 
     /**
+     * Whether to force the existance of a "self" link. The HAl specification encourages it but it is not strictly
+     * required.
+     *
+     * @var bool
+     */
+    protected $forceSelfLink = true;
+
+    /**
      * Route to use to generate a self link for this entity
      *
      * @var string
@@ -569,6 +577,28 @@ class Metadata
     public function setMaxDepth($maxDepth)
     {
         $this->maxDepth = $maxDepth;
+        return $this;
+    }
+
+    /**
+     * Returns true if this entity should be forced to have a "self" link.
+     *
+     * @return boolean
+     */
+    public function getForceSelfLink()
+    {
+        return $this->forceSelfLink;
+    }
+
+    /**
+     * Set whether to force the existance of "self" links.
+     *
+     * @param boolean $forceSelfLink A truthy value
+     * @return $this
+     */
+    public function setForceSelfLink($forceSelfLink)
+    {
+        $this->forceSelfLink = $forceSelfLink;
         return $this;
     }
 }

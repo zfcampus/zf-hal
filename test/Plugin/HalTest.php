@@ -1663,4 +1663,106 @@ class HalTest extends TestCase
             ),
         ));
     }
+
+    public function testCreateEntityFromMetadataWithoutForcedSelfLinks()
+    {
+        $object = new TestAsset\Entity('foo', 'Foo');
+        $metadata = new MetadataMap(array(
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
+                'hydrator'         => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route_name'       => 'hostname/resource',
+                'links'            => array(),
+                'force_self_link' => false,
+            ),
+        ));
+
+        $this->plugin->setMetadataMap($metadata);
+        $entity = $this->plugin->createEntityFromMetadata(
+            $object,
+            $metadata->get('ZFTest\Hal\Plugin\TestAsset\Entity')
+        );
+        $links = $entity->getLinks();
+        $this->assertFalse($links->has('self'));
+    }
+
+    public function testCreateEntityWithoutForcedSelfLinks()
+    {
+        $object = new TestAsset\Entity('foo', 'Foo');
+
+        $metadata = new MetadataMap(array(
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
+                'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route_name'      => 'hostname/resource',
+                'links'           => array(),
+                'force_self_link' => false,
+            ),
+        ));
+        $this->plugin->setMetadataMap($metadata);
+        $entity = $this->plugin->createEntity($object, 'hostname/resource', 'id');
+        $links = $entity->getLinks();
+        $this->assertFalse($links->has('self'));
+    }
+
+    public function testCreateCollectionFromMetadataWithoutForcedSelfLinks()
+    {
+        $set = new TestAsset\Collection(
+            array(
+                (object) array('id' => 'foo', 'name' => 'foo'),
+                (object) array('id' => 'bar', 'name' => 'bar'),
+                (object) array('id' => 'baz', 'name' => 'baz'),
+            )
+        );
+
+        $metadata = new MetadataMap(array(
+            'ZFTest\Hal\Plugin\TestAsset\Collection' => array(
+                'is_collection'       => true,
+                'route_name'          => 'hostname/contacts',
+                'entity_route_name'   => 'hostname/embedded',
+                'links'               => array(),
+                'force_self_link'     => false,
+            ),
+        ));
+
+        $this->plugin->setMetadataMap($metadata);
+
+        $collection = $this->plugin->createCollectionFromMetadata(
+            $set,
+            $metadata->get('ZFTest\Hal\Plugin\TestAsset\Collection')
+        );
+        $links = $collection->getLinks();
+        $this->assertFalse($links->has('self'));
+    }
+
+    public function testCreateCollectionWithoutForcedSelfLinks()
+    {
+        $collection = array('foo' => 'bar');
+        $metadata = new MetadataMap(array(
+            'ZF\Hal\Collection' => array(
+                'is_collection'       => true,
+                'route_name'          => 'hostname/contacts',
+                'entity_route_name'   => 'hostname/embedded',
+                'links'               => array(),
+                'force_self_link'     => false,
+            ),
+        ));
+        $this->plugin->setMetadataMap($metadata);
+
+        $result = $this->plugin->createCollection($collection);
+        $links  = $result->getLinks();
+        $this->assertFalse($links->has('self'));
+    }
+
+    /**
+     * This is a special use-case. See comment in Hal::extractCollection.
+     */
+    public function testExtractCollectionShouldAddSelfLinkToEntityIfEntityIsArray()
+    {
+        $object = array('id' => 'Foo');
+        $collection = new Collection([$object]);
+        $collection->setEntityRoute('hostname/resource');
+        $method = new \ReflectionMethod($this->plugin, 'extractCollection');
+        $method->setAccessible(true);
+        $result = $method->invoke($this->plugin, $collection);
+        $this->assertTrue(isset($result[0]['_links']['self']));
+    }
 }
