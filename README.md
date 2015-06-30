@@ -96,6 +96,8 @@ Each class in the metadata map may contain one or more of the following configur
 - `max_depth` - integer; limit to what nesting level entities and collections are rendered; if the limit is 
   reached, only `self` links will be rendered. default value is `null`, which means no limit: if unlimited circular 
   references are detected, an exception will be thrown to avoid infinite loops.
+- `force_self_link` - boolean; set whether a self-referencing link should be automatically generated for the entity.
+  Defaults to `true` (since its recommended).
 
 The `links` property is an array of arrays, each with the following structure:
 
