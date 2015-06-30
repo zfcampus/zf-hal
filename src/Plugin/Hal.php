@@ -1390,11 +1390,14 @@ class Hal extends AbstractHelper implements
      *
      * Ensures that the link hasn't been previously injected.
      *
+     * This method is marked as public only so that it can be used inside a
+     * closure context in PHP 5.3.
+     *
      * @param Link $link
      * @param LinkCollection $links
      * @return LinkCollection
      */
-    protected function injectPropertyAsLink(Link $link, LinkCollection $links)
+    public function injectPropertyAsLink(Link $link, LinkCollection $links)
     {
         $rel = $link->getRelation();
         if (! $links->has($rel)) {
