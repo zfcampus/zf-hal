@@ -821,7 +821,8 @@ class Hal extends AbstractHelper implements
         $links = $halEntity->getLinks();
         $this->marshalMetadataLinks($metadata, $links);
 
-        if (!$links->has('self')) {
+        $forceSelfLink = $metadata->getForceSelfLink();
+        if ($forceSelfLink && !$links->has('self')) {
             $link = $this->marshalLinkFromMetadata($metadata, $object, $id, $metadata->getRouteIdentifierName());
             $links->add($link);
         }
@@ -830,7 +831,7 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * Create an Entity instance and inject it with a self relational link
+     * Create an Entity instance and inject it with a self relational link if necessary
      *
      * Deprecated; please use createEntity().
      *
@@ -851,7 +852,7 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * Create an Entity instance and inject it with a self relational link
+     * Create an Entity instance and inject it with a self relational link if necessary
      *
      * @param  Entity|array|object $entity
      * @param  string $route
@@ -878,13 +879,15 @@ class Hal extends AbstractHelper implements
                 $halEntity = $entity; // as is
                 break;
         }
-
-        $this->injectSelfLink($halEntity, $route, $routeIdentifierName);
+        $metadata = (!is_array($entity) && $metadataMap->has($entity)) ? $metadataMap->get($entity) : false;
+        if (!$metadata || ($metadata && $metadata->getForceSelfLink())) {
+            $this->injectSelfLink($halEntity, $route, $routeIdentifierName);
+        }
         return $halEntity;
     }
 
     /**
-     * Creates a Collection instance with a self relational link
+     * Creates a Collection instance with a self relational link if necessary
      *
      * @param  Collection|array|object $collection
      * @param  null|string $route
@@ -901,7 +904,10 @@ class Hal extends AbstractHelper implements
             $collection = new Collection($collection);
         }
 
-        $this->injectSelfLink($collection, $route);
+        $metadata = $metadataMap->get($collection);
+        if (!$metadata || ($metadata && $metadata->getForceSelfLink())) {
+            $this->injectSelfLink($collection, $route);
+        }
         return $collection;
     }
 
@@ -922,7 +928,8 @@ class Hal extends AbstractHelper implements
         $links = $collection->getLinks();
         $this->marshalMetadataLinks($metadata, $links);
 
-        if (!$links->has('self')
+        $forceSelfLink = $metadata->getForceSelfLink();
+        if ($forceSelfLink && !$links->has('self')
             && ($metadata->hasUrl() || $metadata->hasRoute())
         ) {
             $link = $this->marshalLinkFromMetadata($metadata, $object);
@@ -1131,6 +1138,7 @@ class Hal extends AbstractHelper implements
         $entityRouteParams    = $halCollection->getEntityRouteParams();
         $entityRouteOptions   = $halCollection->getEntityRouteOptions();
         $metadataMap          = $this->getMetadataMap();
+        $entityMetadata       = null;
 
         foreach ($halCollection->getCollection() as $entity) {
             $eventParams = new ArrayObject(array(
@@ -1193,6 +1201,9 @@ class Hal extends AbstractHelper implements
                 $links = $entity['links'];
             }
 
+            /* $entity is always an array here. We don't have metadata config for arrays so the self link is forced
+               by default (at the moment) and should be removed manually if not required. But at some point it should
+               be discussed if it makes sense to force self links in this particular use-case.  */
             $selfLink = new Link('self');
             $selfLink->setRoute(
                 $eventParams['route'],
