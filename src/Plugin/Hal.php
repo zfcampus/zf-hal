@@ -551,7 +551,8 @@ class Hal extends AbstractHelper implements
     {
         $this->getEventManager()->trigger(__FUNCTION__, $this, array('entity' => $halEntity));
         $entity      = $halEntity->entity;
-        $entityLinks = $halEntity->getLinks();
+        $entityLinks = clone $halEntity->getLinks(); // Clone to prevent link duplication
+
         $metadataMap = $this->getMetadataMap();
 
         if (is_object($entity)) {
@@ -600,17 +601,20 @@ class Hal extends AbstractHelper implements
                 $this->extractEmbeddedCollection($entity, $key, $value, $depth + 1, $maxDepth);
             }
             if ($value instanceof Link) {
-                $entityLinks->add($value);
+                // We have a link; add it to the entity if it's not already present.
+                $entityLinks = $this->injectPropertyAsLink($value, $entityLinks);
                 unset($entity[$key]);
             }
             if ($value instanceof LinkCollection) {
-                array_walk_recursive($value, function ($link) use ($entityLinks) {
-                    $entityLinks->add($link);
+                $that = $this;
+                array_walk_recursive($value, function ($link) use ($entityLinks, $that) {
+                    $that->injectPropertyAsLink($link, $entityLinks);
                 });
                 unset($entity[$key]);
             }
         }
 
+        $halEntity->setLinks($entityLinks);
         $entity['_links'] = $this->fromResource($halEntity);
 
         if (isset($entityHash)) {
@@ -1368,5 +1372,33 @@ class Hal extends AbstractHelper implements
             $link = Link::factory($linkData);
             $links->add($link);
         }
+    }
+
+    /**
+     * Inject a property-based link into the link collection.
+     *
+     * Ensures that the link hasn't been previously injected.
+     *
+     * @param Link $link
+     * @param LinkCollection $links
+     * @return LinkCollection
+     */
+    protected function injectPropertyAsLink(Link $link, LinkCollection $links)
+    {
+        $rel = $link->getRelation();
+        if (! $links->has($rel)) {
+            $links->add($link);
+            return $links;
+        }
+
+        $relLink = $links->get($rel);
+        if ($relLink !== $link
+            || (is_array($relLink) && ! in_array($link, $relLink, true))
+        ) {
+            $links->add($link);
+            return $links;
+        }
+
+        return $links;
     }
 }
