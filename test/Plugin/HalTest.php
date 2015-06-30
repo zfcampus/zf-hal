@@ -1663,4 +1663,50 @@ class HalTest extends TestCase
             ),
         ));
     }
+
+    /**
+     * @group 102
+     */
+    public function testRenderingEntityTwiceMustNotDuplicateLinkProperties()
+    {
+        $link = new Link('resource');
+        $link->setRoute('resource', array('id' => 'user'));
+
+        $entity = new Entity(
+            (object) array(
+                'id'   => 'user',
+                'name' => 'matthew',
+                'resource' => $link,
+            ),
+            'user'
+        );
+
+        $rendered1 = $this->plugin->renderEntity($entity);
+        $rendered2 = $this->plugin->renderEntity($entity);
+        $this->assertEquals($rendered1, $rendered2);
+    }
+
+    /**
+     * @group 102
+     */
+    public function testRenderingEntityTwiceMustNotDuplicateLinkCollectionProperties()
+    {
+        $link = new Link('resource');
+        $link->setRoute('resource', array('id' => 'user'));
+        $links = new LinkCollection();
+        $links->add($link);
+
+        $entity = new Entity(
+            (object) array(
+                'id'   => 'user',
+                'name' => 'matthew',
+                'resources' => $links,
+            ),
+            'user'
+        );
+
+        $rendered1 = $this->plugin->renderEntity($entity);
+        $rendered2 = $this->plugin->renderEntity($entity);
+        $this->assertEquals($rendered1, $rendered2);
+    }
 }
