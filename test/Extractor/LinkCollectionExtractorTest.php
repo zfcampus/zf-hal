@@ -13,6 +13,21 @@ use ZF\Hal\Link\LinkCollection;
 
 class LinkCollectionExtractorTest extends TestCase
 {
+    public function testExtractGivenObjectThatIsNotAnInstanceOfLinkCollectionShouldReturnEmptyArray()
+    {
+        $serverUrlHelper = $this->getMock('Zend\View\Helper\ServerUrl');
+        $urlHelper       = $this->getMock('Zend\View\Helper\Url');
+
+        $linkCollectionExtractor = new LinkCollectionExtractor($serverUrlHelper, $urlHelper);
+
+        $invalidLinkCollection = new \stdClass();
+
+        $result = $linkCollectionExtractor->extract($invalidLinkCollection);
+
+        $this->assertInternalType('array', $result);
+        $this->assertEmpty($result);
+    }
+
     public function testExtractGivenLinkCollectionShouldReturnArrayWithExtractionOfEachLink()
     {
         $serverUrlHelper = $this->getMock('Zend\View\Helper\ServerUrl');
@@ -38,5 +53,34 @@ class LinkCollectionExtractorTest extends TestCase
 
         $this->assertInternalType('array', $result);
         $this->assertCount($linkCollection->count(), $result);
+    }
+
+    public function testExtractGivenLinkCollectionWithTwoLinksForTheSameRelationShouldReturnArrayWithOneKeyThatContainsLinkAggregate()
+    {
+        $serverUrlHelper = $this->getMock('Zend\View\Helper\ServerUrl');
+        $urlHelper       = $this->getMock('Zend\View\Helper\Url');
+
+        $linkCollectionExtractor = new LinkCollectionExtractor($serverUrlHelper, $urlHelper);
+
+        $linkCollection = new LinkCollection();
+        $linkCollection->add(Link::factory(array(
+            'rel' => 'foo',
+            'url' => 'http://example.com/foo',
+        )));
+        $linkCollection->add(Link::factory(array(
+            'rel' => 'foo',
+            'url' => 'http://example.com/bar',
+        )));
+        $linkCollection->add(Link::factory(array(
+            'rel' => 'baz',
+            'url' => 'http://example.com/baz',
+        )));
+
+        $result = $linkCollectionExtractor->extract($linkCollection);
+
+        $this->assertInternalType('array', $result);
+        $this->assertCount(2, $result);
+        $this->assertInternalType('array', $result['foo']);
+        $this->assertCount(2, $result['foo']);
     }
 }
