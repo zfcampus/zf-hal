@@ -606,10 +606,9 @@ class Hal extends AbstractHelper implements
                 unset($entity[$key]);
             }
             if ($value instanceof LinkCollection) {
-                $that = $this;
-                array_walk_recursive($value, function ($link) use ($entityLinks, $that) {
-                    $that->injectPropertyAsLink($link, $entityLinks);
-                });
+                foreach ($value as $link) {
+                    $entityLinks = $this->injectPropertyAsLink($link, $entityLinks);
+                }
                 unset($entity[$key]);
             }
         }
@@ -1379,15 +1378,26 @@ class Hal extends AbstractHelper implements
      *
      * Ensures that the link hasn't been previously injected.
      *
-     * This method is marked as public only so that it can be used inside a
-     * closure context in PHP 5.3.
-     *
-     * @param Link $link
+     * @param Link[]|Link $link
      * @param LinkCollection $links
      * @return LinkCollection
+     * @throws Exception\InvalidArgumentException if a non-link is provided.
      */
-    public function injectPropertyAsLink(Link $link, LinkCollection $links)
+    protected function injectPropertyAsLink($link, LinkCollection $links)
     {
+        if (is_array($link)) {
+            foreach ($link as $single) {
+                $links = $this->injectPropertyAsLink($single, $links);
+            }
+            return $links;
+        }
+
+        if (! $link instanceof Link) {
+            throw new Exception\InvalidArgumentException(
+                'Invalid link discovered; cannot inject into representation'
+            );
+        }
+
         $rel = $link->getRelation();
         if (! $links->has($rel)) {
             $links->add($link);
