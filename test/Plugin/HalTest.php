@@ -1804,7 +1804,7 @@ class HalTest extends TestCase
     public function testExtractCollectionShouldAddSelfLinkToEntityIfEntityIsArray()
     {
         $object = array('id' => 'Foo');
-        $collection = new Collection([$object]);
+        $collection = new Collection(array($object));
         $collection->setEntityRoute('hostname/resource');
         $method = new \ReflectionMethod($this->plugin, 'extractCollection');
         $method->setAccessible(true);
