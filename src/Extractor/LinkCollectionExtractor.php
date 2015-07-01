@@ -46,7 +46,7 @@ class LinkCollectionExtractor extends LinkExtractor
 
                 $aggregate[] = parent::extract($subLink);
             }
-            
+
             $links[$rel] = $aggregate;
         }
 
