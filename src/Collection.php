@@ -238,7 +238,7 @@ class Collection implements Link\LinkCollectionAwareInterface
     }
 
     /**
-     * Set the route identifier name
+     * Set the entity identifier name
      *
      * @param  string $identifier
      * @return self
