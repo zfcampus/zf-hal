@@ -47,7 +47,20 @@ class Entity implements Link\LinkCollectionAwareInterface
      */
     public function &__get($name)
     {
-        throw new \Exception('Direct query of values is deprecated.  Use getters.');
+        trigger_error(sprintf('%s is deprecated, use getEntity() instead.', __METHOD__), E_USER_DEPRECATED);
+        $names = array(
+            'entity' => 'entity',
+            'id'     => 'id',
+        );
+        $name = strtolower($name);
+        if (!in_array($name, array_keys($names))) {
+            throw new Exception\InvalidArgumentException(sprintf(
+                'Invalid property name "%s"',
+                $name
+            ));
+        }
+        $prop = $names[$name];
+        return $this->{$prop};
     }
 
     /**
@@ -63,7 +76,7 @@ class Entity implements Link\LinkCollectionAwareInterface
      */
     public function getEntity()
     {
-        return $this->entity;
+        return &$this->entity;
     }
 
     /**
