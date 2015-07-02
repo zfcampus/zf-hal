@@ -65,6 +65,7 @@ class LinkCollection implements Countable, IteratorAggregate
             $type = (is_object($this->links[$relation])
                 ? get_class($this->links[$relation])
                 : gettype($this->links[$relation]));
+            
             throw new Exception\DomainException(sprintf(
                 '%s::$links should be either a %s\Link or an array; however, it is a "%s"',
                 __CLASS__,
@@ -81,7 +82,7 @@ class LinkCollection implements Countable, IteratorAggregate
      * Retrieve a link relation
      *
      * @param  string $relation
-     * @return Link|array
+     * @return Link|array|null
      */
     public function get($relation)
     {
