@@ -74,9 +74,9 @@ class Entity implements Link\LinkCollectionAwareInterface
     /**
      * @return object|array
      */
-    public function getEntity()
+    public function &getEntity()
     {
-        return &$this->entity;
+        return $this->entity;
     }
 
     /**
