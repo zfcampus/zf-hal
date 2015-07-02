@@ -13,16 +13,22 @@ use ZF\Hal\Link\LinkCollection;
 
 class LinkCollectionExtractorTest extends TestCase
 {
+    protected $linkCollectionExtractor;
+
+    public function setUp()
+    {
+        $linkExtractor = $this->getMockBuilder('ZF\Hal\Extractor\LinkExtractor')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->linkCollectionExtractor = new LinkCollectionExtractor($linkExtractor);
+    }
+
     public function testExtractGivenObjectThatIsNotAnInstanceOfLinkCollectionShouldReturnEmptyArray()
     {
-        $serverUrlHelper = $this->getMock('Zend\View\Helper\ServerUrl');
-        $urlHelper       = $this->getMock('Zend\View\Helper\Url');
-
-        $linkCollectionExtractor = new LinkCollectionExtractor($serverUrlHelper, $urlHelper);
-
         $invalidLinkCollection = new \stdClass();
 
-        $result = $linkCollectionExtractor->extract($invalidLinkCollection);
+        $result = $this->linkCollectionExtractor->extract($invalidLinkCollection);
 
         $this->assertInternalType('array', $result);
         $this->assertEmpty($result);
@@ -30,11 +36,6 @@ class LinkCollectionExtractorTest extends TestCase
 
     public function testExtractGivenLinkCollectionShouldReturnArrayWithExtractionOfEachLink()
     {
-        $serverUrlHelper = $this->getMock('Zend\View\Helper\ServerUrl');
-        $urlHelper       = $this->getMock('Zend\View\Helper\Url');
-
-        $linkCollectionExtractor = new LinkCollectionExtractor($serverUrlHelper, $urlHelper);
-
         $linkCollection = new LinkCollection();
         $linkCollection->add(Link::factory(array(
             'rel' => 'foo',
@@ -49,7 +50,7 @@ class LinkCollectionExtractorTest extends TestCase
             'url' => 'http://example.com/baz',
         )));
 
-        $result = $linkCollectionExtractor->extract($linkCollection);
+        $result = $this->linkCollectionExtractor->extract($linkCollection);
 
         $this->assertInternalType('array', $result);
         $this->assertCount($linkCollection->count(), $result);
@@ -57,11 +58,6 @@ class LinkCollectionExtractorTest extends TestCase
 
     public function testExtractGivenLinkCollectionWithTwoLinksForTheSameRelationShouldReturnArrayWithOneKeyThatContainsLinkAggregate()
     {
-        $serverUrlHelper = $this->getMock('Zend\View\Helper\ServerUrl');
-        $urlHelper       = $this->getMock('Zend\View\Helper\Url');
-
-        $linkCollectionExtractor = new LinkCollectionExtractor($serverUrlHelper, $urlHelper);
-
         $linkCollection = new LinkCollection();
         $linkCollection->add(Link::factory(array(
             'rel' => 'foo',
@@ -76,7 +72,7 @@ class LinkCollectionExtractorTest extends TestCase
             'url' => 'http://example.com/baz',
         )));
 
-        $result = $linkCollectionExtractor->extract($linkCollection);
+        $result = $this->linkCollectionExtractor->extract($linkCollection);
 
         $this->assertInternalType('array', $result);
         $this->assertCount(2, $result);

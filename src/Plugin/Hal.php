@@ -27,8 +27,7 @@ use ZF\ApiProblem\ApiProblem;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
 use ZF\Hal\Exception;
-use ZF\Hal\Extractor\LinkCollectionExtractor;
-use ZF\Hal\Extractor\LinkExtractor;
+use ZF\Hal\Extractor\LinkCollectionExtractorInterface;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Link\LinkCollectionAwareInterface;
@@ -107,11 +106,6 @@ class Hal extends AbstractHelper implements
      * @var Url
      */
     protected $urlHelper;
-
-    /**
-     * @var LinkExtractor
-     */
-    protected $linkExtractor;
 
     /**
      * @var LinkCollectionExtractor
@@ -267,50 +261,18 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * @return LinkExtractor
+     * @return LinkCollectionExtractorInterface
      */
-    protected function getLinkExtractor()
+    public function getLinkCollectionExtractor()
     {
-        if (!$this->linkExtractor) {
-            $this->linkExtractor = new LinkExtractor(
-                $this->serverUrlHelper,
-                $this->urlHelper
-            );
-        }
-
-        return $this->linkExtractor;
-    }
-
-    /**
-     * @param  LinkExtractor $extractor
-     * @return self
-     */
-    public function setLinkExtractor(LinkExtractor $extractor)
-    {
-        $this->linkExtractor = $extractor;
-        return $this;
-    }
-
-    /**
-     * @return LinkCollectionExtractor
-     */
-    protected function getLinkCollectionExtractor()
-    {
-        if (!$this->linkCollectionExtractor) {
-            $this->linkCollectionExtractor = new LinkCollectionExtractor(
-                $this->serverUrlHelper,
-                $this->urlHelper
-            );
-        }
-
         return $this->linkCollectionExtractor;
     }
 
     /**
-     * @param  LinkCollectionExtractor $extractor
+     * @param  LinkCollectionExtractorInterface $extractor
      * @return self
      */
-    public function setLinkCollectionExtractor(LinkCollectionExtractor $extractor)
+    public function setLinkCollectionExtractor(LinkCollectionExtractorInterface $extractor)
     {
         $this->linkCollectionExtractor = $extractor;
         return $this;
@@ -707,9 +669,13 @@ class Hal extends AbstractHelper implements
             'params'   => $params,
         ));
         $events->trigger(__FUNCTION__, $this, $eventParams);
-        $route = $eventParams['route'];
 
-        $path = call_user_func($this->urlHelper, $route, $params->getArrayCopy(), $reUseMatchedParams);
+        $path = call_user_func(
+            $this->urlHelper,
+            $eventParams['route'],
+            $params->getArrayCopy(),
+            $reUseMatchedParams
+        );
 
         if (substr($path, 0, 4) == 'http') {
             return $path;
@@ -726,7 +692,9 @@ class Hal extends AbstractHelper implements
      */
     public function fromLink(Link $linkDefinition)
     {
-        return $this->getLinkExtractor()->extract($linkDefinition);
+        $linkExtractor = $this->linkCollectionExtractor->getLinkExtractor();
+
+        return $linkExtractor->extract($linkDefinition);
     }
 
     /**
@@ -737,7 +705,7 @@ class Hal extends AbstractHelper implements
      */
     public function fromLinkCollection(LinkCollection $collection)
     {
-        return $this->getLinkCollectionExtractor()->extract($collection);
+        return $this->linkCollectionExtractor->extract($collection);
     }
 
     /**

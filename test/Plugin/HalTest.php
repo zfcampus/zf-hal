@@ -18,6 +18,8 @@ use Zend\View\Helper\Url as UrlHelper;
 use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
+use ZF\Hal\Extractor\LinkCollectionExtractor;
+use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Metadata\MetadataMap;
@@ -108,6 +110,10 @@ class HalTest extends TestCase
         $plugin->setController($controller);
         $plugin->setUrlHelper($urlHelper);
         $plugin->setServerUrlHelper($serverUrlHelper);
+
+        $linkExtractor = new LinkExtractor($serverUrlHelper, $urlHelper);
+        $linkCollectionExtractor = new LinkCollectionExtractor($linkExtractor);
+        $plugin->setLinkCollectionExtractor($linkCollectionExtractor);
     }
 
     public function assertRelationalLinkContains($match, $relation, $entity)
@@ -957,7 +963,15 @@ class HalTest extends TestCase
             ->method('extract')
             ->will($this->returnValue($extraction));
 
-        $this->plugin->setLinkExtractor($linkExtractor);
+        $linkCollectionExtractor = $this->getMockBuilder('ZF\Hal\Extractor\LinkCollectionExtractor')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $linkCollectionExtractor
+            ->expects($this->once())
+            ->method('getLinkExtractor')
+            ->will($this->returnValue($linkExtractor));
+
+        $this->plugin->setLinkCollectionExtractor($linkCollectionExtractor);
 
         $link = new Link('foo');
 

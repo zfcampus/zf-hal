@@ -6,13 +6,12 @@
 
 namespace ZF\Hal\Extractor;
 
-use Zend\Stdlib\Extractor\ExtractionInterface;
 use Zend\View\Helper\Url;
 use Zend\View\Helper\ServerUrl;
 use ZF\ApiProblem\Exception\DomainException;
 use ZF\Hal\Link\Link;
 
-class LinkExtractor implements ExtractionInterface
+class LinkExtractor implements LinkExtractorInterface
 {
     /**
      * @var ServerUrl
