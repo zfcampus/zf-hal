@@ -9,6 +9,8 @@ namespace ZF\Hal\Factory;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use ZF\Hal\Exception;
+use ZF\Hal\Extractor\LinkCollectionExtractor;
+use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Plugin;
 
 class HalViewHelperFactory implements FactoryInterface
@@ -35,6 +37,10 @@ class HalViewHelperFactory implements FactoryInterface
             ->setMetadataMap($metadataMap)
             ->setServerUrlHelper($serverUrlHelper)
             ->setUrlHelper($urlHelper);
+
+        $linkExtractor = new LinkExtractor($serverUrlHelper, $urlHelper);
+        $linkCollectionExtractor = new LinkCollectionExtractor($linkExtractor);
+        $helper->setLinkCollectionExtractor($linkCollectionExtractor);
 
         if (isset($config['zf-hal'])
             && isset($config['zf-hal']['renderer'])

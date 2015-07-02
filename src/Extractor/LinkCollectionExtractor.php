@@ -10,8 +10,37 @@ use ZF\ApiProblem\Exception\DomainException;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
 
-class LinkCollectionExtractor extends LinkExtractor
+class LinkCollectionExtractor implements LinkCollectionExtractorInterface
 {
+    /**
+     * @var LinkExtractorInterface
+     */
+    protected $linkExtractor;
+
+    /**
+     * @param LinkExtractorInterface $linkExtractor
+     */
+    public function __construct(LinkExtractorInterface $linkExtractor)
+    {
+        $this->setLinkExtractor($linkExtractor);
+    }
+
+    /**
+     * @return LinkExtractorInterface
+     */
+    public function getLinkExtractor()
+    {
+        return $this->linkExtractor;
+    }
+
+    /**
+     * @param LinkExtractorInterface $linkExtractor
+     */
+    public function setLinkExtractor(LinkExtractorInterface $linkExtractor)
+    {
+        $this->linkExtractor = $linkExtractor;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -24,7 +53,7 @@ class LinkCollectionExtractor extends LinkExtractor
         $links = array();
         foreach ($object as $rel => $linkDefinition) {
             if ($linkDefinition instanceof Link) {
-                $links[$rel] = parent::extract($linkDefinition);
+                $links[$rel] = $this->linkExtractor->extract($linkDefinition);
                 continue;
             }
 
@@ -44,7 +73,7 @@ class LinkCollectionExtractor extends LinkExtractor
                     ));
                 }
 
-                $aggregate[] = parent::extract($subLink);
+                $aggregate[] = $this->linkExtractor->extract($subLink);
             }
 
             $links[$rel] = $aggregate;
