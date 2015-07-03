@@ -16,6 +16,7 @@ use Zend\Mvc\MvcEvent;
 use Zend\Paginator\Adapter\ArrayAdapter as ArrayPaginator;
 use Zend\Paginator\Paginator;
 use Zend\Uri\Http;
+use Zend\Stdlib\Hydrator;
 use Zend\View\Helper\Url as UrlHelper;
 use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use ZF\Hal\Collection;
@@ -24,6 +25,7 @@ use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Metadata\MetadataMap;
 use ZF\Hal\Plugin\Hal as HalHelper;
+use ZFTest\Hal\TestAsset as HalTestAsset;
 
 /**
  * @subpackage UnitTest
@@ -1708,5 +1710,508 @@ class HalTest extends TestCase
         $rendered1 = $this->plugin->renderEntity($entity);
         $rendered2 = $this->plugin->renderEntity($entity);
         $this->assertEquals($rendered1, $rendered2);
+    }
+
+    public function assertIsEntity($entity)
+    {
+        $this->assertInternalType('array', $entity);
+        $this->assertArrayHasKey('_links', $entity, 'Invalid HAL entity; does not contain links');
+        $this->assertInternalType('array', $entity['_links']);
+    }
+
+    public function assertEntityHasRelationalLink($relation, $entity)
+    {
+        $this->assertIsEntity($entity);
+        $links = $entity['_links'];
+        $this->assertArrayHasKey(
+            $relation,
+            $links,
+            sprintf('HAL links do not contain relation "%s"', $relation)
+        );
+        $link = $links[$relation];
+        $this->assertInternalType('array', $link);
+    }
+
+    public function assertRelationalLinkEquals($match, $relation, $entity)
+    {
+        $this->assertEntityHasRelationalLink($relation, $entity);
+        $link = $entity['_links'][$relation];
+        $this->assertArrayHasKey(
+            'href',
+            $link,
+            sprintf(
+                '%s relational link does not have an href; received %s',
+                $relation,
+                var_export($link, 1)
+            )
+        );
+        $href = $link['href'];
+        $this->assertEquals($match, $href);
+    }
+
+    public function testRendersEntityWithAssociatedLinks()
+    {
+        $item = new Entity(array(
+            'foo' => 'bar',
+            'id'  => 'identifier',
+        ), 'identifier');
+        $links = $item->getLinks();
+        $self  = new Link('self');
+        $self->setRoute('resource')->setRouteParams(array('id' => 'identifier'));
+        $links->add($self);
+
+        $result = $this->plugin->renderEntity($item);
+
+        $this->assertRelationalLinkEquals('http://localhost.localdomain/resource/identifier', 'self', $result);
+        $this->assertArrayHasKey('foo', $result);
+        $this->assertEquals('bar', $result['foo']);
+    }
+
+    public function testCanRenderStdclassEntity()
+    {
+        $item = (object) array(
+            'foo' => 'bar',
+            'id'  => 'identifier',
+        );
+
+        $item  = new Entity($item, 'identifier');
+        $links = $item->getLinks();
+        $self  = new Link('self');
+        $self->setRoute('resource')->setRouteParams(array('id' => 'identifier'));
+        $links->add($self);
+
+        $result = $this->plugin->renderEntity($item);
+
+        $this->assertRelationalLinkEquals('http://localhost.localdomain/resource/identifier', 'self', $result);
+        $this->assertArrayHasKey('foo', $result);
+        $this->assertEquals('bar', $result['foo']);
+    }
+
+    public function testCanSerializeHydratableEntity()
+    {
+        $this->plugin->addHydrator(
+            'ZFTest\Hal\TestAsset\ArraySerializable',
+            new Hydrator\ArraySerializable()
+        );
+
+        $item  = new HalTestAsset\ArraySerializable();
+        $item  = new Entity(new HalTestAsset\ArraySerializable(), 'identifier');
+        $links = $item->getLinks();
+        $self  = new Link('self');
+        $self->setRoute('resource')->setRouteParams(array('id' => 'identifier'));
+        $links->add($self);
+
+        $result = $this->plugin->renderEntity($item);
+
+        $this->assertRelationalLinkEquals('http://localhost.localdomain/resource/identifier', 'self', $result);
+        $this->assertArrayHasKey('foo', $result);
+        $this->assertEquals('bar', $result['foo']);
+    }
+
+    public function testUsesDefaultHydratorIfAvailable()
+    {
+        $this->plugin->setDefaultHydrator(
+            new Hydrator\ArraySerializable()
+        );
+
+        $item  = new HalTestAsset\ArraySerializable();
+        $item  = new Entity(new HalTestAsset\ArraySerializable(), 'identifier');
+        $links = $item->getLinks();
+        $self  = new Link('self');
+        $self->setRoute('resource')->setRouteParams(array('id' => 'identifier'));
+        $links->add($self);
+
+        $result = $this->plugin->renderEntity($item);
+
+        $this->assertRelationalLinkEquals('http://localhost.localdomain/resource/identifier', 'self', $result);
+        $this->assertArrayHasKey('foo', $result);
+        $this->assertEquals('bar', $result['foo']);
+    }
+
+    public function testCanRenderNonPaginatedCollection()
+    {
+        $prototype = array('foo' => 'bar');
+        $items = array();
+        foreach (range(1, 100) as $id) {
+            $item       = $prototype;
+            $item['id'] = $id;
+            $items[]    = $item;
+        }
+
+        $collection = new Collection($items);
+        $collection->setCollectionRoute('resource');
+        $collection->setEntityRoute('resource');
+        $links = $collection->getLinks();
+        $self  = new Link('self');
+        $self->setRoute('resource');
+        $links->add($self);
+
+        $result = $this->plugin->renderCollection($collection);
+
+        $this->assertRelationalLinkEquals('http://localhost.localdomain/resource', 'self', $result);
+
+        $this->assertArrayHasKey('_embedded', $result);
+        $this->assertInternalType('array', $result['_embedded']);
+        $this->assertArrayHasKey('items', $result['_embedded']);
+        $this->assertInternalType('array', $result['_embedded']['items']);
+        $this->assertEquals(100, count($result['_embedded']['items']));
+
+        foreach ($result['_embedded']['items'] as $key => $item) {
+            $id = $key + 1;
+
+            $this->assertRelationalLinkEquals('http://localhost.localdomain/resource/' . $id, 'self', $item);
+            $this->assertArrayHasKey('id', $item, var_export($item, 1));
+            $this->assertEquals($id, $item['id']);
+            $this->assertArrayHasKey('foo', $item);
+            $this->assertEquals('bar', $item['foo']);
+        }
+    }
+
+    public function testCanRenderPaginatedCollection()
+    {
+        $prototype = array('foo' => 'bar');
+        $items = array();
+        foreach (range(1, 100) as $id) {
+            $item       = $prototype;
+            $item['id'] = $id;
+            $items[]    = $item;
+        }
+        $adapter   = new ArrayPaginator($items);
+        $paginator = new Paginator($adapter);
+
+        $collection = new Collection($paginator);
+        $collection->setPageSize(5);
+        $collection->setPage(3);
+        $collection->setCollectionRoute('resource');
+        $collection->setEntityRoute('resource');
+        $links = $collection->getLinks();
+        $self  = new Link('self');
+        $self->setRoute('resource');
+        $links->add($self);
+
+        $result = $this->plugin->renderCollection($collection);
+
+        $this->assertInternalType('array', $result, var_export($result, 1));
+        $this->assertRelationalLinkEquals('http://localhost.localdomain/resource?page=3', 'self', $result);
+        $this->assertRelationalLinkEquals('http://localhost.localdomain/resource', 'first', $result);
+        $this->assertRelationalLinkEquals('http://localhost.localdomain/resource?page=20', 'last', $result);
+        $this->assertRelationalLinkEquals('http://localhost.localdomain/resource?page=2', 'prev', $result);
+        $this->assertRelationalLinkEquals('http://localhost.localdomain/resource?page=4', 'next', $result);
+
+        $this->assertArrayHasKey('_embedded', $result);
+        $this->assertInternalType('array', $result['_embedded']);
+        $this->assertArrayHasKey('items', $result['_embedded']);
+        $this->assertInternalType('array', $result['_embedded']['items']);
+        $this->assertEquals(5, count($result['_embedded']['items']));
+
+        foreach ($result['_embedded']['items'] as $key => $item) {
+            $id = $key + 11;
+
+            $this->assertRelationalLinkEquals('http://localhost.localdomain/resource/' . $id, 'self', $item);
+            $this->assertArrayHasKey('id', $item, var_export($item, 1));
+            $this->assertEquals($id, $item['id']);
+            $this->assertArrayHasKey('foo', $item);
+            $this->assertEquals('bar', $item['foo']);
+        }
+    }
+
+    public function invalidPages()
+    {
+        return array(
+            '-1'   => array(-1),
+            '1000' => array(1000),
+        );
+    }
+
+    /**
+     * @dataProvider invalidPages
+     */
+    public function testRenderingPaginatedCollectionCanReturnApiProblemIfPageIsTooHighOrTooLow($page)
+    {
+        $prototype = array('foo' => 'bar');
+        $items = array();
+        foreach (range(1, 100) as $id) {
+            $item       = $prototype;
+            $item['id'] = $id;
+            $items[]    = $item;
+        }
+        $adapter   = new ArrayPaginator($items);
+        $paginator = new Paginator($adapter);
+
+        $collection = new Collection($paginator, 'resource');
+        $collection->setPageSize(5);
+
+        // Using reflection object so we can force a negative page number if desired
+        $r = new ReflectionObject($collection);
+        $p = $r->getProperty('page');
+        $p->setAccessible(true);
+        $p->setValue($collection, $page);
+
+        /* @var \ZF\ApiProblem\ApiProblem*/
+        $result = $this->plugin->renderCollection($collection);
+
+        $this->assertInstanceOf('ZF\ApiProblem\ApiProblem', $result, var_export($result, 1));
+
+        $data = $result->toArray();
+        $this->assertArrayHasKey('status', $data, var_export($result, 1));
+        $this->assertEquals(409, $data['status']);
+        $this->assertArrayHasKey('detail', $data);
+        $this->assertEquals('Invalid page provided', $data['detail']);
+    }
+
+    public function testRendersAttributesAsPartOfNonPaginatedCollection()
+    {
+        $attributes = array(
+            'count' => 100,
+            'type'  => 'foo',
+        );
+
+        $prototype = array('foo' => 'bar');
+        $items = array();
+        foreach (range(1, 100) as $id) {
+            $item       = $prototype;
+            $item['id'] = $id;
+            $items[]    = $item;
+        }
+
+        $collection = new Collection($items, 'resource');
+        $collection->setAttributes($attributes);
+
+        $result = $this->plugin->renderCollection($collection);
+
+        $this->assertInternalType('array', $result, var_export($result, 1));
+        $this->assertArrayHasKey('count', $result, var_export($result, 1));
+        $this->assertEquals(100, $result['count']);
+        $this->assertArrayHasKey('type', $result);
+        $this->assertEquals('foo', $result['type']);
+    }
+
+    public function testRendersAttributeAsPartOfPaginatedCollection()
+    {
+        $attributes = array(
+            'count' => 100,
+            'type'  => 'foo',
+        );
+
+        $prototype = array('foo' => 'bar');
+        $items = array();
+        foreach (range(1, 100) as $id) {
+            $item       = $prototype;
+            $item['id'] = $id;
+            $items[]    = $item;
+        }
+        $adapter   = new ArrayPaginator($items);
+        $paginator = new Paginator($adapter);
+
+        $collection = new Collection($paginator);
+        $collection->setPageSize(5);
+        $collection->setPage(3);
+        $collection->setAttributes($attributes);
+        $collection->setCollectionRoute('resource');
+        $collection->setEntityRoute('resource');
+        $links = $collection->getLinks();
+        $self  = new Link('self');
+        $self->setRoute('resource');
+        $links->add($self);
+
+        $result = $this->plugin->renderCollection($collection);
+
+        $this->assertInternalType('array', $result, var_export($result, 1));
+        $this->assertArrayHasKey('count', $result, var_export($result, 1));
+        $this->assertEquals(100, $result['count']);
+        $this->assertArrayHasKey('type', $result);
+        $this->assertEquals('foo', $result['type']);
+    }
+
+    public function testCanRenderNestedEntitiesAsEmbeddedEntities()
+    {
+        $this->router->addRoute('user', new Segment('/user[/:id]'));
+
+        $child = new Entity(array(
+            'id'     => 'matthew',
+            'name'   => 'matthew',
+            'github' => 'weierophinney',
+        ), 'matthew');
+        $link = new Link('self');
+        $link->setRoute('user')->setRouteParams(array('id' => 'matthew'));
+        $child->getLinks()->add($link);
+
+        $item = new Entity(array(
+            'foo'  => 'bar',
+            'id'   => 'identifier',
+            'user' => $child,
+        ), 'identifier');
+        $link = new Link('self');
+        $link->setRoute('resource')->setRouteParams(array('id' => 'identifier'));
+        $item->getLinks()->add($link);
+
+        $result = $this->plugin->renderEntity($item);
+
+        $this->assertInternalType('array', $result, var_export($result, 1));
+        $this->assertArrayHasKey('_embedded', $result);
+        $embedded = $result['_embedded'];
+        $this->assertArrayHasKey('user', $embedded);
+        $user = $embedded['user'];
+        $this->assertRelationalLinkContains('/user/matthew', 'self', $user);
+
+        foreach ($child->entity as $key => $value) {
+            $this->assertArrayHasKey($key, $user);
+            $this->assertEquals($value, $user[$key]);
+        }
+    }
+
+    public function testRendersEmbeddedEntitiesOfIndividualNonPaginatedCollections()
+    {
+        $this->router->addRoute('user', new Segment('/user[/:id]'));
+
+        $child = new Entity(array(
+            'id'     => 'matthew',
+            'name'   => 'matthew',
+            'github' => 'weierophinney',
+        ), 'matthew');
+        $link = new Link('self');
+        $link->setRoute('user')->setRouteParams(array('id' => 'matthew'));
+        $child->getLinks()->add($link);
+
+        $prototype = array('foo' => 'bar', 'user' => $child);
+        $items = array();
+        foreach (range(1, 3) as $id) {
+            $item       = $prototype;
+            $item['id'] = $id;
+            $items[]    = $item;
+        }
+
+        $collection = new Collection($items);
+        $collection->setCollectionRoute('resource');
+        $collection->setEntityRoute('resource');
+        $links = $collection->getLinks();
+        $self  = new Link('self');
+        $self->setRoute('resource');
+        $links->add($self);
+
+        $result = $this->plugin->renderCollection($collection);
+
+        $this->assertInternalType('array', $result, var_export($result, 1));
+
+        $collection = $result['_embedded']['items'];
+        foreach ($collection as $item) {
+            $this->assertArrayHasKey('_embedded', $item);
+            $embedded = $item['_embedded'];
+            $this->assertArrayHasKey('user', $embedded);
+
+            $user = $embedded['user'];
+            $this->assertRelationalLinkContains('/user/matthew', 'self', $user);
+
+            foreach ($child->entity as $key => $value) {
+                $this->assertArrayHasKey($key, $user);
+                $this->assertEquals($value, $user[$key]);
+            }
+        }
+    }
+
+    public function testRendersEmbeddedEntitiesOfIndividualPaginatedCollections()
+    {
+        $this->router->addRoute('user', new Segment('/user[/:id]'));
+
+        $child = new Entity(array(
+            'id'     => 'matthew',
+            'name'   => 'matthew',
+            'github' => 'weierophinney',
+        ), 'matthew');
+        $link = new Link('self');
+        $link->setRoute('user')->setRouteParams(array('id' => 'matthew'));
+        $child->getLinks()->add($link);
+
+        $prototype = array('foo' => 'bar', 'user' => $child);
+        $items = array();
+        foreach (range(1, 3) as $id) {
+            $item       = $prototype;
+            $item['id'] = $id;
+            $items[]    = $item;
+        }
+        $adapter   = new ArrayPaginator($items);
+        $paginator = new Paginator($adapter);
+
+        $collection = new Collection($paginator);
+        $collection->setPageSize(5);
+        $collection->setPage(1);
+        $collection->setCollectionRoute('resource');
+        $collection->setEntityRoute('resource');
+        $links = $collection->getLinks();
+        $self  = new Link('self');
+        $self->setRoute('resource');
+        $links->add($self);
+
+        $result = $this->plugin->renderCollection($collection);
+
+        $this->assertInternalType('array', $result, var_export($result, 1));
+        $collection = $result['_embedded']['items'];
+        foreach ($collection as $item) {
+            $this->assertArrayHasKey('_embedded', $item, var_export($item, 1));
+            $embedded = $item['_embedded'];
+            $this->assertArrayHasKey('user', $embedded);
+
+            $user = $embedded['user'];
+            $this->assertRelationalLinkContains('/user/matthew', 'self', $user);
+
+            foreach ($child->entity as $key => $value) {
+                $this->assertArrayHasKey($key, $user);
+                $this->assertEquals($value, $user[$key]);
+            }
+        }
+    }
+
+    public function testAllowsSpecifyingAlternateCallbackForReturningEntityId()
+    {
+        $this->plugin->getEventManager()->attach('getIdFromEntity', function ($e) {
+            $entity = $e->getParam('entity');
+
+            if (!is_array($entity)) {
+                return false;
+            }
+
+            if (array_key_exists('name', $entity)) {
+                return $entity['name'];
+            }
+
+            return false;
+        }, 10);
+
+        $prototype = array('foo' => 'bar');
+        $items = array();
+        foreach (range(1, 100) as $id) {
+            $item         = $prototype;
+            $item['name'] = $id;
+            $items[]      = $item;
+        }
+
+        $collection = new Collection($items);
+        $collection->setCollectionRoute('resource');
+        $collection->setEntityRoute('resource');
+        $links = $collection->getLinks();
+        $self  = new Link('self');
+        $self->setRoute('resource');
+        $links->add($self);
+
+        $result = $this->plugin->renderCollection($collection);
+
+        $this->assertInternalType('array', $result, var_export($result, 1));
+        $this->assertRelationalLinkEquals('http://localhost.localdomain/resource', 'self', $result);
+
+        $this->assertArrayHasKey('_embedded', $result);
+        $this->assertInternalType('array', $result['_embedded']);
+        $this->assertArrayHasKey('items', $result['_embedded']);
+        $this->assertInternalType('array', $result['_embedded']['items']);
+        $this->assertEquals(100, count($result['_embedded']['items']));
+
+        foreach ($result['_embedded']['items'] as $key => $item) {
+            $id = $key + 1;
+
+            $this->assertRelationalLinkEquals('http://localhost.localdomain/resource/' . $id, 'self', $item);
+            $this->assertArrayHasKey('name', $item, var_export($item, 1));
+            $this->assertEquals($id, $item['name']);
+            $this->assertArrayHasKey('foo', $item);
+            $this->assertEquals('bar', $item['foo']);
+        }
     }
 }
