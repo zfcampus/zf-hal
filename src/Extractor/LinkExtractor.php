@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2015 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Hal\Extractor;
@@ -50,14 +50,10 @@ class LinkExtractor implements LinkExtractorInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
-    public function extract($object)
+    public function extract(Link $object)
     {
-        if (!$object instanceof Link) {
-            return array();
-        }
-
         if (!$object->isComplete()) {
             throw new DomainException(sprintf(
                 'Link from resource provided to %s was incomplete; must contain a URL or a route',

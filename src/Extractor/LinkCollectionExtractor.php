@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2015 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Hal\Extractor;
@@ -42,16 +42,12 @@ class LinkCollectionExtractor implements LinkCollectionExtractorInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
-    public function extract($object)
+    public function extract(LinkCollection $collection)
     {
-        if (!$object instanceof LinkCollection) {
-            return array();
-        }
-
         $links = array();
-        foreach ($object as $rel => $linkDefinition) {
+        foreach ($collection as $rel => $linkDefinition) {
             if ($linkDefinition instanceof Link) {
                 $links[$rel] = $this->linkExtractor->extract($linkDefinition);
                 continue;

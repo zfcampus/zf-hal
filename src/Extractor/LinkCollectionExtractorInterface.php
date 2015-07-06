@@ -1,22 +1,25 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2015 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Hal\Extractor;
 
-use Zend\Stdlib\Extractor\ExtractionInterface;
+use ZF\Hal\Link\LinkCollection;
 
-interface LinkCollectionExtractorInterface extends ExtractionInterface
+interface LinkCollectionExtractorInterface
 {
+    /**
+     * Extract a link collection into a structured set of links.
+     *
+     * @param LinkCollection $collection
+     * @return array
+     */
+    public function extract(LinkCollection $collection);
+
     /**
      * @return LinkExtractorInterface
      */
     public function getLinkExtractor();
-
-    /**
-     * @param LinkExtractorInterface $linkExtractor
-     */
-    public function setLinkExtractor(LinkExtractorInterface $linkExtractor);
 }

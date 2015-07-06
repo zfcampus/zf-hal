@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2015 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZFTest\Hal\Extractor;
@@ -22,16 +22,6 @@ class LinkCollectionExtractorTest extends TestCase
             ->getMock();
 
         $this->linkCollectionExtractor = new LinkCollectionExtractor($linkExtractor);
-    }
-
-    public function testExtractGivenObjectThatIsNotAnInstanceOfLinkCollectionShouldReturnEmptyArray()
-    {
-        $invalidLinkCollection = new \stdClass();
-
-        $result = $this->linkCollectionExtractor->extract($invalidLinkCollection);
-
-        $this->assertInternalType('array', $result);
-        $this->assertEmpty($result);
     }
 
     public function testExtractGivenLinkCollectionShouldReturnArrayWithExtractionOfEachLink()
@@ -56,7 +46,7 @@ class LinkCollectionExtractorTest extends TestCase
         $this->assertCount($linkCollection->count(), $result);
     }
 
-    public function testExtractGivenLinkCollectionWithTwoLinksForTheSameRelationShouldReturnArrayWithOneKeyThatContainsLinkAggregate()
+    public function testLinkCollectionWithTwoLinksForSameRelationShouldReturnArrayWithOneKeyAggregatingLinks()
     {
         $linkCollection = new LinkCollection();
         $linkCollection->add(Link::factory(array(
