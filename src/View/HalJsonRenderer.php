@@ -77,7 +77,7 @@ class HalJsonRenderer extends JsonRenderer
         if (!$this->helpers instanceof HelperPluginManager) {
             $this->setHelperPluginManager(new HelperPluginManager());
         }
-        
+
         return $this->helpers;
     }
 

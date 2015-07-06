@@ -103,7 +103,7 @@ class HalJsonRendererTest extends TestCase
         $this->assertEquals($collection, json_decode($rendered, true));
     }
 
-    public function testRenderGivenHalJsonModelThatContainsHalCollectionReturningApiProblemShouldReturnApiProblemInJsonFormat()
+    public function testRenderGivenHalJsonModelReturningApiProblemShouldReturnApiProblemInJsonFormat()
     {
         $halCollection = new Collection(array());
         $model = new HalJsonModel(array('payload' => $halCollection));
