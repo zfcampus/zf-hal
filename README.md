@@ -268,6 +268,17 @@ information necessary to create HAL entities, links, or collections.
 The `MetadataMap` aggregates an array of class name keyed `Metadata` instances to be used in
 producing HAL entities, links, or collections.
 
+### Extractors
+
+#### ZF\Hal\Extractor\LinkExtractor
+
+`LinkExtractor` is responsible for extracting a link representation from `Link` instance.
+
+#### ZF\Hal\Extractor\LinkCollectionExtractor
+
+`LinkCollectionExtractor` is responsible for extracting a collection of `Link` instances. It also
+composes a `LinkExtractor` for extracting individual links.
+
 ### Controller Plugins
 
 #### ZF\Hal\Plugin\Hal (a.k.a. "Hal")

@@ -19,6 +19,8 @@ use Zend\View\Model\ViewModel;
 use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
+use ZF\Hal\Extractor\LinkCollectionExtractor;
+use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Plugin\Hal as HalHelper;
 use ZF\Hal\View\HalJsonModel;
@@ -122,9 +124,15 @@ class HalJsonRendererTest extends TestCase
         $url->setRouter($router);
         $serverUrl->setScheme('http');
         $serverUrl->setHost('localhost.localdomain');
+
         $halLinks  = new HalHelper();
         $halLinks->setServerUrlHelper($serverUrl);
         $halLinks->setUrlHelper($url);
+
+        $linkExtractor = new LinkExtractor($serverUrl, $url);
+        $linkCollectionExtractor = new LinkCollectionExtractor($linkExtractor);
+        $halLinks->setLinkCollectionExtractor($linkCollectionExtractor);
+
         $helpers->setService('Hal', $halLinks);
 
         $this->renderer->setHelperPluginManager($helpers);

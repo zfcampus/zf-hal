@@ -24,16 +24,16 @@ use Zend\View\Helper\AbstractHelper;
 use Zend\View\Helper\ServerUrl;
 use Zend\View\Helper\Url;
 use ZF\ApiProblem\ApiProblem;
-use ZF\ApiProblem\Exception\DomainException;
+use ZF\Hal\Collection;
 use ZF\Hal\Entity;
 use ZF\Hal\Exception;
-use ZF\Hal\Collection;
-use ZF\Hal\Resource;
+use ZF\Hal\Extractor\LinkCollectionExtractorInterface;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Link\LinkCollectionAwareInterface;
 use ZF\Hal\Metadata\Metadata;
 use ZF\Hal\Metadata\MetadataMap;
+use ZF\Hal\Resource;
 
 /**
  * Generate links for use with HAL payloads
@@ -103,16 +103,14 @@ class Hal extends AbstractHelper implements
     protected $serverUrlHelper;
 
     /**
-     * Server url
-     *
-     * @var string
-     */
-    protected $serverUrlString;
-
-    /**
      * @var Url
      */
     protected $urlHelper;
+
+    /**
+     * @var LinkCollectionExtractor
+     */
+    protected $linkCollectionExtractor;
 
     /**
      * Entities spl hash stack for circular reference detection
@@ -259,6 +257,24 @@ class Hal extends AbstractHelper implements
     public function setUrlHelper(Url $helper)
     {
         $this->urlHelper = $helper;
+        return $this;
+    }
+
+    /**
+     * @return LinkCollectionExtractorInterface
+     */
+    public function getLinkCollectionExtractor()
+    {
+        return $this->linkCollectionExtractor;
+    }
+
+    /**
+     * @param  LinkCollectionExtractorInterface $extractor
+     * @return self
+     */
+    public function setLinkCollectionExtractor(LinkCollectionExtractorInterface $extractor)
+    {
+        $this->linkCollectionExtractor = $extractor;
         return $this;
     }
 
@@ -656,9 +672,13 @@ class Hal extends AbstractHelper implements
             'params'   => $params,
         ));
         $events->trigger(__FUNCTION__, $this, $eventParams);
-        $route = $eventParams['route'];
 
-        $path = call_user_func($this->urlHelper, $route, $params->getArrayCopy(), $reUseMatchedParams);
+        $path = call_user_func(
+            $this->urlHelper,
+            $eventParams['route'],
+            $params->getArrayCopy(),
+            $reUseMatchedParams
+        );
 
         if (substr($path, 0, 4) == 'http') {
             return $path;
@@ -672,46 +692,12 @@ class Hal extends AbstractHelper implements
      *
      * @param  Link $linkDefinition
      * @return array
-     * @throws DomainException
      */
     public function fromLink(Link $linkDefinition)
     {
-        if (!$linkDefinition->isComplete()) {
-            throw new DomainException(sprintf(
-                'Link from resource provided to %s was incomplete; must contain a URL or a route',
-                __METHOD__
-            ));
-        }
+        $linkExtractor = $this->linkCollectionExtractor->getLinkExtractor();
 
-        $representation = $linkDefinition->getProps();
-
-        if ($linkDefinition->hasUrl()) {
-            $representation['href'] = $linkDefinition->getUrl();
-
-            return $representation;
-        }
-
-        $reuseMatchedParams = true;
-        $options = $linkDefinition->getRouteOptions();
-        if (isset($options['reuse_matched_params'])) {
-            $reuseMatchedParams = (bool) $options['reuse_matched_params'];
-            unset($options['reuse_matched_params']);
-        }
-
-        $path = call_user_func(
-            $this->urlHelper,
-            $linkDefinition->getRoute(),
-            $linkDefinition->getRouteParams(),
-            $options,
-            $reuseMatchedParams
-        );
-
-        if (substr($path, 0, 4) == 'http') {
-            $representation['href'] = $path;
-        } else {
-            $representation['href'] = $this->getServerUrl() . $path;
-        }
-        return $representation;
+        return $linkExtractor->extract($linkDefinition);
     }
 
     /**
@@ -719,36 +705,10 @@ class Hal extends AbstractHelper implements
      *
      * @param  LinkCollection $collection
      * @return array
-     * @throws DomainException
      */
     public function fromLinkCollection(LinkCollection $collection)
     {
-        $links = array();
-        foreach ($collection as $rel => $linkDefinition) {
-            if ($linkDefinition instanceof Link) {
-                $links[$rel] = $this->fromLink($linkDefinition);
-                continue;
-            }
-            if (!is_array($linkDefinition)) {
-                throw new DomainException(sprintf(
-                    'Link object for relation "%s" in resource was malformed; cannot generate link',
-                    $rel
-                ));
-            }
-
-            $aggregate = array();
-            foreach ($linkDefinition as $subLink) {
-                if (!$subLink instanceof Link) {
-                    throw new DomainException(sprintf(
-                        'Link object aggregated for relation "%s" in resource was malformed; cannot generate link',
-                        $rel
-                    ));
-                }
-                $aggregate[] = $this->fromLink($subLink);
-            }
-            $links[$rel] = $aggregate;
-        }
-        return $links;
+        return $this->linkCollectionExtractor->extract($collection);
     }
 
     /**
@@ -1267,19 +1227,6 @@ class Hal extends AbstractHelper implements
         }
 
         return false;
-    }
-
-    /**
-     * Return server url
-     *
-     * @return string
-     */
-    protected function getServerUrl()
-    {
-        if ($this->serverUrlString === null) {
-            $this->serverUrlString = call_user_func($this->serverUrlHelper);
-        }
-        return $this->serverUrlString;
     }
 
     /**
