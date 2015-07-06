@@ -274,9 +274,10 @@ producing HAL entities, links, or collections.
 
 `LinkExtractor` is responsible for extracting a link representation from `Link` instance.
 
-#### ZF\Hal\Extractor\LinkExtractorCollection
+#### ZF\Hal\Extractor\LinkCollectionExtractor
 
-`LinkExtractorCollection` is responsible for extracting a collection of `Link` instances.
+`LinkCollectionExtractor` is responsible for extracting a collection of `Link` instances. It also
+composes a `LinkExtractor` for extracting individual links.
 
 ### Controller Plugins
 
