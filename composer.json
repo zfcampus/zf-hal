@@ -28,6 +28,7 @@
     },
     "require": {
         "php": ">=5.3.23",
+        "symfony/property-access": "~2.7",
         "zfcampus/zf-api-problem": "~1.0",
         "zendframework/zend-escaper": ">=2.3,<2.5",
         "zendframework/zend-eventmanager": ">=2.3,<2.5",
