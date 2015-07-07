@@ -466,7 +466,7 @@ class Hal extends AbstractHelper implements
      *
      * <code>
      * $params = $e->getParams();
-     * $params['routeOptions']['query'] = array('format' => 'json');
+     * $params['routeOptions']['query'] = ['format' => 'json'];
      * </code>
      *
      * @param  Collection $halCollection
@@ -957,76 +957,85 @@ class Hal extends AbstractHelper implements
         $collection = $halCollection->getCollection();
         $page       = $halCollection->getPage();
         $pageSize   = $halCollection->getPageSize();
-        $route      = $halCollection->getCollectionRoute();
-        $params     = $halCollection->getCollectionRouteParams();
-        $options    = $halCollection->getCollectionRouteOptions();
 
         $collection->setItemCountPerPage($pageSize);
         $collection->setCurrentPageNumber($page);
 
-        $count = count($collection);
-        if (!$count) {
+        $pageCount = count($collection);
+        if ($pageCount == 0) {
             return true;
         }
 
-        if ($page < 1 || $page > $count) {
+        if ($page < 1 || $page > $pageCount) {
             return new ApiProblem(409, 'Invalid page provided');
         }
 
-        $links = $halCollection->getLinks();
-        $next  = ($page < $count) ? $page + 1 : false;
-        $prev  = ($page > 1)      ? $page - 1 : false;
+        $this->addSelfLink($halCollection);
+        $this->addFirstLink($halCollection);
+        $this->addLastLink($halCollection);
+        $this->addPrevLink($halCollection);
+        $this->addNextLink($halCollection);
 
-        // self link
-        $link = new Link('self');
+        return true;
+    }
+
+    private function addSelfLink(Collection $halCollection)
+    {
+        $page = $halCollection->getPage();
+        $link = $this->createPaginationLink('self', $halCollection, $page);
+        $halCollection->getLinks()->add($link, true);
+    }
+
+    private function addFirstLink(Collection $halCollection)
+    {
+        $link = $this->createPaginationLink('first', $halCollection);
+        $halCollection->getLinks()->add($link);
+    }
+
+    private function addLastLink(Collection $halCollection)
+    {
+        $page = $halCollection->getCollection()->count();
+        $link = $this->createPaginationLink('last', $halCollection, $page);
+        $halCollection->getLinks()->add($link);
+    }
+
+    private function addPrevLink(Collection $halCollection)
+    {
+        $page = $halCollection->getPage();
+        $prev = ($page > 1) ? $page - 1 : false;
+
+        if ($prev) {
+            $link = $this->createPaginationLink('prev', $halCollection, $prev);
+            $halCollection->getLinks()->add($link);
+        }
+    }
+
+    private function addNextLink(Collection $halCollection)
+    {
+        $page      = $halCollection->getPage();
+        $pageCount = $halCollection->getCollection()->count();
+        $next      = ($page < $pageCount) ? $page + 1 : false;
+
+        if ($next) {
+            $link = $this->createPaginationLink('next', $halCollection, $next);
+            $halCollection->getLinks()->add($link);
+        }
+    }
+
+    private function createPaginationLink($relation, Collection $halCollection, $page = null)
+    {
+        $route   = $halCollection->getCollectionRoute();
+        $params  = $halCollection->getCollectionRouteParams();
+        $options = $halCollection->getCollectionRouteOptions();
+
+        $link = new Link($relation);
         $link->setRoute($route);
         $link->setRouteParams($params);
         $link->setRouteOptions(ArrayUtils::merge($options, [
             'query' => ['page' => $page],
         ]));
-        $links->add($link, true);
 
-        // first link
-        $link = new Link('first');
-        $link->setRoute($route);
-        $link->setRouteParams($params);
-        $link->setRouteOptions(ArrayUtils::merge($options, [
-            'query' => ['page' => null],
-        ]));
-        $links->add($link);
-
-        // last link
-        $link = new Link('last');
-        $link->setRoute($route);
-        $link->setRouteParams($params);
-        $link->setRouteOptions(ArrayUtils::merge($options, [
-            'query' => ['page' => $count],
-        ]));
-        $links->add($link);
-
-        // prev link
-        if ($prev) {
-            $link = new Link('prev');
-            $link->setRoute($route);
-            $link->setRouteParams($params);
-            $link->setRouteOptions(ArrayUtils::merge($options, [
-                'query' => ['page' => $prev],
-            ]));
-            $links->add($link);
-        }
-
-        // next link
-        if ($next) {
-            $link = new Link('next');
-            $link->setRoute($route);
-            $link->setRouteParams($params);
-            $link->setRouteOptions(ArrayUtils::merge($options, [
-                'query' => ['page' => $next],
-            ]));
-            $links->add($link);
-        }
-
-        return true;
+        return $link;
     }
 
     /**
