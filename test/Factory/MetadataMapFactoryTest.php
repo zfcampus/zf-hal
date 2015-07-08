@@ -17,9 +17,9 @@ class MetadataMapFactoryTest extends TestCase
 
         $services
             ->expects($this->at(0))
-            ->method('has')
-            ->with('config')
-            ->will($this->returnValue(false));
+            ->method('get')
+            ->with('ZF\Hal\HalConfig')
+            ->will($this->returnValue([]));
 
         $services
             ->expects($this->at(1))
@@ -37,47 +37,37 @@ class MetadataMapFactoryTest extends TestCase
     {
         $services = $this->getMock('Zend\ServiceManager\ServiceLocatorInterface');
 
-        $services
-            ->expects($this->at(0))
-            ->method('has')
-            ->with('config')
-            ->will($this->returnValue(true));
-
         $config = [
-            'zf-hal' => [
-                'metadata_map' => [
-                    'ZFTest\Hal\Plugin\TestAsset\Entity' => [
-                        'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
-                        'route_name' => 'hostname/resource',
-                        'route_identifier_name' => 'id',
-                        'entity_identifier_name' => 'id',
-                    ],
-                    'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntity' => [
-                        'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
-                        'route'    => 'hostname/embedded',
-                        'route_identifier_name' => 'id',
-                        'entity_identifier_name' => 'id',
-                        'force_self_link' => true, // same as previous
-                    ],
-                    'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithCustomIdentifier' => [
-                        'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
-                        'route'           => 'hostname/embedded_custom',
-                        'route_identifier_name' => 'custom_id',
-                        'entity_identifier_name' => 'custom_id',
-                        'force_self_link' => false,
-                    ],
+            'metadata_map' => [
+                'ZFTest\Hal\Plugin\TestAsset\Entity' => [
+                    'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                    'route_name' => 'hostname/resource',
+                    'route_identifier_name' => 'id',
+                    'entity_identifier_name' => 'id',
+                ],
+                'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntity' => [
+                    'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                    'route'    => 'hostname/embedded',
+                    'route_identifier_name' => 'id',
+                    'entity_identifier_name' => 'id',
+                ],
+                'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithCustomIdentifier' => [
+                    'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                    'route'           => 'hostname/embedded_custom',
+                    'route_identifier_name' => 'custom_id',
+                    'entity_identifier_name' => 'custom_id',
                 ],
             ],
         ];
 
         $services
-            ->expects($this->at(1))
+            ->expects($this->at(0))
             ->method('get')
-            ->with('config')
+            ->with('ZF\Hal\HalConfig')
             ->will($this->returnValue($config));
 
         $services
-            ->expects($this->at(2))
+            ->expects($this->at(1))
             ->method('has')
             ->with('HydratorManager')
             ->will($this->returnValue(false));
@@ -87,7 +77,7 @@ class MetadataMapFactoryTest extends TestCase
 
         $this->assertInstanceOf('ZF\Hal\Metadata\MetadataMap', $metadataMap);
 
-        foreach ($config['zf-hal']['metadata_map'] as $key => $value) {
+        foreach ($config['metadata_map'] as $key => $value) {
             $this->assertTrue($metadataMap->has($key));
             $this->assertInstanceOf('ZF\Hal\Metadata\Metadata', $metadataMap->get($key));
         }

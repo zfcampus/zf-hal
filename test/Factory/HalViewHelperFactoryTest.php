@@ -13,7 +13,7 @@ use Zend\Stdlib\Hydrator\HydratorPluginManager;
 use Zend\View\Helper\ServerUrl;
 use Zend\View\Helper\Url;
 use ZF\Hal\Factory\HalViewHelperFactory;
-use ZF\Hal\Plugin;
+use ZF\Hal\RendererOptions;
 
 class HalViewHelperFactoryTest extends TestCase
 {
@@ -21,7 +21,14 @@ class HalViewHelperFactoryTest extends TestCase
     {
         $services = new ServiceManager();
 
-        $services->setService('Config', $config);
+        $services->setService('ZF\Hal\HalConfig', $config);
+
+        if (isset($config['renderer']) && is_array($config['renderer'])) {
+            $rendererOptions = new RendererOptions($config['renderer']);
+        } else {
+            $rendererOptions = new RendererOptions();
+        }
+        $services->setService('ZF\Hal\RendererOptions', $rendererOptions);
 
         $metadataMap = $this->getMock('ZF\Hal\Metadata\MetadataMap');
         $metadataMap
@@ -46,7 +53,6 @@ class HalViewHelperFactoryTest extends TestCase
             ->will($this->returnValue(new Url()));
 
         $this->pluginManager
-            ->expects($this->any())
             ->method('getServiceLocator')
             ->will($this->returnValue($services));
     }
@@ -61,73 +67,14 @@ class HalViewHelperFactoryTest extends TestCase
         $this->assertInstanceOf('ZF\Hal\Plugin\Hal', $plugin);
     }
 
-    public function testHalViewHelperFactoryInjectsDefaultHydratorIfPresentInConfig()
-    {
-        $config = [
-            'zf-hal' => [
-                'renderer' => [
-                    'default_hydrator' => 'ObjectProperty',
-                ],
-            ],
-        ];
-
-        $this->setupPluginManager($config);
-
-        $factory = new HalViewHelperFactory();
-        $plugin = $factory->createService($this->pluginManager);
-
-        $this->assertInstanceOf('ZF\Hal\Plugin\Hal', $plugin);
-        $this->assertAttributeInstanceOf('Zend\Stdlib\Hydrator\ObjectProperty', 'defaultHydrator', $plugin);
-    }
-
-    public function testHalViewHelperFactoryInjectsHydratorMappingsIfPresentInConfig()
-    {
-        $config = [
-            'zf-hal' => [
-                'renderer' => [
-                    'hydrators' => [
-                        'Some\MadeUp\Component'            => 'ClassMethods',
-                        'Another\MadeUp\Component'         => 'Reflection',
-                        'StillAnother\MadeUp\Component'    => 'ArraySerializable',
-                        'A\Component\With\SharedHydrators' => 'Reflection',
-                    ],
-                ],
-            ],
-        ];
-
-        $this->setupPluginManager($config);
-
-        $factory = new HalViewHelperFactory();
-        $plugin = $factory->createService($this->pluginManager);
-
-        $r             = new ReflectionObject($plugin);
-        $hydratorsProp = $r->getProperty('hydratorMap');
-        $hydratorsProp->setAccessible(true);
-        $hydratorMap = $hydratorsProp->getValue($plugin);
-
-        $hydrators = $plugin->getHydratorManager();
-
-        $this->assertInternalType('array', $hydratorMap);
-
-        foreach ($config['zf-hal']['renderer']['hydrators'] as $class => $serviceName) {
-            $key = strtolower($class);
-            $this->assertArrayHasKey($key, $hydratorMap);
-
-            $hydrator = $hydratorMap[$key];
-            $this->assertSame(get_class($hydrators->get($serviceName)), get_class($hydrator));
-        }
-    }
-
     /**
      * @group fail
      */
     public function testOptionUseProxyIfPresentInConfig()
     {
         $options = [
-            'zf-hal' => [
-                'options' => [
-                    'use_proxy' => true,
-                ],
+            'options' => [
+                'use_proxy' => true,
             ],
         ];
 
