@@ -1201,7 +1201,7 @@ class Hal extends AbstractHelper implements
      */
     protected function convertEntityToArray($entity)
     {
-        return $this->getResourceFactory()->convertEntityToArray($entity);
+        return $this->getEntityExtractor()->extract($entity);
     }
 
     /**
