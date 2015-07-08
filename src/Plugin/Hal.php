@@ -1260,7 +1260,11 @@ class Hal extends AbstractHelper implements
         $relation = 'self'
     ) {
         return $this->getResourceFactory()->marshalLinkFromMetadata(
-            $metadata, $object, $id, $routeIdentifierName, $relation
+            $metadata,
+            $object,
+            $id,
+            $routeIdentifierName,
+            $relation
         );
     }
 

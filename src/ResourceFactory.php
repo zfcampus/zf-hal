@@ -77,7 +77,10 @@ class ResourceFactory
         $forceSelfLink = $metadata->getForceSelfLink();
         if ($forceSelfLink && !$links->has('self')) {
             $link = $this->marshalLinkFromMetadata(
-                $metadata, $object, $id, $metadata->getRouteIdentifierName()
+                $metadata,
+                $object,
+                $id,
+                $metadata->getRouteIdentifierName()
             );
             $links->add($link);
         }
