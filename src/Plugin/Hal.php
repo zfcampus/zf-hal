@@ -24,6 +24,7 @@ use ZF\ApiProblem\ApiProblem;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
 use ZF\Hal\EntityHydratorManager;
+use ZF\Hal\Extractor\EntityExtractor;
 use ZF\Hal\Exception;
 use ZF\Hal\Extractor\LinkCollectionExtractorInterface;
 use ZF\Hal\Link\Link;
@@ -55,6 +56,11 @@ class Hal extends AbstractHelper implements
      * @var EntityHydratorManager
      */
     protected $entityHydratorManager;
+
+    /**
+     * @var EntityExtractor
+     */
+    protected $entityExtractor;
 
     /**
      * Boolean to render embedded entities or just include _embedded data
@@ -201,7 +207,7 @@ class Hal extends AbstractHelper implements
         if (!$this->resourceFactory instanceof ResourceFactory) {
             $this->resourceFactory = new ResourceFactory(
                 $this->getEntityHydratorManager(),
-                $this->getMetadataMap()
+                $this->getEntityExtractor()
             );
         }
         return $this->resourceFactory;
@@ -239,6 +245,30 @@ class Hal extends AbstractHelper implements
     public function setEntityHydratorManager(EntityHydratorManager $manager)
     {
         $this->entityHydratorManager = $manager;
+        return $this;
+    }
+
+    /**
+     * @return EntityExtractor
+     */
+    public function getEntityExtractor()
+    {
+        if (!$this->entityExtractor instanceof EntityExtractor) {
+            $this->entityExtractor = new EntityExtractor(
+                $this->getEntityHydratorManager()
+            );
+        }
+
+        return $this->entityExtractor;
+    }
+
+    /**
+     * @param  EntityExtractor $extractor
+     * @return self
+     */
+    public function setEntityExtractor(EntityExtractor $extractor)
+    {
+        $this->entityExtractor = $extractor;
         return $this;
     }
 
@@ -604,7 +634,7 @@ class Hal extends AbstractHelper implements
         }
 
         if (!is_array($entity)) {
-            $entity = $this->getResourceFactory()->convertEntityToArray($entity);
+            $entity = $this->getEntityExtractor()->extract($entity);
         }
 
         foreach ($entity as $key => $value) {
@@ -1094,7 +1124,7 @@ class Hal extends AbstractHelper implements
             }
 
             if (!is_array($entity)) {
-                $entity = $this->getResourceFactory()->convertEntityToArray($entity);
+                $entity = $this->getEntityExtractor()->extract($entity);
             }
 
             foreach ($entity as $key => $value) {
