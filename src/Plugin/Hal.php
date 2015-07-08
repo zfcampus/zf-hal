@@ -632,11 +632,18 @@ class Hal extends AbstractHelper implements
         $halEntity->setLinks($entityLinks);
         $entity['_links'] = $this->fromResource($halEntity);
 
+        $payload = new ArrayObject($entity);
+        $this->getEventManager()->trigger(
+            __FUNCTION__ . '.post',
+            $this,
+            array('payload' => $payload, 'entity' => $halEntity)
+        );
+
         if (isset($entityHash)) {
             unset($this->entityHashStack[$entityHash]);
         }
 
-        return $entity;
+        return $payload->getArrayCopy();
     }
 
     /**

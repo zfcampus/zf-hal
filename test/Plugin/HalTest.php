@@ -2313,4 +2313,21 @@ class HalTest extends TestCase
             $this->assertEquals('bar', $item['foo']);
         }
     }
+
+    /**
+     * @group 100
+     */
+    public function testRenderEntityPostEventIsTriggered()
+    {
+        $entity = array('id' => 1, 'foo' => 'bar');
+        $halEntity = new Entity($entity, 1);
+
+        $triggered = false;
+        $this->plugin->getEventManager()->attach('renderEntity.post', function ($e) use (&$triggered) {
+            $triggered = true;
+        });
+
+        $this->plugin->renderEntity($halEntity);
+        $this->assertTrue($triggered);
+    }
 }
