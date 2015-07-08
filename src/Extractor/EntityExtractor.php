@@ -43,23 +43,21 @@ class EntityExtractor implements ExtractionInterface
             return $this->serializedEntities[$entity];
         }
 
-        $array    = false;
+        $this->serializedEntities[$entity] = $this->extractEntity($entity);
+
+        return $this->serializedEntities[$entity];
+    }
+
+    private function extractEntity($entity)
+    {
         $hydrator = $this->entityHydratorManager->getHydratorForEntity($entity);
 
         if ($hydrator) {
-            $array = $hydrator->extract($entity);
+            return $hydrator->extract($entity);
+        } elseif ($entity instanceof JsonSerializable) {
+            return $entity->jsonSerialize();
         }
 
-        if (false === $array && $entity instanceof JsonSerializable) {
-            $array = $entity->jsonSerialize();
-        }
-
-        if (false === $array) {
-            $array = get_object_vars($entity);
-        }
-
-        $this->serializedEntities[$entity] = $array;
-
-        return $array;
+        return get_object_vars($entity);
     }
 }
