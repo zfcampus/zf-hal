@@ -17,12 +17,12 @@ class HalConfigFactory implements FactoryInterface
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-        $config = array();
+        $config = [];
         if ($serviceLocator->has('config')) {
             $config = $serviceLocator->get('config');
         }
 
-        $halConfig = array();
+        $halConfig = [];
         if (isset($config['zf-hal']) && is_array($config['zf-hal'])) {
             $halConfig = $config['zf-hal'];
         }

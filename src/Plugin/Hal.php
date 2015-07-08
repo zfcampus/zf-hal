@@ -7,10 +7,7 @@
 namespace ZF\Hal\Plugin;
 
 use ArrayObject;
-use Closure;
 use Countable;
-use JsonSerializable;
-use SplObjectStorage;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
@@ -25,6 +22,7 @@ use Zend\View\Helper\Url;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
+use ZF\Hal\EntityHydratorManager;
 use ZF\Hal\Exception;
 use ZF\Hal\Extractor\LinkCollectionExtractorInterface;
 use ZF\Hal\Link\Link;
@@ -35,6 +33,7 @@ use ZF\Hal\Link\PaginationInjectorInterface;
 use ZF\Hal\Metadata\Metadata;
 use ZF\Hal\Metadata\MetadataMap;
 use ZF\Hal\Resource;
+use ZF\Hal\ResourceFactory;
 
 /**
  * Generate links for use with HAL payloads
@@ -49,11 +48,14 @@ class Hal extends AbstractHelper implements
     protected $controller;
 
     /**
-     * Default hydrator to use if no hydrator found for a specific entity class.
-     *
-     * @var ExtractionInterface
+     * @var ResourceFactory
      */
-    protected $defaultHydrator;
+    protected $resourceFactory;
+
+    /**
+     * @var EntityHydratorManager
+     */
+    protected $entityHydratorManager;
 
     /**
      * Boolean to render embedded entities or just include _embedded data
@@ -70,23 +72,9 @@ class Hal extends AbstractHelper implements
     protected $renderCollections = true;
 
     /**
-     * Map of entities to their ZF\Hal\Entity serializations
-     *
-     * @var SplObjectStorage
-     */
-    protected $serializedEntities;
-
-    /**
      * @var EventManagerInterface
      */
     protected $events;
-
-    /**
-     * Map of class name/(hydrator instance|name) pairs
-     *
-     * @var array
-     */
-    protected $hydratorMap = [];
 
     /**
      * @var HydratorPluginManager
@@ -134,8 +122,6 @@ class Hal extends AbstractHelper implements
             $hydrators = new HydratorPluginManager();
         }
         $this->hydrators = $hydrators;
-
-        $this->serializedEntities = new SplObjectStorage();
     }
 
     /**
@@ -214,6 +200,55 @@ class Hal extends AbstractHelper implements
     }
 
     /**
+     * @return ResourceFactory
+     */
+    public function getResourceFactory()
+    {
+        if (!$this->resourceFactory instanceof ResourceFactory) {
+            $this->resourceFactory = new ResourceFactory(
+                $this->getEntityHydratorManager(),
+                $this->getMetadataMap()
+            );
+        }
+        return $this->resourceFactory;
+    }
+
+    /**
+     * @param  ResourceFactory $factory
+     * @return self
+     */
+    public function setResourceFactory(ResourceFactory $factory)
+    {
+        $this->resourceFactory = $factory;
+        return $this;
+    }
+
+    /**
+     * @return EntityHydratorManager
+     */
+    public function getEntityHydratorManager()
+    {
+        if (!$this->entityHydratorManager instanceof EntityHydratorManager) {
+            $this->entityHydratorManager = new EntityHydratorManager(
+                $this->hydrators,
+                $this->getMetadataMap()
+            );
+        }
+
+        return $this->entityHydratorManager;
+    }
+
+    /**
+     * @param  EntityHydratorManager $manager
+     * @return self
+     */
+    public function setEntityHydratorManager(EntityHydratorManager $manager)
+    {
+        $this->entityHydratorManager = $manager;
+        return $this;
+    }
+
+    /**
      * @return HydratorPluginManager
      */
     public function getHydratorManager()
@@ -222,8 +257,6 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * Retrieve the metadata map
-     *
      * @return MetadataMap
      */
     public function getMetadataMap()
@@ -231,12 +264,11 @@ class Hal extends AbstractHelper implements
         if (! $this->metadataMap instanceof MetadataMap) {
             $this->setMetadataMap(new MetadataMap());
         }
+
         return $this->metadataMap;
     }
 
     /**
-     * Set the metadata map
-     *
      * @param  MetadataMap $map
      * @return self
      */
@@ -314,12 +346,15 @@ class Hal extends AbstractHelper implements
      */
     public function addHydrator($class, $hydrator)
     {
-        if (! $hydrator instanceof ExtractionInterface) {
-            $hydrator = $this->hydrators->get($hydrator);
-        }
+        $this->getEntityHydratorManager()->addHydrator($class, $hydrator);
+        return $this;
+    }
 
-        $class = strtolower($class);
-        $this->hydratorMap[$class] = $hydrator;
+    /**
+     * Set the default hydrator to use if none specified for a class.
+     *
+     * @param  ExtractionInterface $hydrator
+     * @return self
         return $this;
     }
 
@@ -331,7 +366,7 @@ class Hal extends AbstractHelper implements
      */
     public function setDefaultHydrator(ExtractionInterface $hydrator)
     {
-        $this->defaultHydrator = $hydrator;
+        $this->getEntityHydratorManager()->setDefaultHydrator($hydrator);
         return $this;
     }
 
@@ -444,28 +479,7 @@ class Hal extends AbstractHelper implements
      */
     public function getHydratorForEntity($entity)
     {
-        $class = get_class($entity);
-        $classLower = strtolower($class);
-
-        if (isset($this->hydratorMap[$classLower])) {
-            return $this->hydratorMap[$classLower];
-        }
-
-        $metadataMap = $this->getMetadataMap();
-        if ($metadataMap->has($entity)) {
-            $metadata = $metadataMap->get($class);
-            $hydrator = $metadata->getHydrator();
-            if ($hydrator instanceof ExtractionInterface) {
-                $this->addHydrator($class, $hydrator);
-                return $hydrator;
-            }
-        }
-
-        if ($this->defaultHydrator instanceof ExtractionInterface) {
-            return $this->defaultHydrator;
-        }
-
-        return false;
+        return $this->getEntityHydratorManager()->getHydratorForEntity($entity);
     }
 
     /**
@@ -625,12 +639,12 @@ class Hal extends AbstractHelper implements
         }
 
         if (!is_array($entity)) {
-            $entity = $this->convertEntityToArray($entity);
+            $entity = $this->getResourceFactory()->convertEntityToArray($entity);
         }
 
         foreach ($entity as $key => $value) {
             if (is_object($value) && $metadataMap->has($value)) {
-                $value = $this->createEntityFromMetadata(
+                $value = $this->getResourceFactory()->createEntityFromMetadata(
                     $value,
                     $metadataMap->get($value),
                     $this->getRenderEmbeddedEntities()
@@ -784,43 +798,14 @@ class Hal extends AbstractHelper implements
      * @param  Metadata $metadata
      * @param  bool $renderEmbeddedEntities
      * @return Entity|Collection
-     * @throws Exception\RuntimeException
      */
     public function createEntityFromMetadata($object, Metadata $metadata, $renderEmbeddedEntities = true)
     {
-        if ($metadata->isCollection()) {
-            return $this->createCollectionFromMetadata($object, $metadata);
-        }
-
-        $data = $this->convertEntityToArray($object);
-
-        $entityIdentifierName = $metadata->getEntityIdentifierName();
-        if ($entityIdentifierName && ! isset($data[$entityIdentifierName])) {
-            throw new Exception\RuntimeException(sprintf(
-                'Unable to determine entity identifier for object of type "%s"; no fields matching "%s"',
-                get_class($object),
-                $entityIdentifierName
-            ));
-        }
-
-        $id = ($entityIdentifierName) ? $data[$entityIdentifierName]: null;
-
-        if (! $renderEmbeddedEntities) {
-            $object = [];
-        }
-
-        $halEntity = new Entity($object, $id);
-
-        $links = $halEntity->getLinks();
-        $this->marshalMetadataLinks($metadata, $links);
-
-        $forceSelfLink = $metadata->getForceSelfLink();
-        if ($forceSelfLink && ! $links->has('self')) {
-            $link = $this->marshalLinkFromMetadata($metadata, $object, $id, $metadata->getRouteIdentifierName());
-            $links->add($link);
-        }
-
-        return $halEntity;
+        return $this->getResourceFactory()->createEntityFromMetadata(
+            $object,
+            $metadata,
+            $renderEmbeddedEntities
+        );
     }
 
     /**
@@ -855,27 +840,27 @@ class Hal extends AbstractHelper implements
     public function createEntity($entity, $route, $routeIdentifierName)
     {
         $metadataMap = $this->getMetadataMap();
-        switch (true) {
-            case (is_object($entity) && $metadataMap->has($entity)):
-                $generatedEntity = $this->createEntityFromMetadata($entity, $metadataMap->get($entity));
-                $halEntity = new Entity($entity, $generatedEntity->id);
-                $halEntity->setLinks($generatedEntity->getLinks());
-                break;
 
-            case (! $entity instanceof Entity):
-                $id = $this->getIdFromEntity($entity) ?: null;
-                $halEntity = new Entity($entity, $id);
-                break;
-
-            case ($entity instanceof Entity):
-            default:
-                $halEntity = $entity; // as is
-                break;
+        if (is_object($entity) && $metadataMap->has($entity)) {
+            $halEntity = $this->getResourceFactory()->createEntityFromMetadata(
+                $entity,
+                $metadataMap->get($entity)
+            );
+        } elseif (! $entity instanceof Entity) {
+            $id = $this->getIdFromEntity($entity) ?: null;
+            $halEntity = new Entity($entity, $id);
+        } else {
+            $halEntity = $entity;
         }
-        $metadata = (!is_array($entity) && $metadataMap->has($entity)) ? $metadataMap->get($entity) : false;
+
+        $metadata = (! is_array($entity) && $metadataMap->has($entity))
+            ? $metadataMap->get($entity)
+            : false;
+
         if (! $metadata || ($metadata && $metadata->getForceSelfLink())) {
             $this->injectSelfLink($halEntity, $route, $routeIdentifierName);
         }
+
         return $halEntity;
     }
 
@@ -890,7 +875,10 @@ class Hal extends AbstractHelper implements
     {
         $metadataMap = $this->getMetadataMap();
         if (is_object($collection) && $metadataMap->has($collection)) {
-            $collection = $this->createCollectionFromMetadata($collection, $metadataMap->get($collection));
+            $collection = $this->getResourceFactory()->createCollectionFromMetadata(
+                $collection,
+                $metadataMap->get($collection)
+            );
         }
 
         if (! $collection instanceof Collection) {
@@ -901,6 +889,7 @@ class Hal extends AbstractHelper implements
         if (! $metadata || ($metadata && $metadata->getForceSelfLink())) {
             $this->injectSelfLink($collection, $route);
         }
+
         return $collection;
     }
 
@@ -911,25 +900,7 @@ class Hal extends AbstractHelper implements
      */
     public function createCollectionFromMetadata($object, Metadata $metadata)
     {
-        $collection = new Collection($object);
-        $collection->setCollectionName($metadata->getCollectionName());
-        $collection->setCollectionRoute($metadata->getRoute());
-        $collection->setEntityRoute($metadata->getEntityRoute());
-        $collection->setRouteIdentifierName($metadata->getRouteIdentifierName());
-        $collection->setEntityIdentifierName($metadata->getEntityIdentifierName());
-
-        $links = $collection->getLinks();
-        $this->marshalMetadataLinks($metadata, $links);
-
-        $forceSelfLink = $metadata->getForceSelfLink();
-        if ($forceSelfLink && ! $links->has('self')
-            && ($metadata->hasUrl() || $metadata->hasRoute())
-        ) {
-            $link = $this->marshalLinkFromMetadata($metadata, $object);
-            $links->add($link);
-        }
-
-        return $collection;
+        return $this->getResourceFactory()->createCollectionFromMetadata($object, $metadata);
     }
 
     /**
@@ -1076,7 +1047,7 @@ class Hal extends AbstractHelper implements
             $entity = $eventParams['entity'];
 
             if (is_object($entity) && $metadataMap->has($entity)) {
-                $entity = $this->createEntityFromMetadata($entity, $metadataMap->get($entity));
+                $entity = $this->getResourceFactory()->createEntityFromMetadata($entity, $metadataMap->get($entity));
             }
 
             if ($entity instanceof Entity) {
@@ -1086,12 +1057,12 @@ class Hal extends AbstractHelper implements
             }
 
             if (!is_array($entity)) {
-                $entity = $this->convertEntityToArray($entity);
+                $entity = $this->getResourceFactory()->convertEntityToArray($entity);
             }
 
             foreach ($entity as $key => $value) {
                 if (is_object($value) && $metadataMap->has($value)) {
-                    $value = $this->createEntityFromMetadata($value, $metadataMap->get($value));
+                    $value = $this->getResourceFactory()->createEntityFromMetadata($value, $metadataMap->get($value));
                 }
 
                 if ($value instanceof Entity) {
@@ -1194,45 +1165,25 @@ class Hal extends AbstractHelper implements
     /**
      * Convert an individual entity to an array
      *
+     * @deprecated
      * @param  object $entity
      * @return array
      */
     protected function convertEntityToArray($entity)
     {
-        if (isset($this->serializedEntities[$entity])) {
-            return $this->serializedEntities[$entity];
-        }
-
-        $array    = false;
-        $hydrator = $this->getHydratorForEntity($entity);
-
-        if ($hydrator) {
-            $array = $hydrator->extract($entity);
-        }
-
-        if (false === $array && $entity instanceof JsonSerializable) {
-            $array = $entity->jsonSerialize();
-        }
-
-        if (false === $array) {
-            $array = get_object_vars($entity);
-        }
-
-        $this->serializedEntities[$entity] = $array;
-
-        return $array;
+        return $this->getResourceFactory()->convertEntityToArray($entity);
     }
 
     /**
      * Creates a link object, given metadata and a resource
      *
+     * @deprecated
      * @param  Metadata $metadata
      * @param  object $object
      * @param  null|string $id
      * @param  null|string $routeIdentifierName
      * @param  string $relation
      * @return Link
-     * @throws Exception\RuntimeException
      */
     protected function marshalLinkFromMetadata(
         Metadata $metadata,
@@ -1241,56 +1192,25 @@ class Hal extends AbstractHelper implements
         $routeIdentifierName = null,
         $relation = 'self'
     ) {
-        $link = new Link($relation);
-        if ($metadata->hasUrl()) {
-            $link->setUrl($metadata->getUrl());
-            return $link;
-        }
-
-        if (! $metadata->hasRoute()) {
-            throw new Exception\RuntimeException(sprintf(
-                'Unable to create a self link for resource of type "%s"; metadata does not contain a route or a url',
-                get_class($object)
-            ));
-        }
-
-        $params = $metadata->getRouteParams();
-
-        // process any callbacks
-        foreach ($params as $key => $param) {
-            // bind to the object if supported
-            if ($param instanceof Closure
-                && version_compare(PHP_VERSION, '5.4.0') >= 0
-            ) {
-                $param = $param->bindTo($object);
-            }
-
-            // pass the object for callbacks and non-bound closures
-            if (is_callable($param)) {
-                $params[$key] = call_user_func_array($param, [$object]);
-            }
-        }
-
-        if ($routeIdentifierName) {
-            $params = array_merge($params, [$routeIdentifierName => $id]);
-        }
-
-        $link->setRoute($metadata->getRoute(), $params, $metadata->getRouteOptions());
-        return $link;
+        return $this->getResourceFactory()->marshalLinkFromMetadata(
+            $metadata,
+            $object,
+            $id,
+            $routeIdentifierName,
+            $relation
+        );
     }
 
     /**
      * Inject any links found in the metadata into the resource's link collection
      *
+     * @deprecated
      * @param  Metadata $metadata
      * @param  LinkCollection $links
      */
     protected function marshalMetadataLinks(Metadata $metadata, LinkCollection $links)
     {
-        foreach ($metadata->getLinks() as $linkData) {
-            $link = Link::factory($linkData);
-            $links->add($link);
-        }
+        $this->getResourceFactory()->marshalMetadataLinks($metadata, $links);
     }
 
     /**

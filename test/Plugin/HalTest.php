@@ -19,6 +19,7 @@ use Zend\View\Helper\Url as UrlHelper;
 use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
+use ZF\Hal\EntityHydratorManager;
 use ZF\Hal\Extractor\LinkCollectionExtractor;
 use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Link\Link;
@@ -1197,17 +1198,6 @@ class HalTest extends TestCase
         $serialized2 = $this->plugin->renderEntity($entity2);
 
         $this->assertSame($serialized1, $serialized2);
-
-        $data = $serialized1;
-        unset($data['_links']);
-
-        $r = new ReflectionObject($this->plugin);
-        $p = $r->getProperty('serializedEntities');
-        $p->setAccessible(true);
-        $serializedEntities = $p->getValue($this->plugin);
-        $this->assertInstanceOf('SplObjectStorage', $serializedEntities);
-        $this->assertTrue($serializedEntities->contains($foo));
-        $this->assertSame($data, $serializedEntities[$foo]);
     }
 
     /**
@@ -1714,9 +1704,9 @@ class HalTest extends TestCase
         $object = new TestAsset\Entity('foo', 'Foo');
         $metadata = new MetadataMap([
             'ZFTest\Hal\Plugin\TestAsset\Entity' => [
-                'hydrator'         => 'Zend\Stdlib\Hydrator\ObjectProperty',
-                'route_name'       => 'hostname/resource',
-                'links'            => [],
+                'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'route_name'      => 'hostname/resource',
+                'links'           => [],
                 'force_self_link' => false,
             ],
         ]);
@@ -1750,21 +1740,19 @@ class HalTest extends TestCase
 
     public function testCreateCollectionFromMetadataWithoutForcedSelfLinks()
     {
-        $set = new TestAsset\Collection(
-            [
-                (object) ['id' => 'foo', 'name' => 'foo'],
-                (object) ['id' => 'bar', 'name' => 'bar'],
-                (object) ['id' => 'baz', 'name' => 'baz'],
-            ]
-        );
+        $set = new TestAsset\Collection([
+            (object) ['id' => 'foo', 'name' => 'foo'],
+            (object) ['id' => 'bar', 'name' => 'bar'],
+            (object) ['id' => 'baz', 'name' => 'baz'],
+        ]);
 
         $metadata = new MetadataMap([
             'ZFTest\Hal\Plugin\TestAsset\Collection' => [
-                'is_collection'       => true,
-                'route_name'          => 'hostname/contacts',
-                'entity_route_name'   => 'hostname/embedded',
-                'links'               => [],
-                'force_self_link'     => false,
+                'is_collection'     => true,
+                'route_name'        => 'hostname/contacts',
+                'entity_route_name' => 'hostname/embedded',
+                'links'             => [],
+                'force_self_link'   => false,
             ],
         ]);
 
@@ -1783,11 +1771,11 @@ class HalTest extends TestCase
         $collection = ['foo' => 'bar'];
         $metadata = new MetadataMap([
             'ZF\Hal\Collection' => [
-                'is_collection'       => true,
-                'route_name'          => 'hostname/contacts',
-                'entity_route_name'   => 'hostname/embedded',
-                'links'               => [],
-                'force_self_link'     => false,
+                'is_collection'     => true,
+                'route_name'        => 'hostname/contacts',
+                'entity_route_name' => 'hostname/embedded',
+                'links'             => [],
+                'force_self_link'   => false,
             ],
         ]);
         $this->plugin->setMetadataMap($metadata);
