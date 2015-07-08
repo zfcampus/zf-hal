@@ -7,15 +7,13 @@
 namespace ZF\Hal;
 
 use Closure;
-use JsonSerializable;
-use SplObjectStorage;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
+use ZF\Hal\Extractor\EntityExtractor;
 use ZF\Hal\Exception;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Metadata\Metadata;
-use ZF\Hal\Metadata\MetadataMap;
 
 class ResourceFactory
 {
@@ -25,26 +23,18 @@ class ResourceFactory
     protected $entityHydratorManager;
 
     /**
-     * @var MetadataMap
+     * @var EntityExtractor
      */
-    protected $metadataMap;
-
-    /**
-     * Map of entities to their ZF\Hal\Entity serializations
-     *
-     * @var SplObjectStorage
-     */
-    protected $serializedEntities;
+    protected $entityExtractor;
 
     /**
      * @param EntityHydratorManager $entityHydratorManager
-     * @param  MetadataMap $map
+     * @param EntityExtractor $entityExtractor
      */
-    public function __construct(EntityHydratorManager $entityHydratorManager, MetadataMap $map)
+    public function __construct(EntityHydratorManager $entityHydratorManager, EntityExtractor $entityExtractor)
     {
         $this->entityHydratorManager = $entityHydratorManager;
-        $this->metadataMap           = $map;
-        $this->serializedEntities    = new SplObjectStorage();
+        $this->entityExtractor       = $entityExtractor;
     }
 
     /**
@@ -62,7 +52,7 @@ class ResourceFactory
             return $this->createCollectionFromMetadata($object, $metadata);
         }
 
-        $data = $this->convertEntityToArray($object);
+        $data = $this->entityExtractor->extract($object);
 
         $entityIdentifierName = $metadata->getEntityIdentifierName();
         if ($entityIdentifierName && ! isset($data[$entityIdentifierName])) {
@@ -124,38 +114,6 @@ class ResourceFactory
         }
 
         return $halCollection;
-    }
-
-    /**
-     * Convert an individual entity to an array
-     *
-     * @param  object $entity
-     * @return array
-     */
-    public function convertEntityToArray($entity)
-    {
-        if (isset($this->serializedEntities[$entity])) {
-            return $this->serializedEntities[$entity];
-        }
-
-        $array    = false;
-        $hydrator = $this->entityHydratorManager->getHydratorForEntity($entity);
-
-        if ($hydrator) {
-            $array = $hydrator->extract($entity);
-        }
-
-        if (false === $array && $entity instanceof JsonSerializable) {
-            $array = $entity->jsonSerialize();
-        }
-
-        if (false === $array) {
-            $array = get_object_vars($entity);
-        }
-
-        $this->serializedEntities[$entity] = $array;
-
-        return $array;
     }
 
     /**
