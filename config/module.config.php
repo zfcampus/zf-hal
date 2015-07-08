@@ -55,9 +55,11 @@ return array(
     ),
     'service_manager' => array(
         'factories' => array(
-            'ZF\Hal\JsonRenderer' => 'ZF\Hal\Factory\HalJsonRendererFactory',
-            'ZF\Hal\JsonStrategy' => 'ZF\Hal\Factory\HalJsonStrategyFactory',
-            'ZF\Hal\MetadataMap'  => 'ZF\Hal\Factory\MetadataMapFactory',
+            'ZF\Hal\HalConfig'       => 'ZF\Hal\Factory\HalConfigFactory',
+            'ZF\Hal\JsonRenderer'    => 'ZF\Hal\Factory\HalJsonRendererFactory',
+            'ZF\Hal\JsonStrategy'    => 'ZF\Hal\Factory\HalJsonStrategyFactory',
+            'ZF\Hal\MetadataMap'     => 'ZF\Hal\Factory\MetadataMapFactory',
+            'ZF\Hal\RendererOptions' => 'ZF\Hal\Factory\RendererOptionsFactory',
         ),
     ),
     'view_helpers' => array(
