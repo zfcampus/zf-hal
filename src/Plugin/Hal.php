@@ -11,6 +11,7 @@ use Closure;
 use Countable;
 use JsonSerializable;
 use SplObjectStorage;
+use Symfony\Component\PropertyAccess\PropertyAccess;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
@@ -179,30 +180,21 @@ class Hal extends AbstractHelper implements
         ));
         $this->events = $events;
 
-        $events->attach('getIdFromEntity', function ($e) {
+        $accessor = PropertyAccess::createPropertyAccessor();
+
+        $events->attach('getIdFromEntity', function ($e) use ($accessor) {
             $entity = $e->getParam('entity');
 
-            // Found id in array
-            if (is_array($entity) && array_key_exists('id', $entity)) {
-                return $entity['id'];
+            if (is_array($entity)) {
+                $propertyPath = '[id]';
+            } elseif (is_object($entity)) {
+                $propertyPath = 'id';
             }
 
-            // No id in array, or not an object; return false
-            if (is_array($entity) || !is_object($entity)) {
-                return false;
+            if (isset($propertyPath) && $accessor->isReadable($entity, $propertyPath)) {
+                return $accessor->getValue($entity, $propertyPath);
             }
 
-            // Found public id property on object
-            if (isset($entity->id)) {
-                return $entity->id;
-            }
-
-            // Found public id getter on object
-            if (method_exists($entity, 'getid')) {
-                return $entity->getId();
-            }
-
-            // not found
             return false;
         });
 
