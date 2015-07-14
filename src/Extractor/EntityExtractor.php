@@ -35,7 +35,7 @@ class EntityExtractor implements ExtractionInterface
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function extract($entity)
     {
@@ -54,7 +54,9 @@ class EntityExtractor implements ExtractionInterface
 
         if ($hydrator) {
             return $hydrator->extract($entity);
-        } elseif ($entity instanceof JsonSerializable) {
+        }
+
+        if ($entity instanceof JsonSerializable) {
             return $entity->jsonSerialize();
         }
 
