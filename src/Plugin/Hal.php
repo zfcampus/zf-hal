@@ -16,7 +16,6 @@ use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Mvc\Controller\Plugin\PluginInterface as ControllerPluginInterface;
 use Zend\Paginator\Paginator;
-use Zend\Stdlib\ArrayUtils;
 use Zend\Stdlib\DispatchableInterface;
 use Zend\Stdlib\Extractor\ExtractionInterface;
 use Zend\Stdlib\Hydrator\HydratorPluginManager;
@@ -31,6 +30,8 @@ use ZF\Hal\Extractor\LinkCollectionExtractorInterface;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Link\LinkCollectionAwareInterface;
+use ZF\Hal\Link\PaginationInjector;
+use ZF\Hal\Link\PaginationInjectorInterface;
 use ZF\Hal\Metadata\Metadata;
 use ZF\Hal\Metadata\MetadataMap;
 use ZF\Hal\Resource;
@@ -96,6 +97,11 @@ class Hal extends AbstractHelper implements
      * @var MetadataMap
      */
     protected $metadataMap;
+
+    /**
+     * @var PaginationInjectorInterface
+     */
+    protected $paginationInjector;
 
     /**
      * @var ServerUrl
@@ -237,6 +243,27 @@ class Hal extends AbstractHelper implements
     public function setMetadataMap(MetadataMap $map)
     {
         $this->metadataMap = $map;
+        return $this;
+    }
+
+    /**
+     * @return PaginationInjectorInterface
+     */
+    public function getPaginationInjector()
+    {
+        if (!$this->paginationInjector instanceof PaginationInjectorInterface) {
+            $this->setPaginationInjector(new PaginationInjector());
+        }
+        return $this->paginationInjector;
+    }
+
+    /**
+     * @param  PaginationInjectorInterface $injector
+     * @return self
+     */
+    public function setPaginationInjector(PaginationInjectorInterface $injector)
+    {
+        $this->paginationInjector = $injector;
         return $this;
     }
 
@@ -950,92 +977,11 @@ class Hal extends AbstractHelper implements
      * Generate HAL links for a paginated collection
      *
      * @param  Collection $halCollection
-     * @return boolean
+     * @return boolean|ApiProblem
      */
     protected function injectPaginationLinks(Collection $halCollection)
     {
-        $collection = $halCollection->getCollection();
-        $page       = $halCollection->getPage();
-        $pageSize   = $halCollection->getPageSize();
-
-        $collection->setItemCountPerPage($pageSize);
-        $collection->setCurrentPageNumber($page);
-
-        $pageCount = count($collection);
-        if ($pageCount == 0) {
-            return true;
-        }
-
-        if ($page < 1 || $page > $pageCount) {
-            return new ApiProblem(409, 'Invalid page provided');
-        }
-
-        $this->addSelfLink($halCollection);
-        $this->addFirstLink($halCollection);
-        $this->addLastLink($halCollection);
-        $this->addPrevLink($halCollection);
-        $this->addNextLink($halCollection);
-
-        return true;
-    }
-
-    private function addSelfLink(Collection $halCollection)
-    {
-        $page = $halCollection->getPage();
-        $link = $this->createPaginationLink('self', $halCollection, $page);
-        $halCollection->getLinks()->add($link, true);
-    }
-
-    private function addFirstLink(Collection $halCollection)
-    {
-        $link = $this->createPaginationLink('first', $halCollection);
-        $halCollection->getLinks()->add($link);
-    }
-
-    private function addLastLink(Collection $halCollection)
-    {
-        $page = $halCollection->getCollection()->count();
-        $link = $this->createPaginationLink('last', $halCollection, $page);
-        $halCollection->getLinks()->add($link);
-    }
-
-    private function addPrevLink(Collection $halCollection)
-    {
-        $page = $halCollection->getPage();
-        $prev = ($page > 1) ? $page - 1 : false;
-
-        if ($prev) {
-            $link = $this->createPaginationLink('prev', $halCollection, $prev);
-            $halCollection->getLinks()->add($link);
-        }
-    }
-
-    private function addNextLink(Collection $halCollection)
-    {
-        $page      = $halCollection->getPage();
-        $pageCount = $halCollection->getCollection()->count();
-        $next      = ($page < $pageCount) ? $page + 1 : false;
-
-        if ($next) {
-            $link = $this->createPaginationLink('next', $halCollection, $next);
-            $halCollection->getLinks()->add($link);
-        }
-    }
-
-    private function createPaginationLink($relation, Collection $halCollection, $page = null)
-    {
-        $route   = $halCollection->getCollectionRoute();
-        $params  = $halCollection->getCollectionRouteParams();
-        $options = $halCollection->getCollectionRouteOptions();
-
-        $link = new Link($relation);
-        $link->setRoute($route);
-        $link->setRouteParams($params);
-        $link->setRouteOptions(ArrayUtils::merge($options, [
-            'query' => ['page' => $page],
-        ]));
-
-        return $link;
+        return $this->getPaginationInjector()->injectPaginationLinks($halCollection);
     }
 
     /**
