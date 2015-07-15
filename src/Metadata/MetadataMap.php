@@ -19,7 +19,7 @@ class MetadataMap
     /**
      * @var Metadata[]
      */
-    protected $map = array();
+    protected $map = [];
 
     /**
      * Constructor

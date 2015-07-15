@@ -43,10 +43,10 @@ class LinkExtractorTest extends TestCase
 
         $linkExtractor = new LinkExtractor($serverUrlHelper, $urlHelper);
 
-        $params = array(
+        $params = [
             'rel' => 'resource',
             'url' => 'http://api.example.com',
-        );
+        ];
         $link = Link::factory($params);
 
         $result = $linkExtractor->extract($link);
@@ -61,21 +61,21 @@ class LinkExtractorTest extends TestCase
 
         $linkExtractor = new LinkExtractor($serverUrlHelper, $urlHelper);
 
-        $link = Link::factory(array(
+        $link = Link::factory([
             'rel'   => 'resource',
             'url'   => 'http://api.example.com/foo?version=2',
-            'props' => array(
+            'props' => [
                 'version' => 2,
                 'latest'  => true,
-            ),
-        ));
+            ],
+        ]);
         $result = $linkExtractor->extract($link);
 
-        $expected = array(
+        $expected = [
             'href'    => 'http://api.example.com/foo?version=2',
             'version' => 2,
             'latest'  => true,
-        );
+        ];
         $this->assertEquals($expected, $result);
     }
 
@@ -92,15 +92,15 @@ class LinkExtractorTest extends TestCase
         $match = $this->matchUrl('/resource/foo', $urlHelper);
         $this->assertEquals('foo', $match->getParam('id', false));
 
-        $link = Link::factory(array(
+        $link = Link::factory([
             'rel' => 'resource',
-            'route' => array(
+            'route' => [
                 'name' => 'hostname/resource',
-                'options' => array(
+                'options' => [
                     'reuse_matched_params' => false,
-                ),
-            ),
-        ));
+                ],
+            ],
+        ]);
 
         $result = $linkExtractor->extract($link);
 
@@ -117,20 +117,20 @@ class LinkExtractorTest extends TestCase
 
         $router = new TreeRouteStack();
 
-        $router->addRoute('hostname', array(
+        $router->addRoute('hostname', [
             'type' => 'hostname',
-            'options' => array(
+            'options' => [
                 'route' => 'localhost.localdomain',
-            ),
-            'child_routes' => array(
-                'resource' => array(
+            ],
+            'child_routes' => [
+                'resource' => [
                     'type' => 'segment',
-                    'options' => array(
+                    'options' => [
                         'route' => '/resource[/:id]'
-                    ),
-                ),
-            )
-        ));
+                    ],
+                ],
+            ]
+        ]);
 
         $match = $router->match($request);
         if ($match instanceof RouteMatch) {

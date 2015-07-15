@@ -43,32 +43,32 @@ class MetadataMapFactoryTest extends TestCase
             ->with('config')
             ->will($this->returnValue(true));
 
-        $config = array(
-            'zf-hal' => array(
-                'metadata_map' => array(
-                    'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
+        $config = [
+            'zf-hal' => [
+                'metadata_map' => [
+                    'ZFTest\Hal\Plugin\TestAsset\Entity' => [
                         'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
                         'route_name' => 'hostname/resource',
                         'route_identifier_name' => 'id',
                         'entity_identifier_name' => 'id',
-                    ),
-                    'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntity' => array(
+                    ],
+                    'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntity' => [
                         'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
                         'route'    => 'hostname/embedded',
                         'route_identifier_name' => 'id',
                         'entity_identifier_name' => 'id',
                         'force_self_link' => true, // same as previous
-                    ),
-                    'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithCustomIdentifier' => array(
+                    ],
+                    'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithCustomIdentifier' => [
                         'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
                         'route'           => 'hostname/embedded_custom',
                         'route_identifier_name' => 'custom_id',
                         'entity_identifier_name' => 'custom_id',
                         'force_self_link' => false,
-                    ),
-                ),
-            ),
-        );
+                    ],
+                ],
+            ],
+        ];
 
         $services
             ->expects($this->at(1))

@@ -19,7 +19,7 @@ class LinkCollection implements Countable, IteratorAggregate
     /**
      * @var array
      */
-    protected $links = array();
+    protected $links = [];
 
     /**
      * Return a count of link relations
@@ -58,7 +58,7 @@ class LinkCollection implements Countable, IteratorAggregate
         }
 
         if ($this->links[$relation] instanceof Link) {
-            $this->links[$relation] = array($this->links[$relation]);
+            $this->links[$relation] = [$this->links[$relation]];
         }
 
         if (!is_array($this->links[$relation])) {

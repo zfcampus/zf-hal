@@ -35,26 +35,26 @@ class HalJsonModelTest extends TestCase
 
     public function invalidPayloads()
     {
-        return array(
-            'null'       => array(null),
-            'true'       => array(true),
-            'false'      => array(false),
-            'zero-int'   => array(0),
-            'int'        => array(1),
-            'zero-float' => array(0.0),
-            'float'      => array(1.1),
-            'string'     => array('string'),
-            'array'      => array(array()),
-            'stdclass'   => array(new stdClass),
-        );
+        return [
+            'null'       => [null],
+            'true'       => [true],
+            'false'      => [false],
+            'zero-int'   => [0],
+            'int'        => [1],
+            'zero-float' => [0.0],
+            'float'      => [1.1],
+            'string'     => ['string'],
+            'array'      => [[]],
+            'stdclass'   => [new stdClass],
+        ];
     }
 
     public function invalidCollectionPayloads()
     {
         $payloads = $this->invalidPayloads();
-        $payloads['exception'] = array(new \Exception);
-        $payloads['stdclass']  = array(new stdClass);
-        $payloads['hal-item']  = array(new Entity(array(), 'id', 'route'));
+        $payloads['exception'] = [new \Exception];
+        $payloads['stdclass']  = [new stdClass];
+        $payloads['hal-item']  = [new Entity([], 'id', 'route')];
         return $payloads;
     }
 
@@ -69,7 +69,7 @@ class HalJsonModelTest extends TestCase
 
     public function testIsCollectionReturnsTrueForCollectionPayload()
     {
-        $collection = new Collection(array(), 'item/route');
+        $collection = new Collection([], 'item/route');
         $this->model->setPayload($collection);
         $this->assertTrue($this->model->isCollection());
     }
@@ -77,9 +77,9 @@ class HalJsonModelTest extends TestCase
     public function invalidEntityPayloads()
     {
         $payloads = $this->invalidPayloads();
-        $payloads['exception']      = array(new \Exception);
-        $payloads['stdclass']       = array(new stdClass);
-        $payloads['hal-collection'] = array(new Collection(array(), 'item/route'));
+        $payloads['exception']      = [new \Exception];
+        $payloads['stdclass']       = [new stdClass];
+        $payloads['hal-collection'] = [new Collection([], 'item/route')];
         return $payloads;
     }
 
@@ -94,7 +94,7 @@ class HalJsonModelTest extends TestCase
 
     public function testIsEntityReturnsTrueForEntityPayload()
     {
-        $item = new Entity(array(), 'id', 'route');
+        $item = new Entity([], 'id', 'route');
         $this->model->setPayload($item);
         $this->assertTrue($this->model->isEntity());
     }
