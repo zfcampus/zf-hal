@@ -26,24 +26,24 @@ class ResourceFactoryTest extends TestCase
     {
         $object = new TestAsset\Entity('foo', 'Foo');
 
-        $metadata = new MetadataMap(array(
-            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
+        $metadata = new MetadataMap([
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => [
                 'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
-                'links'      => array(
-                    array(
+                'links'      => [
+                    [
                         'rel' => 'describedby',
                         'url' => 'http://example.com/api/help/resource',
-                    ),
-                    array(
+                    ],
+                    [
                         'rel' => 'children',
-                        'route' => array(
+                        'route' => [
                             'name' => 'resource/children',
-                        ),
-                    ),
-                ),
-            ),
-        ));
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
         $resourceFactory = $this->getResourceFactory($metadata);
 
@@ -80,7 +80,7 @@ class ResourceFactoryTest extends TestCase
     {
         $object = new TestAsset\Entity('foo', 'Foo');
 
-        $callback = $this->getMock('stdClass', array('callback'));
+        $callback = $this->getMock('stdClass', ['callback']);
         $callback->expects($this->atLeastOnce())
                  ->method('callback')
                  ->with($this->equalTo($object))
@@ -88,12 +88,12 @@ class ResourceFactoryTest extends TestCase
 
         $test = $this;
 
-        $metadata = new MetadataMap(array(
-            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
+        $metadata = new MetadataMap([
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => [
                 'hydrator'     => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route_name'   => 'hostname/resource',
-                'route_params' => array(
-                    'test-1' => array($callback, 'callback'),
+                'route_params' => [
+                    'test-1' => [$callback, 'callback'],
                     'test-2' => function ($expected) use ($object, $test) {
                         $test->assertSame($expected, $object);
                         if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
@@ -102,9 +102,9 @@ class ResourceFactoryTest extends TestCase
 
                         return 'closure-param';
                     },
-                ),
-            ),
-        ));
+                ],
+            ],
+        ]);
 
         $resourceFactory = $this->getResourceFactory($metadata);
 
@@ -133,25 +133,25 @@ class ResourceFactoryTest extends TestCase
      */
     public function testInjectsLinksFromMetadataWhenCreatingCollection()
     {
-        $set = new TestAsset\Collection(array(
-            (object) array('id' => 'foo', 'name' => 'foo'),
-            (object) array('id' => 'bar', 'name' => 'bar'),
-            (object) array('id' => 'baz', 'name' => 'baz'),
-        ));
+        $set = new TestAsset\Collection([
+            (object) ['id' => 'foo', 'name' => 'foo'],
+            (object) ['id' => 'bar', 'name' => 'bar'],
+            (object) ['id' => 'baz', 'name' => 'baz'],
+        ]);
 
-        $metadata = new MetadataMap(array(
-            'ZFTest\Hal\Plugin\TestAsset\Collection' => array(
+        $metadata = new MetadataMap([
+            'ZFTest\Hal\Plugin\TestAsset\Collection' => [
                 'is_collection'       => true,
                 'route_name'          => 'hostname/contacts',
                 'entity_route_name'   => 'hostname/embedded',
-                'links'               => array(
-                    array(
+                'links'               => [
+                    [
                         'rel' => 'describedby',
                         'url' => 'http://example.com/api/help/collection',
-                    ),
-                ),
-            ),
-        ));
+                    ],
+                ],
+            ],
+        ]);
 
         $resourceFactory = $this->getResourceFactory($metadata);
 

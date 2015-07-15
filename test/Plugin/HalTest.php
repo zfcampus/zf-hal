@@ -442,33 +442,32 @@ class HalTest extends TestCase
         $entity->first_child  = new TestAsset\EmbeddedEntity('bar', 'Bar');
         $entity->second_child = new TestAsset\EmbeddedEntityWithCustomIdentifier('baz', 'Baz');
 
-        $metadata = new MetadataMap(array(
-            'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntity' => array(
+        $metadata = new MetadataMap([
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntity' => [
                 'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route'    => 'hostname/embedded',
-            ),
-            'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithCustomIdentifier' => array(
+            ],
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithCustomIdentifier' => [
                 'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route'           => 'hostname/embedded_custom',
                 'route_identifier_name' => 'custom_id',
                 'entity_identifier_name' => 'custom_id',
-            ),
-
-            'ZFTest\Hal\Plugin\TestAsset\Collection' => array(
+            ],
+            'ZFTest\Hal\Plugin\TestAsset\Collection' => [
                 'is_collection'  => true,
                 'route'          => 'hostname/contacts',
                 'entity_route'   => 'hostname/embedded',
-            ),
-            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
+            ],
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => [
                 'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
-            ),
-        ));
+            ],
+        ]);
 
         $this->plugin->setMetadataMap($metadata);
         $this->plugin->setRenderEmbeddedEntities(false);
 
-        $collection = new Collection(array($entity), 'hostname/resource');
+        $collection = new Collection([$entity], 'hostname/resource');
         $self = new Link('self');
         $self->setRoute('hostname/resource');
         $collection->getLinks()->add($self);
@@ -1062,12 +1061,12 @@ class HalTest extends TestCase
     {
         return [
             /**
-             * array(
+             * [
              *     $entity,
              *     $metadataMap,
              *     $expectedResult,
              *     $exception,
-             * )
+             * ]
              */
             [
                 $this->createNestedEntity(),
