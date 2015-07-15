@@ -18,8 +18,8 @@ class JsonSerializableEntity extends Entity implements JsonSerializable
 
     public function jsonSerialize()
     {
-        return array(
+        return [
             'id' => $this->id,
-        );
+        ];
     }
 }

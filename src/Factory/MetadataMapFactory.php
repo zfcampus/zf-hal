@@ -19,7 +19,7 @@ class MetadataMapFactory implements FactoryInterface
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-        $config = array();
+        $config = [];
         if ($serviceLocator->has('config')) {
             $config = $serviceLocator->get('config');
         }
@@ -30,7 +30,7 @@ class MetadataMapFactory implements FactoryInterface
             $hydrators = new HydratorPluginManager();
         }
 
-        $map = array();
+        $map = [];
         if (isset($config['zf-hal'])
             && isset($config['zf-hal']['metadata_map'])
             && is_array($config['zf-hal']['metadata_map'])

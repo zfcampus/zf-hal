@@ -72,7 +72,7 @@ class Metadata
      *
      * @var array
      */
-    protected $links = array();
+    protected $links = [];
 
     /**
      * Whether to force the existance of a "self" link. The HAl specification encourages it but it is not strictly
@@ -94,14 +94,14 @@ class Metadata
      *
      * @var array
      */
-    protected $routeOptions = array();
+    protected $routeOptions = [];
 
     /**
      * Additional route parameters to use when generating a self link for this entity
      *
      * @var array
      */
-    protected $routeParams = array();
+    protected $routeParams = [];
 
     /**
      * URL to use for this entity (instead of a route)
@@ -131,7 +131,7 @@ class Metadata
      * @param  HydratorPluginManager $hydrators
      * @throws Exception\InvalidArgumentException
      */
-    public function __construct($class, array $options = array(), HydratorPluginManager $hydrators = null)
+    public function __construct($class, array $options = [], HydratorPluginManager $hydrators = null)
     {
         $filter = new FilterChain();
         $filter->attachByName('WordUnderscoreToCamelCase')

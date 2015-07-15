@@ -36,7 +36,7 @@ class LinkTest extends TestCase
     public function testCanSetRouteParamsWhenSpecifyingRoute()
     {
         $route  = 'api/docs';
-        $params = array('version' => '1.1');
+        $params = ['version' => '1.1'];
         $link = new Link('describedby');
         $link->setRoute($route, $params);
         $this->assertEquals($route, $link->getRoute());
@@ -46,7 +46,7 @@ class LinkTest extends TestCase
     public function testCanSetRouteOptionsWhenSpecifyingRoute()
     {
         $route   = 'api/docs';
-        $options = array('query' => 'version=1.1');
+        $options = ['query' => 'version=1.1'];
         $link = new Link('describedby');
         $link->setRoute($route, null, $options);
         $this->assertEquals($route, $link->getRoute());
@@ -56,7 +56,7 @@ class LinkTest extends TestCase
     public function testCanSetRouteParamsSeparately()
     {
         $route  = 'api/docs';
-        $params = array('version' => '1.1');
+        $params = ['version' => '1.1'];
         $link = new Link('describedby');
         $link->setRoute($route);
         $link->setRouteParams($params);
@@ -67,7 +67,7 @@ class LinkTest extends TestCase
     public function testCanSetRouteOptionsSeparately()
     {
         $route   = 'api/docs';
-        $options = array('query' => 'version=1.1');
+        $options = ['query' => 'version=1.1'];
         $link = new Link('describedby');
         $link->setRoute($route);
         $link->setRouteOptions($options);
@@ -146,10 +146,10 @@ class LinkTest extends TestCase
     {
         $rel  = 'describedby';
         $url  = 'http://example.com/docs.html';
-        $link = Link::factory(array(
+        $link = Link::factory([
             'rel' => $rel,
             'url' => $url,
-        ));
+        ]);
         $this->assertInstanceOf('ZF\Hal\Link\Link', $link);
         $this->assertEquals($rel, $link->getRelation());
         $this->assertEquals($url, $link->getUrl());
@@ -162,16 +162,16 @@ class LinkTest extends TestCase
     {
         $rel     = 'describedby';
         $route   = 'api/docs';
-        $params  = array('version' => '1.1');
-        $options = array('query' => 'version=1.1');
-        $link = Link::factory(array(
+        $params  = ['version' => '1.1'];
+        $options = ['query' => 'version=1.1'];
+        $link = Link::factory([
             'rel'   => $rel,
-            'route' => array(
+            'route' => [
                 'name'    => $route,
                 'params'  => $params,
                 'options' => $options,
-            ),
-        ));
+            ],
+        ]);
 
         $this->assertInstanceOf('ZF\Hal\Link\Link', $link);
         $this->assertEquals('describedby', $link->getRelation());
@@ -184,21 +184,21 @@ class LinkTest extends TestCase
     {
         $rel = 'describedby';
         $url = 'http://example.org/api/foo?version=2';
-        $link = Link::factory(array(
+        $link = Link::factory([
             'rel'   => $rel,
             'url'   => $url,
-            'props' => array(
+            'props' => [
                 'version' => 2,
                 'latest'  => true,
-            )
-        ));
+            ]
+        ]);
 
         $this->assertInstanceOf('ZF\Hal\Link\Link', $link);
         $this->assertEquals('describedby', $link->getRelation());
         $props = $link->getProps();
-        $this->assertEquals(array(
+        $this->assertEquals([
             'version' => 2,
             'latest'  => true,
-        ), $props);
+        ], $props);
     }
 }

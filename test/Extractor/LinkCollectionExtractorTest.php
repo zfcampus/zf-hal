@@ -27,18 +27,18 @@ class LinkCollectionExtractorTest extends TestCase
     public function testExtractGivenLinkCollectionShouldReturnArrayWithExtractionOfEachLink()
     {
         $linkCollection = new LinkCollection();
-        $linkCollection->add(Link::factory(array(
+        $linkCollection->add(Link::factory([
             'rel' => 'foo',
             'url' => 'http://example.com/foo',
-        )));
-        $linkCollection->add(Link::factory(array(
+        ]));
+        $linkCollection->add(Link::factory([
             'rel' => 'bar',
             'url' => 'http://example.com/bar',
-        )));
-        $linkCollection->add(Link::factory(array(
+        ]));
+        $linkCollection->add(Link::factory([
             'rel' => 'baz',
             'url' => 'http://example.com/baz',
-        )));
+        ]));
 
         $result = $this->linkCollectionExtractor->extract($linkCollection);
 
@@ -49,18 +49,18 @@ class LinkCollectionExtractorTest extends TestCase
     public function testLinkCollectionWithTwoLinksForSameRelationShouldReturnArrayWithOneKeyAggregatingLinks()
     {
         $linkCollection = new LinkCollection();
-        $linkCollection->add(Link::factory(array(
+        $linkCollection->add(Link::factory([
             'rel' => 'foo',
             'url' => 'http://example.com/foo',
-        )));
-        $linkCollection->add(Link::factory(array(
+        ]));
+        $linkCollection->add(Link::factory([
             'rel' => 'foo',
             'url' => 'http://example.com/bar',
-        )));
-        $linkCollection->add(Link::factory(array(
+        ]));
+        $linkCollection->add(Link::factory([
             'rel' => 'baz',
             'url' => 'http://example.com/baz',
-        )));
+        ]));
 
         $result = $this->linkCollectionExtractor->extract($linkCollection);
 

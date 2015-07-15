@@ -21,7 +21,7 @@ class Link
     /**
      * @var array
      */
-    protected $props = array();
+    protected $props = [];
 
     /**
      * @var string
@@ -36,12 +36,12 @@ class Link
     /**
      * @var array
      */
-    protected $routeOptions = array();
+    protected $routeOptions = [];
 
     /**
      * @var array
      */
-    protected $routeParams = array();
+    protected $routeParams = [];
 
     /**
      * @var string
@@ -111,10 +111,10 @@ class Link
             $name    = $routeInfo['name'];
             $params  = isset($routeInfo['params']) && is_array($routeInfo['params'])
                 ? $routeInfo['params']
-                : array();
+                : [];
             $options = isset($routeInfo['options']) && is_array($routeInfo['options'])
                 ? $routeInfo['options']
-                : array();
+                : [];
             $link->setRoute($name, $params, $options);
             return $link;
         }
