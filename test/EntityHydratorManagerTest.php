@@ -77,11 +77,11 @@ class EntityHydratorManagerTest extends TestCase
         $entity        = new TestAsset\Entity('foo', 'Foo Bar');
         $hydratorClass = 'ZFTest\Hal\Plugin\TestAsset\DummyHydrator';
 
-        $metadataMap = new MetadataMap(array(
-            'ZFTest\Hal\Plugin\TestAsset\Entity' => array(
+        $metadataMap = new MetadataMap([
+            'ZFTest\Hal\Plugin\TestAsset\Entity' => [
                 'hydrator' => $hydratorClass,
-            ),
-        ));
+            ],
+        ]);
 
         $hydratorPluginManager = new HydratorPluginManager();
         $entityHydratorManager = new EntityHydratorManager($hydratorPluginManager, $metadataMap);
