@@ -66,7 +66,7 @@ class ResourceFactory
         $id = ($entityIdentifierName) ? $data[$entityIdentifierName]: null;
 
         if (!$renderEmbeddedEntities) {
-            $object = array();
+            $object = [];
         }
 
         $halEntity = new Entity($object, $id);
@@ -160,12 +160,12 @@ class ResourceFactory
 
             // pass the object for callbacks and non-bound closures
             if (is_callable($param)) {
-                $params[$key] = call_user_func_array($param, array($object));
+                $params[$key] = call_user_func_array($param, [$object]);
             }
         }
 
         if ($routeIdentifierName) {
-            $params = array_merge($params, array($routeIdentifierName => $id));
+            $params = array_merge($params, [$routeIdentifierName => $id]);
         }
 
         $link->setRoute($metadata->getRoute(), $params, $metadata->getRouteOptions());

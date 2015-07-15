@@ -28,7 +28,7 @@ class RendererOptions extends AbstractOptions
     /**
      * @var array
      */
-    protected $hydrators = array();
+    protected $hydrators = [];
 
     /**
      * @param string $hydrator

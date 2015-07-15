@@ -20,7 +20,7 @@ class RendererOptionsFactory implements FactoryInterface
     {
         $config = $serviceLocator->get('ZF\Hal\HalConfig');
 
-        $rendererConfig = array();
+        $rendererConfig = [];
         if (isset($config['renderer']) && is_array($config['renderer'])) {
             $rendererConfig = $config['renderer'];
         }

@@ -27,7 +27,7 @@ class EntityHydratorManager
      *
      * @var array
      */
-    protected $hydratorMap = array();
+    protected $hydratorMap = [];
 
     /**
      * Default hydrator to use if no hydrator found for a specific entity class.
