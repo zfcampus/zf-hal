@@ -17,7 +17,7 @@ use ZF\Hal\Plugin;
 
 class HalViewHelperFactoryTest extends TestCase
 {
-    public function setupPluginManager($config = array())
+    public function setupPluginManager($config = [])
     {
         $services = new ServiceManager();
 
@@ -63,13 +63,13 @@ class HalViewHelperFactoryTest extends TestCase
 
     public function testHalViewHelperFactoryInjectsDefaultHydratorIfPresentInConfig()
     {
-        $config = array(
-            'zf-hal' => array(
-                'renderer' => array(
+        $config = [
+            'zf-hal' => [
+                'renderer' => [
                     'default_hydrator' => 'ObjectProperty',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         $this->setupPluginManager($config);
 
@@ -82,18 +82,18 @@ class HalViewHelperFactoryTest extends TestCase
 
     public function testHalViewHelperFactoryInjectsHydratorMappingsIfPresentInConfig()
     {
-        $config = array(
-            'zf-hal' => array(
-                'renderer' => array(
-                    'hydrators' => array(
+        $config = [
+            'zf-hal' => [
+                'renderer' => [
+                    'hydrators' => [
                         'Some\MadeUp\Component'            => 'ClassMethods',
                         'Another\MadeUp\Component'         => 'Reflection',
                         'StillAnother\MadeUp\Component'    => 'ArraySerializable',
                         'A\Component\With\SharedHydrators' => 'Reflection',
-                    ),
-                ),
-            ),
-        );
+                    ],
+                ],
+            ],
+        ];
 
         $this->setupPluginManager($config);
 
@@ -123,13 +123,13 @@ class HalViewHelperFactoryTest extends TestCase
      */
     public function testOptionUseProxyIfPresentInConfig()
     {
-        $options = array(
-            'zf-hal' => array(
-                'options' => array(
+        $options = [
+            'zf-hal' => [
+                'options' => [
                     'use_proxy' => true,
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
 
         $this->setupPluginManager($options);
 

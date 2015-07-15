@@ -96,6 +96,8 @@ Each class in the metadata map may contain one or more of the following configur
 - `max_depth` - integer; limit to what nesting level entities and collections are rendered; if the limit is 
   reached, only `self` links will be rendered. default value is `null`, which means no limit: if unlimited circular 
   references are detected, an exception will be thrown to avoid infinite loops.
+- `force_self_link` - boolean; set whether a self-referencing link should be automatically generated for the entity.
+  Defaults to `true` (since its recommended).
 
 The `links` property is an array of arrays, each with the following structure:
 
@@ -265,6 +267,17 @@ information necessary to create HAL entities, links, or collections.
 
 The `MetadataMap` aggregates an array of class name keyed `Metadata` instances to be used in
 producing HAL entities, links, or collections.
+
+### Extractors
+
+#### ZF\Hal\Extractor\LinkExtractor
+
+`LinkExtractor` is responsible for extracting a link representation from `Link` instance.
+
+#### ZF\Hal\Extractor\LinkCollectionExtractor
+
+`LinkCollectionExtractor` is responsible for extracting a collection of `Link` instances. It also
+composes a `LinkExtractor` for extracting individual links.
 
 ### Controller Plugins
 

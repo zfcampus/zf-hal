@@ -15,16 +15,16 @@ class EntityTest extends TestCase
 {
     public function invalidEntities()
     {
-        return array(
-            'null'       => array(null),
-            'true'       => array(true),
-            'false'      => array(false),
-            'zero-int'   => array(0),
-            'int'        => array(1),
-            'zero-float' => array(0.0),
-            'float'      => array(1.1),
-            'string'     => array('string'),
-        );
+        return [
+            'null'       => [null],
+            'true'       => [true],
+            'false'      => [false],
+            'zero-int'   => [0],
+            'int'        => [1],
+            'zero-float' => [0.0],
+            'float'      => [1.1],
+            'string'     => ['string'],
+        ];
     }
 
     /**
@@ -47,14 +47,14 @@ class EntityTest extends TestCase
     public function testComposesLinkCollectionByDefault()
     {
         $entity = new stdClass;
-        $hal    = new Entity($entity, 'id', 'route', array('foo' => 'bar'));
+        $hal    = new Entity($entity, 'id', 'route', ['foo' => 'bar']);
         $this->assertInstanceOf('ZF\Hal\Link\LinkCollection', $hal->getLinks());
     }
 
     public function testLinkCollectionMayBeInjected()
     {
         $entity = new stdClass;
-        $hal    = new Entity($entity, 'id', 'route', array('foo' => 'bar'));
+        $hal    = new Entity($entity, 'id', 'route', ['foo' => 'bar']);
         $links  = new LinkCollection();
         $hal->setLinks($links);
         $this->assertSame($links, $hal->getLinks());
@@ -62,7 +62,7 @@ class EntityTest extends TestCase
 
     public function testRetrievingEntityCanReturnByReference()
     {
-        $entity = array('foo' => 'bar');
+        $entity = ['foo' => 'bar'];
         $hal    = new Entity($entity, 'id');
         $this->assertEquals($entity, $hal->entity);
 
@@ -78,7 +78,7 @@ class EntityTest extends TestCase
      */
     public function testConstructorAllowsNullIdentifier()
     {
-        $hal = new Entity(array('foo' => 'bar'), null);
+        $hal = new Entity(['foo' => 'bar'], null);
         $this->assertNull($hal->id);
     }
 }

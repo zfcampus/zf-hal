@@ -72,7 +72,15 @@ class Metadata
      *
      * @var array
      */
-    protected $links = array();
+    protected $links = [];
+
+    /**
+     * Whether to force the existance of a "self" link. The HAl specification encourages it but it is not strictly
+     * required.
+     *
+     * @var bool
+     */
+    protected $forceSelfLink = true;
 
     /**
      * Route to use to generate a self link for this entity
@@ -86,14 +94,14 @@ class Metadata
      *
      * @var array
      */
-    protected $routeOptions = array();
+    protected $routeOptions = [];
 
     /**
      * Additional route parameters to use when generating a self link for this entity
      *
      * @var array
      */
-    protected $routeParams = array();
+    protected $routeParams = [];
 
     /**
      * URL to use for this entity (instead of a route)
@@ -123,7 +131,7 @@ class Metadata
      * @param  HydratorPluginManager $hydrators
      * @throws Exception\InvalidArgumentException
      */
-    public function __construct($class, array $options = array(), HydratorPluginManager $hydrators = null)
+    public function __construct($class, array $options = [], HydratorPluginManager $hydrators = null)
     {
         $filter = new FilterChain();
         $filter->attachByName('WordUnderscoreToCamelCase')
@@ -569,6 +577,28 @@ class Metadata
     public function setMaxDepth($maxDepth)
     {
         $this->maxDepth = $maxDepth;
+        return $this;
+    }
+
+    /**
+     * Returns true if this entity should be forced to have a "self" link.
+     *
+     * @return boolean
+     */
+    public function getForceSelfLink()
+    {
+        return $this->forceSelfLink;
+    }
+
+    /**
+     * Set whether to force the existance of "self" links.
+     *
+     * @param boolean $forceSelfLink A truthy value
+     * @return $this
+     */
+    public function setForceSelfLink($forceSelfLink)
+    {
+        $this->forceSelfLink = $forceSelfLink;
         return $this;
     }
 }
