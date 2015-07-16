@@ -47,7 +47,7 @@ class HalViewHelperFactory implements FactoryInterface
 
         $defaultHydrator = $rendererOptions->getDefaultHydrator();
         if ($defaultHydrator) {
-            if (!$hydrators->has($defaultHydrator)) {
+            if (! $hydrators->has($defaultHydrator)) {
                 throw new Exception\DomainException(sprintf(
                     'Cannot locate default hydrator by name "%s" via the HydratorManager',
                     $defaultHydrator

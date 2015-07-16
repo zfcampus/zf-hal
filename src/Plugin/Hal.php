@@ -210,7 +210,7 @@ class Hal extends AbstractHelper implements
      */
     public function getResourceFactory()
     {
-        if (!$this->resourceFactory instanceof ResourceFactory) {
+        if (! $this->resourceFactory instanceof ResourceFactory) {
             $this->resourceFactory = new ResourceFactory(
                 $this->getEntityHydratorManager(),
                 $this->getEntityExtractor()
@@ -234,7 +234,7 @@ class Hal extends AbstractHelper implements
      */
     public function getEntityHydratorManager()
     {
-        if (!$this->entityHydratorManager instanceof EntityHydratorManager) {
+        if (! $this->entityHydratorManager instanceof EntityHydratorManager) {
             $this->entityHydratorManager = new EntityHydratorManager(
                 $this->hydrators,
                 $this->getMetadataMap()
@@ -259,7 +259,7 @@ class Hal extends AbstractHelper implements
      */
     public function getEntityExtractor()
     {
-        if (!$this->entityExtractor instanceof EntityExtractor) {
+        if (! $this->entityExtractor instanceof EntityExtractor) {
             $this->entityExtractor = new EntityExtractor(
                 $this->getEntityHydratorManager()
             );

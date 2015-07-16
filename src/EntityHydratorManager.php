@@ -63,7 +63,7 @@ class EntityHydratorManager
      */
     public function addHydrator($class, $hydrator)
     {
-        if (!$hydrator instanceof ExtractionInterface) {
+        if (! $hydrator instanceof ExtractionInterface) {
             $hydrator = $this->hydrators->get($hydrator);
         }
 

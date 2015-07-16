@@ -65,7 +65,7 @@ class ResourceFactory
 
         $id = ($entityIdentifierName) ? $data[$entityIdentifierName]: null;
 
-        if (!$renderEmbeddedEntities) {
+        if (! $renderEmbeddedEntities) {
             $object = [];
         }
 
@@ -75,7 +75,7 @@ class ResourceFactory
         $this->marshalMetadataLinks($metadata, $links);
 
         $forceSelfLink = $metadata->getForceSelfLink();
-        if ($forceSelfLink && !$links->has('self')) {
+        if ($forceSelfLink && ! $links->has('self')) {
             $link = $this->marshalLinkFromMetadata(
                 $metadata,
                 $object,
@@ -106,7 +106,7 @@ class ResourceFactory
         $this->marshalMetadataLinks($metadata, $links);
 
         $forceSelfLink = $metadata->getForceSelfLink();
-        if ($forceSelfLink && !$links->has('self')
+        if ($forceSelfLink && ! $links->has('self')
             && ($metadata->hasUrl() || $metadata->hasRoute())
         ) {
             $link = $this->marshalLinkFromMetadata($metadata, $object);
@@ -140,7 +140,7 @@ class ResourceFactory
             return $link;
         }
 
-        if (!$metadata->hasRoute()) {
+        if (! $metadata->hasRoute()) {
             throw new Exception\RuntimeException(sprintf(
                 'Unable to create a self link for resource of type "%s"; metadata does not contain a route or a url',
                 get_class($object)
