@@ -163,7 +163,7 @@ class Hal extends AbstractHelper implements
      */
     public function getEventManager()
     {
-        if (!$this->events) {
+        if (! $this->events) {
             $this->setEventManager(new EventManager());
         }
         return $this->events;
@@ -228,7 +228,7 @@ class Hal extends AbstractHelper implements
      */
     public function getMetadataMap()
     {
-        if (!$this->metadataMap instanceof MetadataMap) {
+        if (! $this->metadataMap instanceof MetadataMap) {
             $this->setMetadataMap(new MetadataMap());
         }
         return $this->metadataMap;
@@ -251,7 +251,7 @@ class Hal extends AbstractHelper implements
      */
     public function getPaginationInjector()
     {
-        if (!$this->paginationInjector instanceof PaginationInjectorInterface) {
+        if (! $this->paginationInjector instanceof PaginationInjectorInterface) {
             $this->setPaginationInjector(new PaginationInjector());
         }
         return $this->paginationInjector;
@@ -314,7 +314,7 @@ class Hal extends AbstractHelper implements
      */
     public function addHydrator($class, $hydrator)
     {
-        if (!$hydrator instanceof ExtractionInterface) {
+        if (! $hydrator instanceof ExtractionInterface) {
             $hydrator = $this->hydrators->get($hydrator);
         }
 
@@ -620,7 +620,7 @@ class Hal extends AbstractHelper implements
             }
         }
 
-        if (!$renderEntity || ($maxDepth !== null && $depth > $maxDepth)) {
+        if (! $renderEntity || ($maxDepth !== null && $depth > $maxDepth)) {
             $entity = [];
         }
 
@@ -805,7 +805,7 @@ class Hal extends AbstractHelper implements
 
         $id = ($entityIdentifierName) ? $data[$entityIdentifierName]: null;
 
-        if (!$renderEmbeddedEntities) {
+        if (! $renderEmbeddedEntities) {
             $object = [];
         }
 
@@ -815,7 +815,7 @@ class Hal extends AbstractHelper implements
         $this->marshalMetadataLinks($metadata, $links);
 
         $forceSelfLink = $metadata->getForceSelfLink();
-        if ($forceSelfLink && !$links->has('self')) {
+        if ($forceSelfLink && ! $links->has('self')) {
             $link = $this->marshalLinkFromMetadata($metadata, $object, $id, $metadata->getRouteIdentifierName());
             $links->add($link);
         }
@@ -873,7 +873,7 @@ class Hal extends AbstractHelper implements
                 break;
         }
         $metadata = (!is_array($entity) && $metadataMap->has($entity)) ? $metadataMap->get($entity) : false;
-        if (!$metadata || ($metadata && $metadata->getForceSelfLink())) {
+        if (! $metadata || ($metadata && $metadata->getForceSelfLink())) {
             $this->injectSelfLink($halEntity, $route, $routeIdentifierName);
         }
         return $halEntity;
@@ -893,12 +893,12 @@ class Hal extends AbstractHelper implements
             $collection = $this->createCollectionFromMetadata($collection, $metadataMap->get($collection));
         }
 
-        if (!$collection instanceof Collection) {
+        if (! $collection instanceof Collection) {
             $collection = new Collection($collection);
         }
 
         $metadata = $metadataMap->get($collection);
-        if (!$metadata || ($metadata && $metadata->getForceSelfLink())) {
+        if (! $metadata || ($metadata && $metadata->getForceSelfLink())) {
             $this->injectSelfLink($collection, $route);
         }
         return $collection;
@@ -922,7 +922,7 @@ class Hal extends AbstractHelper implements
         $this->marshalMetadataLinks($metadata, $links);
 
         $forceSelfLink = $metadata->getForceSelfLink();
-        if ($forceSelfLink && !$links->has('self')
+        if ($forceSelfLink && ! $links->has('self')
             && ($metadata->hasUrl() || $metadata->hasRoute())
         ) {
             $link = $this->marshalLinkFromMetadata($metadata, $object);
@@ -1247,7 +1247,7 @@ class Hal extends AbstractHelper implements
             return $link;
         }
 
-        if (!$metadata->hasRoute()) {
+        if (! $metadata->hasRoute()) {
             throw new Exception\RuntimeException(sprintf(
                 'Unable to create a self link for resource of type "%s"; metadata does not contain a route or a url',
                 get_class($object)

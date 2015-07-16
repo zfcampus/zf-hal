@@ -19,14 +19,14 @@ class PaginationInjector implements PaginationInjectorInterface
     public function injectPaginationLinks(Collection $halCollection)
     {
         $collection = $halCollection->getCollection();
-        if (!$collection instanceof Paginator) {
+        if (! $collection instanceof Paginator) {
             return false;
         }
 
         $this->configureCollection($halCollection);
 
         $pageCount = count($collection);
-        if ($pageCount == 0) {
+        if ($pageCount === 0) {
             return true;
         }
 
