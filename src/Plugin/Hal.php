@@ -16,7 +16,6 @@ use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Mvc\Controller\Plugin\PluginInterface as ControllerPluginInterface;
 use Zend\Paginator\Paginator;
-use Zend\Stdlib\ArrayUtils;
 use Zend\Stdlib\DispatchableInterface;
 use Zend\Stdlib\Extractor\ExtractionInterface;
 use Zend\Stdlib\Hydrator\HydratorPluginManager;
@@ -31,6 +30,8 @@ use ZF\Hal\Extractor\LinkCollectionExtractorInterface;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Link\LinkCollectionAwareInterface;
+use ZF\Hal\Link\PaginationInjector;
+use ZF\Hal\Link\PaginationInjectorInterface;
 use ZF\Hal\Metadata\Metadata;
 use ZF\Hal\Metadata\MetadataMap;
 use ZF\Hal\Resource;
@@ -98,6 +99,11 @@ class Hal extends AbstractHelper implements
     protected $metadataMap;
 
     /**
+     * @var PaginationInjectorInterface
+     */
+    protected $paginationInjector;
+
+    /**
      * @var ServerUrl
      */
     protected $serverUrlHelper;
@@ -157,7 +163,7 @@ class Hal extends AbstractHelper implements
      */
     public function getEventManager()
     {
-        if (!$this->events) {
+        if (! $this->events) {
             $this->setEventManager(new EventManager());
         }
         return $this->events;
@@ -222,7 +228,7 @@ class Hal extends AbstractHelper implements
      */
     public function getMetadataMap()
     {
-        if (!$this->metadataMap instanceof MetadataMap) {
+        if (! $this->metadataMap instanceof MetadataMap) {
             $this->setMetadataMap(new MetadataMap());
         }
         return $this->metadataMap;
@@ -237,6 +243,27 @@ class Hal extends AbstractHelper implements
     public function setMetadataMap(MetadataMap $map)
     {
         $this->metadataMap = $map;
+        return $this;
+    }
+
+    /**
+     * @return PaginationInjectorInterface
+     */
+    public function getPaginationInjector()
+    {
+        if (! $this->paginationInjector instanceof PaginationInjectorInterface) {
+            $this->setPaginationInjector(new PaginationInjector());
+        }
+        return $this->paginationInjector;
+    }
+
+    /**
+     * @param  PaginationInjectorInterface $injector
+     * @return self
+     */
+    public function setPaginationInjector(PaginationInjectorInterface $injector)
+    {
+        $this->paginationInjector = $injector;
         return $this;
     }
 
@@ -287,7 +314,7 @@ class Hal extends AbstractHelper implements
      */
     public function addHydrator($class, $hydrator)
     {
-        if (!$hydrator instanceof ExtractionInterface) {
+        if (! $hydrator instanceof ExtractionInterface) {
             $hydrator = $this->hydrators->get($hydrator);
         }
 
@@ -466,7 +493,7 @@ class Hal extends AbstractHelper implements
      *
      * <code>
      * $params = $e->getParams();
-     * $params['routeOptions']['query'] = array('format' => 'json');
+     * $params['routeOptions']['query'] = ['format' => 'json'];
      * </code>
      *
      * @param  Collection $halCollection
@@ -593,7 +620,7 @@ class Hal extends AbstractHelper implements
             }
         }
 
-        if (!$renderEntity || ($maxDepth !== null && $depth > $maxDepth)) {
+        if (! $renderEntity || ($maxDepth !== null && $depth > $maxDepth)) {
             $entity = [];
         }
 
@@ -778,7 +805,7 @@ class Hal extends AbstractHelper implements
 
         $id = ($entityIdentifierName) ? $data[$entityIdentifierName]: null;
 
-        if (!$renderEmbeddedEntities) {
+        if (! $renderEmbeddedEntities) {
             $object = [];
         }
 
@@ -788,7 +815,7 @@ class Hal extends AbstractHelper implements
         $this->marshalMetadataLinks($metadata, $links);
 
         $forceSelfLink = $metadata->getForceSelfLink();
-        if ($forceSelfLink && !$links->has('self')) {
+        if ($forceSelfLink && ! $links->has('self')) {
             $link = $this->marshalLinkFromMetadata($metadata, $object, $id, $metadata->getRouteIdentifierName());
             $links->add($link);
         }
@@ -846,7 +873,7 @@ class Hal extends AbstractHelper implements
                 break;
         }
         $metadata = (!is_array($entity) && $metadataMap->has($entity)) ? $metadataMap->get($entity) : false;
-        if (!$metadata || ($metadata && $metadata->getForceSelfLink())) {
+        if (! $metadata || ($metadata && $metadata->getForceSelfLink())) {
             $this->injectSelfLink($halEntity, $route, $routeIdentifierName);
         }
         return $halEntity;
@@ -866,12 +893,12 @@ class Hal extends AbstractHelper implements
             $collection = $this->createCollectionFromMetadata($collection, $metadataMap->get($collection));
         }
 
-        if (!$collection instanceof Collection) {
+        if (! $collection instanceof Collection) {
             $collection = new Collection($collection);
         }
 
         $metadata = $metadataMap->get($collection);
-        if (!$metadata || ($metadata && $metadata->getForceSelfLink())) {
+        if (! $metadata || ($metadata && $metadata->getForceSelfLink())) {
             $this->injectSelfLink($collection, $route);
         }
         return $collection;
@@ -895,7 +922,7 @@ class Hal extends AbstractHelper implements
         $this->marshalMetadataLinks($metadata, $links);
 
         $forceSelfLink = $metadata->getForceSelfLink();
-        if ($forceSelfLink && !$links->has('self')
+        if ($forceSelfLink && ! $links->has('self')
             && ($metadata->hasUrl() || $metadata->hasRoute())
         ) {
             $link = $this->marshalLinkFromMetadata($metadata, $object);
@@ -950,83 +977,11 @@ class Hal extends AbstractHelper implements
      * Generate HAL links for a paginated collection
      *
      * @param  Collection $halCollection
-     * @return boolean
+     * @return boolean|ApiProblem
      */
     protected function injectPaginationLinks(Collection $halCollection)
     {
-        $collection = $halCollection->getCollection();
-        $page       = $halCollection->getPage();
-        $pageSize   = $halCollection->getPageSize();
-        $route      = $halCollection->getCollectionRoute();
-        $params     = $halCollection->getCollectionRouteParams();
-        $options    = $halCollection->getCollectionRouteOptions();
-
-        $collection->setItemCountPerPage($pageSize);
-        $collection->setCurrentPageNumber($page);
-
-        $count = count($collection);
-        if (!$count) {
-            return true;
-        }
-
-        if ($page < 1 || $page > $count) {
-            return new ApiProblem(409, 'Invalid page provided');
-        }
-
-        $links = $halCollection->getLinks();
-        $next  = ($page < $count) ? $page + 1 : false;
-        $prev  = ($page > 1)      ? $page - 1 : false;
-
-        // self link
-        $link = new Link('self');
-        $link->setRoute($route);
-        $link->setRouteParams($params);
-        $link->setRouteOptions(ArrayUtils::merge($options, [
-            'query' => ['page' => $page],
-        ]));
-        $links->add($link, true);
-
-        // first link
-        $link = new Link('first');
-        $link->setRoute($route);
-        $link->setRouteParams($params);
-        $link->setRouteOptions(ArrayUtils::merge($options, [
-            'query' => ['page' => null],
-        ]));
-        $links->add($link);
-
-        // last link
-        $link = new Link('last');
-        $link->setRoute($route);
-        $link->setRouteParams($params);
-        $link->setRouteOptions(ArrayUtils::merge($options, [
-            'query' => ['page' => $count],
-        ]));
-        $links->add($link);
-
-        // prev link
-        if ($prev) {
-            $link = new Link('prev');
-            $link->setRoute($route);
-            $link->setRouteParams($params);
-            $link->setRouteOptions(ArrayUtils::merge($options, [
-                'query' => ['page' => $prev],
-            ]));
-            $links->add($link);
-        }
-
-        // next link
-        if ($next) {
-            $link = new Link('next');
-            $link->setRoute($route);
-            $link->setRouteParams($params);
-            $link->setRouteOptions(ArrayUtils::merge($options, [
-                'query' => ['page' => $next],
-            ]));
-            $links->add($link);
-        }
-
-        return true;
+        return $this->getPaginationInjector()->injectPaginationLinks($halCollection);
     }
 
     /**
@@ -1292,7 +1247,7 @@ class Hal extends AbstractHelper implements
             return $link;
         }
 
-        if (!$metadata->hasRoute()) {
+        if (! $metadata->hasRoute()) {
             throw new Exception\RuntimeException(sprintf(
                 'Unable to create a self link for resource of type "%s"; metadata does not contain a route or a url',
                 get_class($object)
