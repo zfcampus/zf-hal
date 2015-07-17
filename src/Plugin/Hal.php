@@ -1052,7 +1052,6 @@ class Hal extends AbstractHelper implements
         $entityRouteParams    = $halCollection->getEntityRouteParams();
         $entityRouteOptions   = $halCollection->getEntityRouteOptions();
         $metadataMap          = $this->getMetadataMap();
-        $entityMetadata       = null;
 
         foreach ($halCollection->getCollection() as $entity) {
             $eventParams = new ArrayObject([
