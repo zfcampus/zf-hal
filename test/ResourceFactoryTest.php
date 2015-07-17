@@ -96,9 +96,7 @@ class ResourceFactoryTest extends TestCase
                     'test-1' => [$callback, 'callback'],
                     'test-2' => function ($expected) use ($object, $test) {
                         $test->assertSame($expected, $object);
-                        if (version_compare(PHP_VERSION, '5.4.0') >= 0) {
-                            $test->assertSame($object, $this);
-                        }
+                        $test->assertSame($object, $this);
 
                         return 'closure-param';
                     },
