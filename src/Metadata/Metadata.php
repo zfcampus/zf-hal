@@ -6,10 +6,10 @@
 
 namespace ZF\Hal\Metadata;
 
+use Zend\Filter\FilterChain;
 use Zend\Stdlib\Extractor\ExtractionInterface;
 use Zend\Stdlib\Hydrator\HydratorPluginManager;
 use ZF\Hal\Exception;
-use Zend\Filter\FilterChain;
 
 class Metadata
 {
