@@ -26,7 +26,6 @@ use ZF\Hal\Entity;
 use ZF\Hal\EntityHydratorManager;
 use ZF\Hal\Exception;
 use ZF\Hal\Extractor\EntityExtractor;
-use ZF\Hal\Extractor\LinkCollectionExtractor;
 use ZF\Hal\Extractor\LinkCollectionExtractorInterface;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
@@ -110,7 +109,7 @@ class Hal extends AbstractHelper implements
     protected $urlHelper;
 
     /**
-     * @var LinkCollectionExtractor
+     * @var LinkCollectionExtractorInterface
      */
     protected $linkCollectionExtractor;
 
