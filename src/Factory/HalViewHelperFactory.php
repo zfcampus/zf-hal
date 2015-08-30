@@ -60,6 +60,9 @@ class HalViewHelperFactory implements FactoryInterface
 
         $helper->setRenderEmbeddedEntities($rendererOptions->getRenderEmbeddedEntities());
         $helper->setRenderCollections($rendererOptions->getRenderEmbeddedCollections());
+        $helper->setUseResourceLinksInsteadOfEmbeddedEntityLink(
+            $rendererOptions->getUseResourceLinksInsteadOfEmbeddedEntityLink()
+        );
 
         $hydratorMap = $rendererOptions->getHydrators();
         foreach ($hydratorMap as $class => $hydratorServiceName) {

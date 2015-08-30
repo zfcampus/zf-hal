@@ -26,6 +26,14 @@ class RendererOptions extends AbstractOptions
     protected $renderEmbeddedCollections = true;
 
     /**
+     * When set to true embedded entities will will be created as _links members instead of inside _embedded.
+     * This option is only in effect when @see renderEmbeddedEntities is false. Defaulted to false for non-breaking
+     * compatibility concerns
+     * @var bool
+     */
+    protected $useResourceLinksInsteadOfEmbeddedEntityLink = false;
+
+    /**
      * @var array
      */
     protected $hydrators = [];
@@ -55,7 +63,7 @@ class RendererOptions extends AbstractOptions
     }
 
     /**
-     * @return string
+     * @return bool
      */
     public function getRenderEmbeddedEntities()
     {
@@ -71,11 +79,27 @@ class RendererOptions extends AbstractOptions
     }
 
     /**
-     * @return string
+     * @return bool
      */
     public function getRenderEmbeddedCollections()
     {
         return $this->renderEmbeddedCollections;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getUseResourceLinksInsteadOfEmbeddedEntityLink()
+    {
+        return $this->useResourceLinksInsteadOfEmbeddedEntityLink;
+    }
+
+    /**
+     * @param bool $flag
+     */
+    public function setUseResourceLinksInsteadOfEmbeddedEntityLink($flag)
+    {
+        $this->useResourceLinksInsteadOfEmbeddedEntityLink = (bool) $flag;
     }
 
     /**
