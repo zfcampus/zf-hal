@@ -665,7 +665,12 @@ class Hal extends AbstractHelper implements
         }
 
         if (! $renderEntity || ($maxDepth !== null && $depth > $maxDepth)) {
-            $entity = [];
+            $id = $this->getIdFromEntity($entity);
+            if($id){
+                $entity = ['id' => $id];
+            }else{
+                $entity = [];
+            }
         }
 
         if (!is_array($entity)) {
