@@ -6,8 +6,8 @@
 
 namespace ZF\Hal;
 
-use Zend\Stdlib\Extractor\ExtractionInterface;
-use Zend\Stdlib\Hydrator\HydratorPluginManager;
+use Zend\Hydrator\ExtractionInterface;
+use Zend\Hydrator\HydratorPluginManager;
 use ZF\Hal\Metadata\MetadataMap;
 
 class EntityHydratorManager
