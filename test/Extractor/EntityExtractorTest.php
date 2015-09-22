@@ -7,7 +7,7 @@
 namespace ZFTest\Hal\Extractor;
 
 use PHPUnit_Framework_TestCase as TestCase;
-use Zend\Stdlib\Hydrator\ObjectProperty;
+use Zend\Hydrator\ObjectProperty;
 use ZF\Hal\Extractor\EntityExtractor;
 use ZFTest\Hal\Plugin\TestAsset;
 

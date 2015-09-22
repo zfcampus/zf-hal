@@ -8,7 +8,7 @@ namespace ZF\Hal\Factory;
 
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\Stdlib\Hydrator\HydratorPluginManager;
+use Zend\Hydrator\HydratorPluginManager;
 use ZF\Hal\Metadata;
 
 class MetadataMapFactory implements FactoryInterface

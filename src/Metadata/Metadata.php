@@ -6,8 +6,8 @@
 
 namespace ZF\Hal\Metadata;
 
-use Zend\Stdlib\Extractor\ExtractionInterface;
-use Zend\Stdlib\Hydrator\HydratorPluginManager;
+use Zend\Hydrator\ExtractionInterface;
+use Zend\Hydrator\HydratorPluginManager;
 use ZF\Hal\Exception;
 use Zend\Filter\FilterChain;
 
@@ -424,7 +424,7 @@ class Metadata
                 $type = gettype($hydrator);
             }
             throw new Exception\InvalidArgumentException(sprintf(
-                'Hydrator class must implement Zend\Stdlib\Extractor\ExtractionInterface; received "%s"',
+                'Hydrator class must implement Zend\Hydrator\ExtractionInterface; received "%s"',
                 $type
             ));
         }

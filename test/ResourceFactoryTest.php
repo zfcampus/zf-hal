@@ -7,7 +7,7 @@
 namespace ZFTest\Hal;
 
 use PHPUnit_Framework_TestCase as TestCase;
-use Zend\Stdlib\Hydrator\HydratorPluginManager;
+use Zend\Hydrator\HydratorPluginManager;
 use ZF\Hal\EntityHydratorManager;
 use ZF\Hal\Extractor\EntityExtractor;
 use ZF\Hal\Metadata\MetadataMap;
@@ -28,7 +28,7 @@ class ResourceFactoryTest extends TestCase
 
         $metadata = new MetadataMap([
             'ZFTest\Hal\Plugin\TestAsset\Entity' => [
-                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator'   => 'Zend\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
                 'links'      => [
                     [
@@ -90,7 +90,7 @@ class ResourceFactoryTest extends TestCase
 
         $metadata = new MetadataMap([
             'ZFTest\Hal\Plugin\TestAsset\Entity' => [
-                'hydrator'     => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator'     => 'Zend\Hydrator\ObjectProperty',
                 'route_name'   => 'hostname/resource',
                 'route_params' => [
                     'test-1' => [$callback, 'callback'],

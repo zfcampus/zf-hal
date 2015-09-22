@@ -9,7 +9,7 @@ namespace ZFTest\Hal\Factory;
 use PHPUnit_Framework_TestCase as TestCase;
 use ReflectionObject;
 use Zend\ServiceManager\ServiceManager;
-use Zend\Stdlib\Hydrator\HydratorPluginManager;
+use Zend\Hydrator\HydratorPluginManager;
 use Zend\View\Helper\ServerUrl;
 use Zend\View\Helper\Url;
 use ZF\Hal\Factory\HalViewHelperFactory;

@@ -6,7 +6,7 @@
 
 namespace ZF\Hal\Metadata;
 
-use Zend\Stdlib\Hydrator\HydratorPluginManager;
+use Zend\Hydrator\HydratorPluginManager;
 use ZF\Hal\Exception;
 
 class MetadataMap
