@@ -40,19 +40,19 @@ class MetadataMapFactoryTest extends TestCase
         $config = [
             'metadata_map' => [
                 'ZFTest\Hal\Plugin\TestAsset\Entity' => [
-                    'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                    'hydrator'   => 'Zend\Hydrator\ObjectProperty',
                     'route_name' => 'hostname/resource',
                     'route_identifier_name' => 'id',
                     'entity_identifier_name' => 'id',
                 ],
                 'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntity' => [
-                    'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                    'hydrator' => 'Zend\Hydrator\ObjectProperty',
                     'route'    => 'hostname/embedded',
                     'route_identifier_name' => 'id',
                     'entity_identifier_name' => 'id',
                 ],
                 'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithCustomIdentifier' => [
-                    'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                    'hydrator'        => 'Zend\Hydrator\ObjectProperty',
                     'route'           => 'hostname/embedded_custom',
                     'route_identifier_name' => 'custom_id',
                     'entity_identifier_name' => 'custom_id',

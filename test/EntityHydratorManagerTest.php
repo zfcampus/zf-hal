@@ -7,7 +7,7 @@
 namespace ZFTest\Hal\Extractor;
 
 use PHPUnit_Framework_TestCase as TestCase;
-use Zend\Stdlib\Hydrator\HydratorPluginManager;
+use Zend\Hydrator\HydratorPluginManager;
 use ZF\Hal\EntityHydratorManager;
 use ZF\Hal\Metadata\MetadataMap;
 use ZFTest\Hal\Plugin\TestAsset;
