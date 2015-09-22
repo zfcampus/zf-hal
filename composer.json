@@ -36,7 +36,7 @@
         "zendframework/zend-paginator": "~2.3",
         "zendframework/zend-uri": "~2.3",
         "zendframework/zend-view": "~2.3",
-        "zendframework/zend-stdlib": "~2.3"
+        "zendframework/zend-stdlib": ">=2.3.0,<2.7.0"
     },
     "require-dev": {
         "phpunit/PHPUnit": "4.7.*",
