@@ -31,6 +31,8 @@ use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Link\LinkCollectionAwareInterface;
 use ZF\Hal\Link\PaginationInjector;
 use ZF\Hal\Link\PaginationInjectorInterface;
+use ZF\Hal\Link\SelfLinkInjector;
+use ZF\Hal\Link\SelfLinkInjectorInterface;
 use ZF\Hal\Metadata\Metadata;
 use ZF\Hal\Metadata\MetadataMap;
 use ZF\Hal\Resource;
@@ -96,6 +98,11 @@ class Hal extends AbstractHelper implements
      * @var PaginationInjectorInterface
      */
     protected $paginationInjector;
+
+    /**
+     * @var SelfLinkInjectorInterface
+     */
+    protected $selfLinkInjector;
 
     /**
      * @var ServerUrl
@@ -326,6 +333,27 @@ class Hal extends AbstractHelper implements
     public function setPaginationInjector(PaginationInjectorInterface $injector)
     {
         $this->paginationInjector = $injector;
+        return $this;
+    }
+
+    /**
+     * @return SelfLinkInjectorInterface
+     */
+    public function getSelfLinkInjector()
+    {
+        if (! $this->selfLinkInjector instanceof SelfLinkInjectorInterface) {
+            $this->setSelfLinkInjector(new SelfLinkInjector());
+        }
+        return $this->selfLinkInjector;
+    }
+
+    /**
+     * @param  SelfLinkInjectorInterface $injector
+     * @return self
+     */
+    public function setSelfLinkInjector(SelfLinkInjectorInterface $injector)
+    {
+        $this->selfLinkInjector = $injector;
         return $this;
     }
 
@@ -942,36 +970,7 @@ class Hal extends AbstractHelper implements
      */
     public function injectSelfLink(LinkCollectionAwareInterface $resource, $route, $routeIdentifier = 'id')
     {
-        $links = $resource->getLinks();
-        if ($links->has('self')) {
-            return;
-        }
-
-        $self = new Link('self');
-        $self->setRoute($route);
-
-        $routeParams  = [];
-        $routeOptions = [];
-        if ($resource instanceof Entity
-            && null !== $resource->id
-        ) {
-            $routeParams = [
-                $routeIdentifier => $resource->id,
-            ];
-        }
-        if ($resource instanceof Collection) {
-            $routeParams  = $resource->getCollectionRouteParams();
-            $routeOptions = $resource->getCollectionRouteOptions();
-        }
-
-        if (!empty($routeParams)) {
-            $self->setRouteParams($routeParams);
-        }
-        if (!empty($routeOptions)) {
-            $self->setRouteOptions($routeOptions);
-        }
-
-        $links->add($self, true);
+        $this->getSelfLinkInjector()->injectSelfLink($resource, $route, $routeIdentifier);
     }
 
     /**
