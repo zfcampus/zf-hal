@@ -19,6 +19,7 @@ use ZF\Hal\Entity;
 use ZF\Hal\Extractor\LinkCollectionExtractor;
 use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Link\Link;
+use ZF\Hal\Link\LinkUrlBuilder;
 use ZF\Hal\Plugin\Hal as HalHelper;
 use ZF\Hal\View\HalJsonModel;
 use ZF\Hal\View\HalJsonRenderer;
@@ -48,11 +49,12 @@ class ChildEntitiesIntegrationTest extends TestCase
         $serverUrlHelper->setScheme('http');
         $serverUrlHelper->setHost('localhost.localdomain');
 
-        $linksHelper = new HalHelper();
-        $linksHelper->setUrlHelper($urlHelper);
-        $linksHelper->setServerUrlHelper($serverUrlHelper);
+        $linkUrlBuilder = new LinkUrlBuilder($serverUrlHelper, $urlHelper);
 
-        $linkExtractor = new LinkExtractor($serverUrlHelper, $urlHelper);
+        $linksHelper = new HalHelper();
+        $linksHelper->setLinkUrlBuilder($linkUrlBuilder);
+
+        $linkExtractor = new LinkExtractor($linkUrlBuilder);
         $linkCollectionExtractor = new LinkCollectionExtractor($linkExtractor);
         $linksHelper->setLinkCollectionExtractor($linkCollectionExtractor);
 

@@ -55,11 +55,14 @@ return [
     ],
     'service_manager' => [
         'factories' => [
-            'ZF\Hal\HalConfig'       => 'ZF\Hal\Factory\HalConfigFactory',
-            'ZF\Hal\JsonRenderer'    => 'ZF\Hal\Factory\HalJsonRendererFactory',
-            'ZF\Hal\JsonStrategy'    => 'ZF\Hal\Factory\HalJsonStrategyFactory',
-            'ZF\Hal\MetadataMap'     => 'ZF\Hal\Factory\MetadataMapFactory',
-            'ZF\Hal\RendererOptions' => 'ZF\Hal\Factory\RendererOptionsFactory',
+            'ZF\Hal\Extractor\LinkExtractor' => 'ZF\Hal\Factory\LinkExtractorFactory',
+            'ZF\Hal\Extractor\LinkCollectionExtractor' => 'ZF\Hal\Factory\LinkCollectionExtractorFactory',
+            'ZF\Hal\HalConfig'           => 'ZF\Hal\Factory\HalConfigFactory',
+            'ZF\Hal\JsonRenderer'        => 'ZF\Hal\Factory\HalJsonRendererFactory',
+            'ZF\Hal\JsonStrategy'        => 'ZF\Hal\Factory\HalJsonStrategyFactory',
+            'ZF\Hal\Link\LinkUrlBuilder' => 'ZF\Hal\Factory\LinkUrlBuilderFactory',
+            'ZF\Hal\MetadataMap'         => 'ZF\Hal\Factory\MetadataMapFactory',
+            'ZF\Hal\RendererOptions'     => 'ZF\Hal\Factory\RendererOptionsFactory',
         ],
     ],
     'view_helpers' => [

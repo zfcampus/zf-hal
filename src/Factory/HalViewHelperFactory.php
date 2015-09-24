@@ -9,8 +9,6 @@ namespace ZF\Hal\Factory;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use ZF\Hal\Exception;
-use ZF\Hal\Extractor\LinkCollectionExtractor;
-use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Plugin;
 
 class HalViewHelperFactory implements FactoryInterface
@@ -22,27 +20,19 @@ class HalViewHelperFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
         $services        = $serviceLocator->getServiceLocator();
-        $halConfig       = $services->get('ZF\Hal\HalConfig');
+
         /* @var $rendererOptions \ZF\Hal\RendererOptions */
         $rendererOptions = $services->get('ZF\Hal\RendererOptions');
         $metadataMap     = $services->get('ZF\Hal\MetadataMap');
         $hydrators       = $metadataMap->getHydratorManager();
 
-        $serverUrlHelper = $serviceLocator->get('ServerUrl');
-        if (isset($halConfig['options']['use_proxy'])) {
-            $serverUrlHelper->setUseProxy($halConfig['options']['use_proxy']);
-        }
-
-        $urlHelper = $serviceLocator->get('Url');
-
         $helper = new Plugin\Hal($hydrators);
-        $helper
-            ->setMetadataMap($metadataMap)
-            ->setServerUrlHelper($serverUrlHelper)
-            ->setUrlHelper($urlHelper);
+        $helper->setMetadataMap($metadataMap);
 
-        $linkExtractor = new LinkExtractor($serverUrlHelper, $urlHelper);
-        $linkCollectionExtractor = new LinkCollectionExtractor($linkExtractor);
+        $linkUrlBuilder = $services->get('ZF\Hal\Link\LinkUrlBuilder');
+        $helper->setLinkUrlBuilder($linkUrlBuilder);
+
+        $linkCollectionExtractor = $services->get('ZF\Hal\Extractor\LinkCollectionExtractor');
         $helper->setLinkCollectionExtractor($linkCollectionExtractor);
 
         $defaultHydrator = $rendererOptions->getDefaultHydrator();

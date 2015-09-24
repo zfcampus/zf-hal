@@ -17,8 +17,6 @@ use Zend\Mvc\Controller\Plugin\PluginInterface as ControllerPluginInterface;
 use Zend\Paginator\Paginator;
 use Zend\Stdlib\DispatchableInterface;
 use Zend\View\Helper\AbstractHelper;
-use Zend\View\Helper\ServerUrl;
-use Zend\View\Helper\Url;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
@@ -29,6 +27,7 @@ use ZF\Hal\Extractor\LinkCollectionExtractorInterface;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Link\LinkCollectionAwareInterface;
+use ZF\Hal\Link\LinkUrlBuilder;
 use ZF\Hal\Link\PaginationInjector;
 use ZF\Hal\Link\PaginationInjectorInterface;
 use ZF\Hal\Metadata\Metadata;
@@ -98,14 +97,9 @@ class Hal extends AbstractHelper implements
     protected $paginationInjector;
 
     /**
-     * @var ServerUrl
+     * @var LinkUrlBuilder
      */
-    protected $serverUrlHelper;
-
-    /**
-     * @var Url
-     */
-    protected $urlHelper;
+    protected $linkUrlBuilder;
 
     /**
      * @var LinkCollectionExtractor
@@ -309,6 +303,16 @@ class Hal extends AbstractHelper implements
     }
 
     /**
+     * @param  LinkUrlBuilder $builder
+     * @return self
+     */
+    public function setLinkUrlBuilder(LinkUrlBuilder $builder)
+    {
+        $this->linkUrlBuilder = $builder;
+        return $this;
+    }
+
+    /**
      * @return PaginationInjectorInterface
      */
     public function getPaginationInjector()
@@ -326,26 +330,6 @@ class Hal extends AbstractHelper implements
     public function setPaginationInjector(PaginationInjectorInterface $injector)
     {
         $this->paginationInjector = $injector;
-        return $this;
-    }
-
-    /**
-     * @param ServerUrl $helper
-     * @return self
-     */
-    public function setServerUrlHelper(ServerUrl $helper)
-    {
-        $this->serverUrlHelper = $helper;
-        return $this;
-    }
-
-    /**
-     * @param Url $helper
-     * @return self
-     */
-    public function setUrlHelper(Url $helper)
-    {
-        $this->urlHelper = $helper;
         return $this;
     }
 
@@ -751,18 +735,12 @@ class Hal extends AbstractHelper implements
         ]);
         $events->trigger(__FUNCTION__, $this, $eventParams);
 
-        $path = call_user_func(
-            $this->urlHelper,
-            $eventParams['route'],
+        return $this->linkUrlBuilder->buildLinkUrl(
+            $route,
             $params->getArrayCopy(),
+            [],
             $reUseMatchedParams
         );
-
-        if (substr($path, 0, 4) == 'http') {
-            return $path;
-        }
-
-        return call_user_func($this->serverUrlHelper, $path);
     }
 
     /**

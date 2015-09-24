@@ -19,11 +19,11 @@ use Zend\View\Helper\Url as UrlHelper;
 use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
-use ZF\Hal\EntityHydratorManager;
 use ZF\Hal\Extractor\LinkCollectionExtractor;
 use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
+use ZF\Hal\Link\LinkUrlBuilder;
 use ZF\Hal\Metadata\MetadataMap;
 use ZF\Hal\Plugin\Hal as HalHelper;
 use ZFTest\Hal\TestAsset as HalTestAsset;
@@ -111,10 +111,11 @@ class HalTest extends TestCase
 
         $this->plugin = $plugin = new HalHelper();
         $plugin->setController($controller);
-        $plugin->setUrlHelper($urlHelper);
-        $plugin->setServerUrlHelper($serverUrlHelper);
 
-        $linkExtractor = new LinkExtractor($serverUrlHelper, $urlHelper);
+        $linkUrlBuilder = new LinkUrlBuilder($serverUrlHelper, $urlHelper);
+        $plugin->setLinkUrlBuilder($linkUrlBuilder);
+
+        $linkExtractor = new LinkExtractor($linkUrlBuilder);
         $linkCollectionExtractor = new LinkCollectionExtractor($linkExtractor);
         $plugin->setLinkCollectionExtractor($linkCollectionExtractor);
     }
