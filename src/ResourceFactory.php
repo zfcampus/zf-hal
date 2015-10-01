@@ -66,7 +66,12 @@ class ResourceFactory
         $id = ($entityIdentifierName) ? $data[$entityIdentifierName]: null;
 
         if (! $renderEmbeddedEntities) {
-            $object = [];
+            if($id){
+                $object = ['id' => $id];
+            }else{
+                $object = [];
+            }
+
         }
 
         $halEntity = new Entity($object, $id);
