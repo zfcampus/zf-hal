@@ -173,6 +173,10 @@ class ResourceFactory
             $params = array_merge($params, [$routeIdentifierName => $id]);
         }
 
+        if($relation !== 'self' && $id){
+            $link->setProps(array_merge($link->getProps(),['id' => $id]));
+        }
+
         $link->setRoute($metadata->getRoute(), $params, $metadata->getRouteOptions());
         return $link;
     }
