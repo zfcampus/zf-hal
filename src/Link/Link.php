@@ -143,6 +143,7 @@ class Link
      * @param  string $route
      * @param  null|array|Traversable $params
      * @param  null|array|Traversable $options
+     * @throws DomainException
      * @return self
      */
     public function setRoute($route, $params = null, $options = null)
@@ -168,6 +169,7 @@ class Link
      * Set route assembly options
      *
      * @param  array|Traversable $options
+     * @throws Exception\InvalidArgumentException
      * @return self
      */
     public function setRouteOptions($options)
@@ -192,6 +194,7 @@ class Link
      * Set route assembly parameters/substitutions
      *
      * @param  array|Traversable $params
+     * @throws Exception\InvalidArgumentException
      * @return self
      */
     public function setRouteParams($params)
@@ -216,6 +219,8 @@ class Link
      * Set an explicit URL for the link relation
      *
      * @param  string $url
+     * @throws Exception\InvalidArgumentException
+     * @throws DomainException
      * @return self
      */
     public function setUrl($url)

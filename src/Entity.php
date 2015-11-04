@@ -15,6 +15,9 @@ class Entity implements Link\LinkCollectionAwareInterface
      */
     protected $links;
 
+    /**
+     * @var object|array
+     */
     protected $entity;
 
     /**
@@ -36,6 +39,7 @@ class Entity implements Link\LinkCollectionAwareInterface
      * Retrieve properties
      *
      * @param  string $name
+     * @throws Exception\InvalidArgumentException
      * @return mixed
      */
     public function &__get($name)

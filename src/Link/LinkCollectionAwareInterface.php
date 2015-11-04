@@ -8,6 +8,13 @@ namespace ZF\Hal\Link;
 
 interface LinkCollectionAwareInterface
 {
+    /**
+     * @param LinkCollection $links
+     */
     public function setLinks(LinkCollection $links);
+
+    /**
+     * @return LinkCollection
+     */
     public function getLinks();
 }
