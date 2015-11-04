@@ -74,6 +74,8 @@ class Link
                 __METHOD__
             ));
         }
+
+        /** @var Link $link */
         $link = new static($spec['rel']);
 
         if (isset($spec['props'])

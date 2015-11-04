@@ -8,6 +8,7 @@ namespace ZF\Hal\Factory;
 
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\View\Renderer\JsonRenderer;
 use ZF\Hal\View;
 
 class HalJsonStrategyFactory implements FactoryInterface
@@ -18,6 +19,7 @@ class HalJsonStrategyFactory implements FactoryInterface
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
+        /** @var JsonRenderer $renderer */
         $renderer = $serviceLocator->get('ZF\Hal\JsonRenderer');
 
         return new View\HalJsonStrategy($renderer);

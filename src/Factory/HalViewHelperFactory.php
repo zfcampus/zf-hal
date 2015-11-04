@@ -17,6 +17,7 @@ class HalViewHelperFactory implements FactoryInterface
 {
     /**
      * @param  ServiceLocatorInterface $serviceLocator
+     * @throws Exception\DomainException
      * @return Plugin\Hal
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
