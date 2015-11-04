@@ -15,6 +15,9 @@ class Entity implements Link\LinkCollectionAwareInterface
      */
     protected $links;
 
+    /**
+     * @var object|array
+     */
     protected $entity;
 
     /**
