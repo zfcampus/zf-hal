@@ -66,7 +66,12 @@ class ResourceFactory
         $id = ($entityIdentifierName) ? $data[$entityIdentifierName]: null;
 
         if (! $renderEmbeddedEntities) {
-            $object = [];
+            if($id){
+                $object = ['id' => $id];
+            }else{
+                $object = [];
+            }
+
         }
 
         $halEntity = new Entity($object, $id);
@@ -166,6 +171,10 @@ class ResourceFactory
 
         if ($routeIdentifierName) {
             $params = array_merge($params, [$routeIdentifierName => $id]);
+        }
+
+        if($relation !== 'self' && $id){
+            $link->setProps(array_merge($link->getProps(),['id' => $id]));
         }
 
         $link->setRoute($metadata->getRoute(), $params, $metadata->getRouteOptions());

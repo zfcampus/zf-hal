@@ -78,6 +78,13 @@ class Hal extends AbstractHelper implements
     protected $renderCollections = true;
 
     /**
+     * When set to true embedded entities will will be created as _links members instead of inside _embedded.
+     * This option is only in effect when @see renderEmbeddedEntities is false
+     * @var bool
+     */
+    protected $useResourceLinksInsteadOfEmbeddedEntityLink = false;
+
+    /**
      * @var EventManagerInterface
      */
     protected $events;
@@ -479,6 +486,26 @@ class Hal extends AbstractHelper implements
     }
 
     /**
+     * Get boolean to use _links instead of embedding non-rendered (link-only) entities
+     *
+     * @return bool
+     */
+    public function getUseResourceLinksInsteadOfEmbeddedEntityLink()
+    {
+        return $this->useResourceLinksInsteadOfEmbeddedEntityLink;
+    }
+
+    /**
+     * Set boolean to use _links instead of embedding non-rendered (link-only) entities
+     *
+     * @param bool $flag
+     */
+    public function setUseResourceLinksInsteadOfEmbeddedEntityLink($flag)
+    {
+        $this->useResourceLinksInsteadOfEmbeddedEntityLink = (bool) $flag;
+    }
+
+    /**
      * Retrieve a hydrator for a given entity
      *
      * Please use getHydratorForEntity().
@@ -665,7 +692,12 @@ class Hal extends AbstractHelper implements
         }
 
         if (! $renderEntity || ($maxDepth !== null && $depth > $maxDepth)) {
-            $entity = [];
+            $id = $this->getIdFromEntity($entity);
+            if($id){
+                $entity = ['id' => $id];
+            }else{
+                $entity = [];
+            }
         }
 
         if (!is_array($entity)) {
@@ -673,16 +705,32 @@ class Hal extends AbstractHelper implements
         }
 
         foreach ($entity as $key => $value) {
+            $valueMetadata = null;
             if (is_object($value) && $metadataMap->has($value)) {
+                $valueMetadata = $metadataMap->get($value);
                 $value = $this->getResourceFactory()->createEntityFromMetadata(
                     $value,
-                    $metadataMap->get($value),
+                    $valueMetadata,
                     $this->getRenderEmbeddedEntities()
                 );
             }
 
             if ($value instanceof Entity) {
-                $this->extractEmbeddedEntity($entity, $key, $value, $depth + 1, $maxDepth);
+                if (
+                    ( ! $this->getRenderEmbeddedEntities() && $this->getUseResourceLinksInsteadOfEmbeddedEntityLink())
+                    || ($this->getRenderEmbeddedEntities() && $depth >= $maxDepth)
+                ) {
+                    $value = $this->getResourceFactory()->marshalLinkFromMetadata(
+                        $valueMetadata,
+                        $value,
+                        $value->id,
+                        $valueMetadata->getRouteIdentifierName(),
+                        $key
+                    );
+                } else {
+                    $this->extractEmbeddedEntity($entity, $key, $value, $depth + 1, $maxDepth);
+                }
+
             }
             if ($value instanceof Collection) {
                 $this->extractEmbeddedCollection($entity, $key, $value, $depth + 1, $maxDepth);
