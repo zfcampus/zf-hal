@@ -716,18 +716,21 @@ class Hal extends AbstractHelper implements
             }
 
             if ($value instanceof Entity) {
-                if($this->getRenderEmbeddedEntities() ||
-                    (!$this->getRenderEmbeddedEntities() && !$this->getUseResourceLinksInsteadOfEmbeddedEntityLink()))
-                {
-                    $this->extractEmbeddedEntity($entity, $key, $value, $depth + 1, $maxDepth);
-                }else{
+                if (
+                    ( ! $this->getRenderEmbeddedEntities() && $this->getUseResourceLinksInsteadOfEmbeddedEntityLink())
+                    || ($this->getRenderEmbeddedEntities() && $depth >= $maxDepth)
+                ) {
                     $value = $this->getResourceFactory()->marshalLinkFromMetadata(
                         $valueMetadata,
                         $value,
                         $value->id,
                         $valueMetadata->getRouteIdentifierName(),
-                        $key);
+                        $key
+                    );
+                } else {
+                    $this->extractEmbeddedEntity($entity, $key, $value, $depth + 1, $maxDepth);
                 }
+
             }
             if ($value instanceof Collection) {
                 $this->extractEmbeddedCollection($entity, $key, $value, $depth + 1, $maxDepth);
