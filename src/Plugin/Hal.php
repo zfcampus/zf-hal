@@ -386,14 +386,6 @@ class Hal extends AbstractHelper implements
      *
      * @param  ExtractionInterface $hydrator
      * @return self
-    return $this;
-    }
-
-    /**
-     * Set the default hydrator to use if none specified for a class.
-     *
-     * @param  ExtractionInterface $hydrator
-     * @return self
      */
     public function setDefaultHydrator(ExtractionInterface $hydrator)
     {
