@@ -81,9 +81,9 @@ class HalJsonStrategy extends JsonStrategy
         $contentType = $this->contentType;
         $response    = $e->getResponse();
 
-        if ($model instanceof ApiProblemModel){
+        if ($model instanceof ApiProblemModel) {
             $contentType = 'application/problem+json';
-        } else if ($model instanceof HalJsonModel
+        } elseif ($model instanceof HalJsonModel
             && ($model->isCollection() || $model->isEntity())
         ) {
             $contentType = 'application/hal+json';
