@@ -121,7 +121,7 @@ class MetadataMap
      *
      * Lazy-loads the Metadata instance if one is not present for a matching class.
      *
-     * @param  object|string $class Object or classname for which to retrieve metadata
+     * @param  object|string $class Object or class name for which to retrieve metadata
      * @return Metadata
      */
     public function get($class)

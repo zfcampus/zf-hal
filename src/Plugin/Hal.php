@@ -8,6 +8,7 @@ namespace ZF\Hal\Plugin;
 
 use ArrayObject;
 use Countable;
+use Zend\EventManager\EventInterface;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerInterface;
@@ -108,7 +109,7 @@ class Hal extends AbstractHelper implements
     protected $urlHelper;
 
     /**
-     * @var LinkCollectionExtractor
+     * @var LinkCollectionExtractorInterface
      */
     protected $linkCollectionExtractor;
 
@@ -175,7 +176,7 @@ class Hal extends AbstractHelper implements
         ]);
         $this->events = $events;
 
-        $events->attach('getIdFromEntity', function ($e) {
+        $events->attach('getIdFromEntity', function (EventInterface $e) {
             $entity = $e->getParam('entity');
 
             // Found id in array
@@ -377,14 +378,6 @@ class Hal extends AbstractHelper implements
     public function addHydrator($class, $hydrator)
     {
         $this->getEntityHydratorManager()->addHydrator($class, $hydrator);
-        return $this;
-    }
-
-    /**
-     * Set the default hydrator to use if none specified for a class.
-     *
-     * @param  ExtractionInterface $hydrator
-     * @return self
         return $this;
     }
 
@@ -603,8 +596,9 @@ class Hal extends AbstractHelper implements
      * method.
      *
      * @deprecated
-     * @param  Resource $halResource
+     * @param \ZF\Hal\Resource $halResource
      * @param  bool $renderResource
+     * @param int $depth
      * @return array
      */
     public function renderResource(Resource $halResource, $renderResource = true, $depth = 0)

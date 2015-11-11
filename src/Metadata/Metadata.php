@@ -75,7 +75,7 @@ class Metadata
     protected $links = [];
 
     /**
-     * Whether to force the existance of a "self" link. The HAl specification encourages it but it is not strictly
+     * Whether to force the existence of a "self" link. The HAl specification encourages it but it is not strictly
      * required.
      *
      * @var bool
@@ -591,7 +591,7 @@ class Metadata
     }
 
     /**
-     * Set whether to force the existance of "self" links.
+     * Set whether to force the existence of "self" links.
      *
      * @param boolean $forceSelfLink A truthy value
      * @return $this
