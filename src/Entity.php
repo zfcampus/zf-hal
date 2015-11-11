@@ -8,6 +8,9 @@ namespace ZF\Hal;
 
 class Entity implements Link\LinkCollectionAwareInterface
 {
+    /**
+     * @var mixed
+     */
     protected $id;
 
     /**

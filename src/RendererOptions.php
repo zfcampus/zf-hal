@@ -87,7 +87,7 @@ class RendererOptions extends AbstractOptions
     }
 
     /**
-     * @return string
+     * @return array $hydrators
      */
     public function getHydrators()
     {

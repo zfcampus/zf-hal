@@ -8,6 +8,7 @@ namespace ZF\Hal;
 
 use Traversable;
 use Zend\Stdlib\ArrayUtils;
+use Zend\Paginator\Paginator;
 
 /**
  * Model a collection for use with HAL payloads
@@ -19,10 +20,10 @@ class Collection implements Link\LinkCollectionAwareInterface
      *
      * @var array
      */
-    protected $attributes = array();
+    protected $attributes = [];
 
     /**
-     * @var array|Traversable|\Zend\Paginator\Paginator
+     * @var array|Traversable|Paginator
      */
     protected $collection;
 
@@ -41,12 +42,12 @@ class Collection implements Link\LinkCollectionAwareInterface
     /**
      * @var array
      */
-    protected $collectionRouteOptions = array();
+    protected $collectionRouteOptions = [];
 
     /**
      * @var array
      */
-    protected $collectionRouteParams = array();
+    protected $collectionRouteParams = [];
 
     /**
      * Name of the field representing the identifier
@@ -94,15 +95,15 @@ class Collection implements Link\LinkCollectionAwareInterface
     /**
      * @var array
      */
-    protected $entityRouteOptions = array();
+    protected $entityRouteOptions = [];
 
     /**
      * @var array
      */
-    protected $entityRouteParams = array();
+    protected $entityRouteParams = [];
 
     /**
-     * @param  array|Traversable|\Zend\Paginator\Paginator $collection
+     * @param  array|Traversable|Paginator $collection
      * @param  string $entityRoute
      * @param  array|Traversable $entityRouteParams
      * @param  array|Traversable $entityRouteOptions
@@ -135,8 +136,8 @@ class Collection implements Link\LinkCollectionAwareInterface
      * Proxy to properties to allow read access
      *
      * @param  string $name
-     * @throws \Exception
      * @return mixed
+     * @throws \Exception
      */
     public function __get($name)
     {
@@ -228,7 +229,7 @@ class Collection implements Link\LinkCollectionAwareInterface
     /**
      * Set the route identifier name
      *
-     * @param string $identifier
+     * @param  string $identifier
      * @return self
      */
     public function setRouteIdentifierName($identifier)
@@ -238,9 +239,9 @@ class Collection implements Link\LinkCollectionAwareInterface
     }
 
     /**
-     * Set the route identifier name
+     * Set the entity identifier name
      *
-     * @param string $identifier
+     * @param  string $identifier
      * @return self
      */
     public function setEntityIdentifierName($identifier)
@@ -306,9 +307,9 @@ class Collection implements Link\LinkCollectionAwareInterface
         }
 
         $size = (int) $size;
-        if ($size < 1) {
+        if ($size < 1 && $size !== -1) {
             throw new Exception\InvalidArgumentException(sprintf(
-                'size must be a positive integer; received "%s"',
+                'size must be a positive integer or -1 (to disable pagination); received "%s"',
                 $size
             ));
         }
@@ -340,7 +341,11 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function setResourceLinks(Link\LinkCollection $links)
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::setEntityLinks', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::setEntityLinks',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->setEntityLinks($links);
     }
 
@@ -367,7 +372,11 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function setResourceRoute($route)
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::setEntityRoute', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::setEntityRoute',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->setEntityRoute($route);
     }
 
@@ -406,7 +415,11 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function setResourceRouteOptions($options)
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::setEntityRouteOptions', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::setEntityRouteOptions',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->setEntityRouteOptions($options);
     }
 
@@ -445,7 +458,11 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function setResourceRouteParams($params)
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::setEntityRouteParams', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::setEntityRouteParams',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->setEntityRouteParams($params);
     }
 
@@ -482,7 +499,11 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function getResourceLinks()
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::getEntityLinks', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::getEntityLinks',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->getEntityLinks();
     }
 
@@ -499,7 +520,7 @@ class Collection implements Link\LinkCollectionAwareInterface
     /**
      * Collection
      *
-     * @return string
+     * @return array|Traversable|Paginator
      */
     public function getCollection()
     {
@@ -586,7 +607,11 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function getResourceRoute()
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::getEntityRoute', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::getEntityRoute',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->getEntityRoute();
     }
 
@@ -610,7 +635,11 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function getResourceRouteOptions()
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::getEntityRouteOptions', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::getEntityRouteOptions',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->getEntityRouteOptions();
     }
 
@@ -634,7 +663,11 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function getResourceRouteParams()
     {
-        trigger_error(sprintf('%s is deprecated; please use %s::getEntityRouteParams', __METHOD__, __CLASS__), E_USER_DEPRECATED);
+        trigger_error(sprintf(
+            '%s is deprecated; please use %s::getEntityRouteParams',
+            __METHOD__,
+            __CLASS__
+        ), E_USER_DEPRECATED);
         return $this->getEntityRouteParams();
     }
 

@@ -6,6 +6,7 @@
 
 namespace ZF\Hal\Factory;
 
+use Zend\Mvc\Controller\PluginManager;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 
@@ -17,6 +18,7 @@ class HalControllerPluginFactory implements FactoryInterface
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
+        /** @var PluginManager $serviceLocator */
         $services = $serviceLocator->getServiceLocator();
         $helpers  = $services->get('ViewHelperManager');
 

@@ -8,10 +8,12 @@ namespace ZF\Hal\Factory;
 
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\View\HelperPluginManager;
 use ZF\Hal\Exception;
 use ZF\Hal\Extractor\LinkCollectionExtractor;
 use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Plugin;
+use ZF\Hal\Metadata\MetadataMap;
 
 class HalViewHelperFactory implements FactoryInterface
 {
@@ -22,10 +24,12 @@ class HalViewHelperFactory implements FactoryInterface
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
+        /** @var HelperPluginManager $serviceLocator */
         $services        = $serviceLocator->getServiceLocator();
         $halConfig       = $services->get('ZF\Hal\HalConfig');
         /* @var $rendererOptions \ZF\Hal\RendererOptions */
         $rendererOptions = $services->get('ZF\Hal\RendererOptions');
+        /** @var MetadataMap $metadataMap */
         $metadataMap     = $services->get('ZF\Hal\MetadataMap');
         $hydrators       = $metadataMap->getHydratorManager();
 
