@@ -9,6 +9,7 @@ namespace ZF\Hal\View;
 use Zend\View\Strategy\JsonStrategy;
 use Zend\View\ViewEvent;
 use ZF\ApiProblem\View\ApiProblemModel;
+use Zend\Http\Response;
 
 /**
  * Extension of the JSON strategy to handle the HalJsonModel and provide
@@ -88,7 +89,7 @@ class HalJsonStrategy extends JsonStrategy
             $contentType = 'application/hal+json';
         }
 
-        // Populate response
+        /** @var Response $response */
         $response->setContent($result);
         $headers = $response->getHeaders();
         $headers->addHeaderLine('content-type', $contentType);
