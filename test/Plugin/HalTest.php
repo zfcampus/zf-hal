@@ -19,7 +19,6 @@ use Zend\View\Helper\Url as UrlHelper;
 use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
-use ZF\Hal\EntityHydratorManager;
 use ZF\Hal\Extractor\LinkCollectionExtractor;
 use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Link\Link;
@@ -2113,5 +2112,38 @@ class HalTest extends TestCase
 
         $this->plugin->renderEntity($halEntity);
         $this->assertTrue($triggered);
+    }
+
+    /**
+     * @expectedException \Zend\Mvc\Router\Exception\RuntimeException
+     */
+    public function testNotExistingRouteInMetadataLinks()
+    {
+        $object = new TestAsset\Entity('foo', 'Foo');
+        $object->first_child  = new TestAsset\EmbeddedEntity('bar', 'Bar');
+        $entity = new Entity($object, 'foo');
+        $self = new Link('self');
+        $self->setRoute('hostname/resource', ['id' => 'foo']);
+        $entity->getLinks()->add($self);
+
+        $metadata = new MetadataMap([
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntity' => [
+                'hydrator' => 'Zend\Hydrator\ObjectProperty',
+                'route'    => 'hostname/embedded',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
+                'links' => array(
+                    'link' => array(
+                        'rel' => 'link',
+                        'route' => array(
+                            'name' => 'non_existing_route',
+                        )
+                    )
+                )
+            ],
+        ]);
+
+        $this->plugin->setMetadataMap($metadata);
+        $this->plugin->renderEntity($entity);
     }
 }
