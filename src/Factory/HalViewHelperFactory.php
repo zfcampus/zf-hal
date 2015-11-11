@@ -14,6 +14,8 @@ use ZF\Hal\Extractor\LinkCollectionExtractor;
 use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Plugin;
 use ZF\Hal\Metadata\MetadataMap;
+use Zend\View\Helper\Url;
+use Zend\View\Helper\ServerUrl;
 
 class HalViewHelperFactory implements FactoryInterface
 {
@@ -32,12 +34,12 @@ class HalViewHelperFactory implements FactoryInterface
         /** @var MetadataMap $metadataMap */
         $metadataMap     = $services->get('ZF\Hal\MetadataMap');
         $hydrators       = $metadataMap->getHydratorManager();
-
+        /** @var ServerUrl $serverUrlHelper */
         $serverUrlHelper = $serviceLocator->get('ServerUrl');
         if (isset($halConfig['options']['use_proxy'])) {
             $serverUrlHelper->setUseProxy($halConfig['options']['use_proxy']);
         }
-
+        /** @var Url $urlHelper */
         $urlHelper = $serviceLocator->get('Url');
 
         $helper = new Plugin\Hal($hydrators);
