@@ -238,6 +238,7 @@ class ChildEntitiesIntegrationTest extends TestCase
         $this->assertObjectHasAttribute('_embedded', $test);
         $this->assertObjectHasAttribute('child', $test->_embedded);
         $this->assertInternalType('array', $test->_embedded->child);
+        $this->assertCount(2, $test->_embedded->child);
 
         foreach ($test->_embedded->child as $child) {
             $this->assertObjectHasAttribute('_links', $child);
@@ -338,6 +339,7 @@ class ChildEntitiesIntegrationTest extends TestCase
         $this->assertObjectHasAttribute('_embedded', $test);
         $this->assertObjectHasAttribute('child', $test->_embedded);
         $this->assertInternalType('array', $test->_embedded->child);
+        $this->assertCount(2, $test->_embedded->child);
 
         foreach ($test->_embedded->child as $child) {
             $this->assertObjectHasAttribute('_links', $child);
