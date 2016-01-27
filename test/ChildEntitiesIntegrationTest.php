@@ -141,11 +141,11 @@ class ChildEntitiesIntegrationTest extends TestCase
             ['luke', 'Luke Skywalker'],
             ['leia', 'Leia Organa'],
         ];
-        $collection = [];
+        $this->collection = [];
         foreach ($children as $info) {
-            $collection[] = call_user_func_array([$this, 'setUpChildEntity'], $info);
+            $this->collection[] = call_user_func_array([$this, 'setUpChildEntity'], $info);
         }
-        $collection = new Collection($collection);
+        $collection = new Collection($this->collection);
         $collection->setCollectionRoute('parent/child');
         $collection->setEntityRoute('parent/child');
         $collection->setPage(1);
