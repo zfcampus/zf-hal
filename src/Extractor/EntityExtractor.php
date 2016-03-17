@@ -8,7 +8,7 @@ namespace ZF\Hal\Extractor;
 
 use JsonSerializable;
 use SplObjectStorage;
-use Zend\Stdlib\Extractor\ExtractionInterface;
+use Zend\Hydrator\ExtractionInterface;
 use ZF\Hal\EntityHydratorManager;
 
 class EntityExtractor implements ExtractionInterface

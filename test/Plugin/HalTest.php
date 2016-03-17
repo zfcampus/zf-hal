@@ -14,7 +14,7 @@ use Zend\Mvc\MvcEvent;
 use Zend\Paginator\Adapter\ArrayAdapter as ArrayPaginator;
 use Zend\Paginator\Paginator;
 use Zend\Uri\Http;
-use Zend\Stdlib\Hydrator;
+use Zend\Hydrator;
 use Zend\View\Helper\Url as UrlHelper;
 use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use ZF\Hal\Collection;
@@ -225,19 +225,19 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap([
             'ZFTest\Hal\Plugin\TestAsset\Entity' => [
-                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator'   => 'Zend\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
             ],
             'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntity' => [
-                'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator' => 'Zend\Hydrator\ObjectProperty',
                 'route'    => 'hostname/embedded',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
             ],
             'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithCustomIdentifier' => [
-                'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator'        => 'Zend\Hydrator\ObjectProperty',
                 'route'           => 'hostname/embedded_custom',
                 'route_identifier_name' => 'custom_id',
                 'entity_identifier_name' => 'custom_id',
@@ -276,19 +276,19 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap([
             'ZFTest\Hal\Plugin\TestAsset\Entity' => [
-                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator'   => 'Zend\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
             ],
             'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntity' => [
-                'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator' => 'Zend\Hydrator\ObjectProperty',
                 'route'    => 'hostname/embedded',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
             ],
             'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithCustomIdentifier' => [
-                'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator'        => 'Zend\Hydrator\ObjectProperty',
                 'route'           => 'hostname/embedded_custom',
                 'route_identifier_name' => 'custom_id',
                 'entity_identifier_name' => 'custom_id',
@@ -395,7 +395,7 @@ class HalTest extends TestCase
                 'entity_identifier_name' => 'id',
             ],
             'ZFTest\Hal\Plugin\TestAsset\Entity' => [
-                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator'   => 'Zend\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
@@ -444,11 +444,11 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap([
             'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntity' => [
-                'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator' => 'Zend\Hydrator\ObjectProperty',
                 'route'    => 'hostname/embedded',
             ],
             'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithCustomIdentifier' => [
-                'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator'        => 'Zend\Hydrator\ObjectProperty',
                 'route'           => 'hostname/embedded_custom',
                 'route_identifier_name' => 'custom_id',
                 'entity_identifier_name' => 'custom_id',
@@ -459,7 +459,7 @@ class HalTest extends TestCase
                 'entity_route'   => 'hostname/embedded',
             ],
             'ZFTest\Hal\Plugin\TestAsset\Entity' => [
-                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator'   => 'Zend\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
             ],
         ]);
@@ -707,7 +707,7 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap([
             'ZFTest\Hal\Plugin\TestAsset\Entity' => [
-                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator'   => 'Zend\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
                 'links'      => [
                     [
@@ -891,7 +891,7 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap([
             'ZFTest\Hal\Plugin\TestAsset\Entity' => [
-                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator'   => 'Zend\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
@@ -1003,7 +1003,7 @@ class HalTest extends TestCase
     {
         $metadata = new MetadataMap([
             'ZFTest\Hal\Plugin\TestAsset\Entity' => [
-                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator'   => 'Zend\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
@@ -1174,14 +1174,14 @@ class HalTest extends TestCase
     {
         return new MetadataMap([
             'ZFTest\Hal\Plugin\TestAsset\Entity' => [
-                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator'   => 'Zend\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
                 'max_depth' => $maxDepth,
             ],
             'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithBackReference' => [
-                'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator' => 'Zend\Hydrator\ObjectProperty',
                 'route'    => 'hostname/embedded',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
@@ -1435,13 +1435,13 @@ class HalTest extends TestCase
                 'max_depth'           => $maxDepth,
             ],
             'ZFTest\Hal\Plugin\TestAsset\Entity' => [
-                'hydrator'   => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator'   => 'Zend\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
             ],
             'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntityWithBackReference' => [
-                'hydrator' => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator' => 'Zend\Hydrator\ObjectProperty',
                 'route'    => 'hostname/embedded',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
@@ -1500,7 +1500,7 @@ class HalTest extends TestCase
         $object = new TestAsset\Entity('foo', 'Foo');
         $metadata = new MetadataMap([
             'ZFTest\Hal\Plugin\TestAsset\Entity' => [
-                'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator'        => 'Zend\Hydrator\ObjectProperty',
                 'route_name'      => 'hostname/resource',
                 'links'           => [],
                 'force_self_link' => false,
@@ -1522,7 +1522,7 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap([
             'ZFTest\Hal\Plugin\TestAsset\Entity' => [
-                'hydrator'        => 'Zend\Stdlib\Hydrator\ObjectProperty',
+                'hydrator'        => 'Zend\Hydrator\ObjectProperty',
                 'route_name'      => 'hostname/resource',
                 'links'           => [],
                 'force_self_link' => false,
