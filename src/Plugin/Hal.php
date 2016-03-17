@@ -637,7 +637,7 @@ class Hal extends AbstractHelper implements
     public function renderEntity(Entity $halEntity, $renderEntity = true, $depth = 0, $maxDepth = null)
     {
         $this->getEventManager()->trigger(__FUNCTION__, $this, ['entity' => $halEntity]);
-        $entity      = $halEntity->entity;
+        $entity      = $halEntity->getEntity();
         $entityLinks = clone $halEntity->getLinks(); // Clone to prevent link duplication
 
         $metadataMap = $this->getMetadataMap();
@@ -953,10 +953,10 @@ class Hal extends AbstractHelper implements
         $routeParams  = [];
         $routeOptions = [];
         if ($resource instanceof Entity
-            && null !== $resource->id
+            && null !== $resource->getId()
         ) {
             $routeParams = [
-                $routeIdentifier => $resource->id,
+                $routeIdentifier => $resource->getId(),
             ];
         }
         if ($resource instanceof Collection) {

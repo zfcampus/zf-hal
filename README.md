@@ -179,7 +179,7 @@ class Module
     public function onRenderEntity($e)
     {
         $entity = $e->getParam('entity');
-        if (! $entity->entity instanceof SomeTypeIHaveDefined) {
+        if (! $entity->getEntity() instanceof SomeTypeIHaveDefined) {
             // do nothing
             return;
         }
