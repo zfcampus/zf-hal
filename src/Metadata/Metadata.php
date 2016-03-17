@@ -6,8 +6,8 @@
 
 namespace ZF\Hal\Metadata;
 
-use Zend\Stdlib\Hydrator\HydratorInterface;
-use Zend\Stdlib\Hydrator\HydratorPluginManager;
+use Zend\Hydrator\ExtractionInterface;
+use Zend\Hydrator\HydratorPluginManager;
 use ZF\Hal\Exception;
 use Zend\Filter\FilterChain;
 
@@ -30,7 +30,7 @@ class Metadata
     /**
      * Hydrator to use when extracting object of this class
      *
-     * @var HydratorInterface
+     * @var ExtractionInterface
      */
     protected $hydrator;
 
@@ -72,7 +72,15 @@ class Metadata
      *
      * @var array
      */
-    protected $links = array();
+    protected $links = [];
+
+    /**
+     * Whether to force the existance of a "self" link. The HAl specification encourages it but it is not strictly
+     * required.
+     *
+     * @var bool
+     */
+    protected $forceSelfLink = true;
 
     /**
      * Route to use to generate a self link for this entity
@@ -86,14 +94,14 @@ class Metadata
      *
      * @var array
      */
-    protected $routeOptions = array();
+    protected $routeOptions = [];
 
     /**
      * Additional route parameters to use when generating a self link for this entity
      *
      * @var array
      */
-    protected $routeParams = array();
+    protected $routeParams = [];
 
     /**
      * URL to use for this entity (instead of a route)
@@ -123,7 +131,7 @@ class Metadata
      * @param  HydratorPluginManager $hydrators
      * @throws Exception\InvalidArgumentException
      */
-    public function __construct($class, array $options = array(), HydratorPluginManager $hydrators = null)
+    public function __construct($class, array $options = [], HydratorPluginManager $hydrators = null)
     {
         $filter = new FilterChain();
         $filter->attachByName('WordUnderscoreToCamelCase')
@@ -214,7 +222,7 @@ class Metadata
     /**
      * Retrieve the hydrator to associate with this class, if any
      *
-     * @return null|HydratorInterface
+     * @return null|ExtractionInterface
      */
     public function getHydrator()
     {
@@ -392,9 +400,9 @@ class Metadata
     /**
      * Set the hydrator to use with this class
      *
-     * @param  string|HydratorInterface $hydrator
+     * @param  string|ExtractionInterface $hydrator
      * @return self
-     * @throws Exception\InvalidArgumentException if the class or hydrator does not implement HydratorInterface
+     * @throws Exception\InvalidArgumentException if the class or hydrator does not implement ExtractionInterface
      */
     public function setHydrator($hydrator)
     {
@@ -407,7 +415,7 @@ class Metadata
                 $hydrator = new $hydrator();
             }
         }
-        if (!$hydrator instanceof HydratorInterface) {
+        if (!$hydrator instanceof ExtractionInterface) {
             if (is_object($hydrator)) {
                 $type = get_class($hydrator);
             } elseif (is_string($hydrator)) {
@@ -416,7 +424,7 @@ class Metadata
                 $type = gettype($hydrator);
             }
             throw new Exception\InvalidArgumentException(sprintf(
-                'Hydrator class must implement Zend\Stdlib\Hydrator\HydratorInterface; received "%s"',
+                'Hydrator class must implement Zend\Hydrator\ExtractionInterface; received "%s"',
                 $type
             ));
         }
@@ -569,6 +577,28 @@ class Metadata
     public function setMaxDepth($maxDepth)
     {
         $this->maxDepth = $maxDepth;
+        return $this;
+    }
+
+    /**
+     * Returns true if this entity should be forced to have a "self" link.
+     *
+     * @return boolean
+     */
+    public function getForceSelfLink()
+    {
+        return $this->forceSelfLink;
+    }
+
+    /**
+     * Set whether to force the existance of "self" links.
+     *
+     * @param boolean $forceSelfLink A truthy value
+     * @return $this
+     */
+    public function setForceSelfLink($forceSelfLink)
+    {
+        $this->forceSelfLink = $forceSelfLink;
         return $this;
     }
 }

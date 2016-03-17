@@ -9,6 +9,8 @@ namespace ZF\Hal\Factory;
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use ZF\Hal\Exception;
+use ZF\Hal\Extractor\LinkCollectionExtractor;
+use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Plugin;
 
 class HalViewHelperFactory implements FactoryInterface
@@ -20,15 +22,18 @@ class HalViewHelperFactory implements FactoryInterface
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
         $services        = $serviceLocator->getServiceLocator();
-        $config          = $services->get('Config');
+        $halConfig       = $services->get('ZF\Hal\HalConfig');
+        /* @var $rendererOptions \ZF\Hal\RendererOptions */
+        $rendererOptions = $services->get('ZF\Hal\RendererOptions');
         $metadataMap     = $services->get('ZF\Hal\MetadataMap');
         $hydrators       = $metadataMap->getHydratorManager();
 
         $serverUrlHelper = $serviceLocator->get('ServerUrl');
-        if (isset($config['zf-hal']['options']['use_proxy'])) {
-            $serverUrlHelper->setUseProxy($config['zf-hal']['options']['use_proxy']);
+        if (isset($halConfig['options']['use_proxy'])) {
+            $serverUrlHelper->setUseProxy($halConfig['options']['use_proxy']);
         }
-        $urlHelper       = $serviceLocator->get('Url');
+
+        $urlHelper = $serviceLocator->get('Url');
 
         $helper = new Plugin\Hal($hydrators);
         $helper
@@ -36,43 +41,29 @@ class HalViewHelperFactory implements FactoryInterface
             ->setServerUrlHelper($serverUrlHelper)
             ->setUrlHelper($urlHelper);
 
-        if (isset($config['zf-hal'])
-            && isset($config['zf-hal']['renderer'])
-        ) {
-            $config = $config['zf-hal']['renderer'];
+        $linkExtractor = new LinkExtractor($serverUrlHelper, $urlHelper);
+        $linkCollectionExtractor = new LinkCollectionExtractor($linkExtractor);
+        $helper->setLinkCollectionExtractor($linkCollectionExtractor);
 
-            if (isset($config['default_hydrator'])) {
-                $hydratorServiceName = $config['default_hydrator'];
-
-                if (!$hydrators->has($hydratorServiceName)) {
-                    throw new Exception\DomainException(sprintf(
-                        'Cannot locate default hydrator by name "%s" via the HydratorManager',
-                        $hydratorServiceName
-                    ));
-                }
-
-                $hydrator = $hydrators->get($hydratorServiceName);
-                $helper->setDefaultHydrator($hydrator);
+        $defaultHydrator = $rendererOptions->getDefaultHydrator();
+        if ($defaultHydrator) {
+            if (! $hydrators->has($defaultHydrator)) {
+                throw new Exception\DomainException(sprintf(
+                    'Cannot locate default hydrator by name "%s" via the HydratorManager',
+                    $defaultHydrator
+                ));
             }
 
-            if (isset($config['render_embedded_resources'])) {
-                $helper->setRenderEmbeddedEntities($config['render_embedded_resources']);
-            }
+            $hydrator = $hydrators->get($defaultHydrator);
+            $helper->setDefaultHydrator($hydrator);
+        }
 
-            if (isset($config['render_embedded_entities'])) {
-                $helper->setRenderEmbeddedEntities($config['render_embedded_entities']);
-            }
+        $helper->setRenderEmbeddedEntities($rendererOptions->getRenderEmbeddedEntities());
+        $helper->setRenderCollections($rendererOptions->getRenderEmbeddedCollections());
 
-            if (isset($config['render_collections'])) {
-                $helper->setRenderCollections($config['render_collections']);
-            }
-
-            if (isset($config['hydrators']) && is_array($config['hydrators'])) {
-                $hydratorMap = $config['hydrators'];
-                foreach ($hydratorMap as $class => $hydratorServiceName) {
-                    $helper->addHydrator($class, $hydratorServiceName);
-                }
-            }
+        $hydratorMap = $rendererOptions->getHydrators();
+        foreach ($hydratorMap as $class => $hydratorServiceName) {
+            $helper->addHydrator($class, $hydratorServiceName);
         }
 
         return $helper;

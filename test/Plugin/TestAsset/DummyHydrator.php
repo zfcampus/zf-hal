@@ -6,7 +6,7 @@
 
 namespace ZFTest\Hal\Plugin\TestAsset;
 
-use Zend\Stdlib\Hydrator\ArraySerializable;
+use Zend\Hydrator\ArraySerializable;
 
 class DummyHydrator extends ArraySerializable
 {

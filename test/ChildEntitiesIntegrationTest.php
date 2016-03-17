@@ -16,6 +16,8 @@ use Zend\View\Helper\Url as UrlHelper;
 use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
+use ZF\Hal\Extractor\LinkCollectionExtractor;
+use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Plugin\Hal as HalHelper;
 use ZF\Hal\View\HalJsonModel;
@@ -50,6 +52,10 @@ class ChildEntitiesIntegrationTest extends TestCase
         $linksHelper->setUrlHelper($urlHelper);
         $linksHelper->setServerUrlHelper($serverUrlHelper);
 
+        $linkExtractor = new LinkExtractor($serverUrlHelper, $urlHelper);
+        $linkCollectionExtractor = new LinkCollectionExtractor($linkExtractor);
+        $linksHelper->setLinkCollectionExtractor($linkCollectionExtractor);
+
         $this->helpers = $helpers = new HelperPluginManager();
         $helpers->setService('url', $urlHelper);
         $helpers->setService('serverUrl', $serverUrlHelper);
@@ -70,44 +76,44 @@ class ChildEntitiesIntegrationTest extends TestCase
 
     public function setupRouter()
     {
-        $routes = array(
-            'parent' => array(
+        $routes = [
+            'parent' => [
                 'type' => 'Segment',
-                'options' => array(
+                'options' => [
                     'route' => '/api/parent[/:parent]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => 'Api\ParentController',
-                    ),
-                ),
+                    ],
+                ],
                 'may_terminate' => true,
-                'child_routes' => array(
-                    'child' => array(
+                'child_routes' => [
+                    'child' => [
                         'type' => 'Segment',
-                        'options' => array(
+                        'options' => [
                             'route' => '/child[/:child]',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => 'Api\ChildController',
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        );
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
         $this->router = $router = new TreeRouteStack();
         $router->addRoutes($routes);
     }
 
     public function setUpParentEntity()
     {
-        $this->parent = (object) array(
+        $this->parent = (object) [
             'id'   => 'anakin',
             'name' => 'Anakin Skywalker',
-        );
+        ];
         $entity = new Entity($this->parent, 'anakin');
 
         $link = new Link('self');
         $link->setRoute('parent');
-        $link->setRouteParams(array('parent'=> 'anakin'));
+        $link->setRouteParams(['parent'=> 'anakin']);
         $entity->getLinks()->add($link);
 
         return $entity;
@@ -115,15 +121,15 @@ class ChildEntitiesIntegrationTest extends TestCase
 
     public function setUpChildEntity($id, $name)
     {
-        $this->child = (object) array(
+        $this->child = (object) [
             'id'   => $id,
             'name' => $name,
-        );
+        ];
         $entity = new Entity($this->child, $id);
 
         $link = new Link('self');
         $link->setRoute('parent/child');
-        $link->setRouteParams(array('child'=> $id));
+        $link->setRouteParams(['child'=> $id]);
         $entity->getLinks()->add($link);
 
         return $entity;
@@ -131,13 +137,13 @@ class ChildEntitiesIntegrationTest extends TestCase
 
     public function setUpChildCollection()
     {
-        $children = array(
-            array('luke', 'Luke Skywalker'),
-            array('leia', 'Leia Organa'),
-        );
-        $this->collection = array();
+        $children = [
+            ['luke', 'Luke Skywalker'],
+            ['leia', 'Leia Organa'],
+        ];
+        $this->collection = [];
         foreach ($children as $info) {
-            $collection[] = call_user_func_array(array($this, 'setUpChildEntity'), $info);
+            $collection[] = call_user_func_array([$this, 'setUpChildEntity'], $info);
         }
         $collection = new Collection($this->collection);
         $collection->setCollectionRoute('parent/child');
@@ -246,29 +252,29 @@ class ChildEntitiesIntegrationTest extends TestCase
 
     public function setUpAlternateRouter()
     {
-        $routes = array(
-            'parent' => array(
+        $routes = [
+            'parent' => [
                 'type' => 'Segment',
-                'options' => array(
+                'options' => [
                     'route' => '/api/parent[/:id]',
-                    'defaults' => array(
+                    'defaults' => [
                         'controller' => 'Api\ParentController',
-                    ),
-                ),
+                    ],
+                ],
                 'may_terminate' => true,
-                'child_routes' => array(
-                    'child' => array(
+                'child_routes' => [
+                    'child' => [
                         'type' => 'Segment',
-                        'options' => array(
+                        'options' => [
                             'route' => '/child[/:child_id]',
-                            'defaults' => array(
+                            'defaults' => [
                                 'controller' => 'Api\ChildController',
-                            ),
-                        ),
-                    ),
-                ),
-            ),
-        );
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
         $this->router = $router = new TreeRouteStack();
         $router->addRoutes($routes);
         $this->helpers->get('url')->setRouter($router);

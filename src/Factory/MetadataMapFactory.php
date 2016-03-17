@@ -8,7 +8,7 @@ namespace ZF\Hal\Factory;
 
 use Zend\ServiceManager\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
-use Zend\Stdlib\Hydrator\HydratorPluginManager;
+use Zend\Hydrator\HydratorPluginManager;
 use ZF\Hal\Metadata;
 
 class MetadataMapFactory implements FactoryInterface
@@ -19,10 +19,7 @@ class MetadataMapFactory implements FactoryInterface
      */
     public function createService(ServiceLocatorInterface $serviceLocator)
     {
-        $config = array();
-        if ($serviceLocator->has('config')) {
-            $config = $serviceLocator->get('config');
-        }
+        $config = $serviceLocator->get('ZF\Hal\HalConfig');
 
         if ($serviceLocator->has('HydratorManager')) {
             $hydrators = $serviceLocator->get('HydratorManager');
@@ -30,12 +27,9 @@ class MetadataMapFactory implements FactoryInterface
             $hydrators = new HydratorPluginManager();
         }
 
-        $map = array();
-        if (isset($config['zf-hal'])
-            && isset($config['zf-hal']['metadata_map'])
-            && is_array($config['zf-hal']['metadata_map'])
-        ) {
-            $map = $config['zf-hal']['metadata_map'];
+        $map = [];
+        if (isset($config['metadata_map']) && is_array($config['metadata_map'])) {
+            $map = $config['metadata_map'];
         }
 
         return new Metadata\MetadataMap($map, $hydrators);

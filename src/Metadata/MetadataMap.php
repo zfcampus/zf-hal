@@ -6,7 +6,7 @@
 
 namespace ZF\Hal\Metadata;
 
-use Zend\Stdlib\Hydrator\HydratorPluginManager;
+use Zend\Hydrator\HydratorPluginManager;
 use ZF\Hal\Exception;
 
 class MetadataMap
@@ -19,7 +19,7 @@ class MetadataMap
     /**
      * @var Metadata[]
      */
-    protected $map = array();
+    protected $map = [];
 
     /**
      * Constructor
@@ -145,8 +145,8 @@ class MetadataMap
 
     /**
      * Retrieve a metadata instance.
-     * 
-     * @param string $class 
+     *
+     * @param string $class
      * @return Metadata
      */
     private function getMetadataInstance($class)

@@ -96,6 +96,8 @@ Each class in the metadata map may contain one or more of the following configur
 - `max_depth` - integer; limit to what nesting level entities and collections are rendered; if the limit is 
   reached, only `self` links will be rendered. default value is `null`, which means no limit: if unlimited circular 
   references are detected, an exception will be thrown to avoid infinite loops.
+- `force_self_link` - boolean; set whether a self-referencing link should be automatically generated for the entity.
+  Defaults to `true` (since its recommended).
 
 The `links` property is an array of arrays, each with the following structure:
 
@@ -149,7 +151,9 @@ The `ZF\Hal\Plugin\Hal` triggers several events during its lifecycle. From the `
 instance composed into the HAL plugin, you may attach to the following events:
 
 - `renderCollection`
+- `renderCollection.post`
 - `renderEntity`
+- `renderEntity.post`
 - `createLink`
 - `renderCollection.entity`
 - `getIdFromEntity`
@@ -190,6 +194,36 @@ class Module
     }
 }
 ```
+
+Notes on individual events:
+
+- `renderCollection` defines one parameter, `collection`, which is the
+  `ZF\Hal\Collection` being rendered.
+- `renderCollection.post` defines two parameters: `collection`, which is the
+  `ZF\Hal\Collection` being rendered, and `payload`, an `ArrayObject`
+  representation of the collection, including the page count, size, and total
+  items, and links.
+- `renderEntity` defines one parameter, `entity`, which is the
+  `ZF\Hal\Entity` being rendered.
+- `renderEntity.post` defines two parameters: `entity`, which is the
+  `ZF\Hal\Entity` being rendered, and `payload`, an `ArrayObject`
+  representation of the entity, including links.
+- `createLink` defines the following event parameters:
+  - `route`, the route name to use when generating the link, if any.
+  - `id`, the entity identifier value to use when generating the link, if any.
+  - `entity`, the entity for which the link is being generated, if any.
+  - `params`, any additional routing parameters to use when generating the link.
+- `renderCollection.entity` defines the following event parameters:
+  - `collection`, the `ZF\Hal\Collection` to which the entity belongs.
+  - `entity`, the current entity being rendered; this may or may not be a
+    `ZF\Hal\Entity`.
+  - `route`, the route name for the current entity.
+  - `routeParams`, route parameters to use when generating links for the current
+    entity.
+  - `routeOptions`, route options to use when generating links for the current
+    entity.
+- `getIdFromEntity` defines one parameter, `entity`, which is an array or object
+  from which an identifier needs to be extracted.
 
 ### Listeners
 
@@ -233,6 +267,17 @@ information necessary to create HAL entities, links, or collections.
 
 The `MetadataMap` aggregates an array of class name keyed `Metadata` instances to be used in
 producing HAL entities, links, or collections.
+
+### Extractors
+
+#### ZF\Hal\Extractor\LinkExtractor
+
+`LinkExtractor` is responsible for extracting a link representation from `Link` instance.
+
+#### ZF\Hal\Extractor\LinkCollectionExtractor
+
+`LinkCollectionExtractor` is responsible for extracting a collection of `Link` instances. It also
+composes a `LinkExtractor` for extracting individual links.
 
 ### Controller Plugins
 

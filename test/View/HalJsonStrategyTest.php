@@ -54,7 +54,7 @@ class HalJsonStrategyTest extends TestCase
     public function testInjectResponseDoesNotSetContentTypeHeaderIfResultIsNotString()
     {
         $this->event->setRenderer($this->renderer);
-        $this->event->setResult(array('foo'));
+        $this->event->setResult(['foo']);
         $this->strategy->injectResponse($this->event);
         $headers = $this->response->getHeaders();
         $this->assertFalse($headers->has('Content-Type'));
@@ -73,21 +73,21 @@ class HalJsonStrategyTest extends TestCase
 
     public function halObjects()
     {
-        $entity = new Entity(array(
+        $entity = new Entity([
             'foo' => 'bar',
-        ), 'identifier', 'route');
+        ], 'identifier', 'route');
         $link = new Link('self');
-        $link->setRoute('resource/route')->setRouteParams(array('id' => 'identifier'));
+        $link->setRoute('resource/route')->setRouteParams(['id' => 'identifier']);
         $entity->getLinks()->add($link);
 
-        $collection = new Collection(array($entity));
+        $collection = new Collection([$entity]);
         $collection->setCollectionRoute('collection/route');
         $collection->setEntityRoute('resource/route');
 
-        return array(
-            'entity'     => array($entity),
-            'collection' => array($collection),
-        );
+        return [
+            'entity'     => [$entity],
+            'collection' => [$collection],
+        ];
     }
 
     /**
@@ -95,7 +95,7 @@ class HalJsonStrategyTest extends TestCase
      */
     public function testInjectResponseSetsContentTypeHeaderToHalForHalModel($hal)
     {
-        $model = new HalJsonModel(array('payload' => $hal));
+        $model = new HalJsonModel(['payload' => $hal]);
 
         $this->event->setModel($model);
         $this->event->setRenderer($this->renderer);

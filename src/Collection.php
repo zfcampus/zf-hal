@@ -19,7 +19,7 @@ class Collection implements Link\LinkCollectionAwareInterface
      *
      * @var array
      */
-    protected $attributes = array();
+    protected $attributes = [];
 
     /**
      * @var array|Traversable|\Zend\Paginator\Paginator
@@ -41,12 +41,12 @@ class Collection implements Link\LinkCollectionAwareInterface
     /**
      * @var array
      */
-    protected $collectionRouteOptions = array();
+    protected $collectionRouteOptions = [];
 
     /**
      * @var array
      */
-    protected $collectionRouteParams = array();
+    protected $collectionRouteParams = [];
 
     /**
      * Name of the field representing the identifier
@@ -94,12 +94,12 @@ class Collection implements Link\LinkCollectionAwareInterface
     /**
      * @var array
      */
-    protected $entityRouteOptions = array();
+    protected $entityRouteOptions = [];
 
     /**
      * @var array
      */
-    protected $entityRouteParams = array();
+    protected $entityRouteParams = [];
 
     /**
      * @param  array|Traversable|\Zend\Paginator\Paginator $collection
@@ -238,7 +238,7 @@ class Collection implements Link\LinkCollectionAwareInterface
     }
 
     /**
-     * Set the route identifier name
+     * Set the entity identifier name
      *
      * @param  string $identifier
      * @return self

@@ -19,7 +19,7 @@ class Entity implements Link\LinkCollectionAwareInterface
     protected $links;
 
     /**
-     * @var object|array 
+     * @var object|array
      */
     protected $entity;
 
@@ -41,17 +41,24 @@ class Entity implements Link\LinkCollectionAwareInterface
     /**
      * Retrieve properties
      *
+     * @deprecated
      * @param  string $name
      * @throws Exception\InvalidArgumentException
      * @return mixed
      */
     public function &__get($name)
     {
-        trigger_error(sprintf('%s is deprecated, use getEntity() instead.', __METHOD__), E_USER_DEPRECATED);
-        $names = array(
+        trigger_error(
+            sprintf(
+                '%s is deprecated, use getters instead.',
+                __METHOD__
+            ),
+            E_USER_DEPRECATED
+        );
+        $names = [
             'entity' => 'entity',
             'id'     => 'id',
-        );
+        ];
         $name = strtolower($name);
         if (!in_array($name, array_keys($names))) {
             throw new Exception\InvalidArgumentException(sprintf(
@@ -72,6 +79,8 @@ class Entity implements Link\LinkCollectionAwareInterface
     }
 
     /**
+     * TODO: Get by reference is that really necessary?
+     *
      * @return object|array
      */
     public function &getEntity()
