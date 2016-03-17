@@ -1193,6 +1193,14 @@ class Hal extends AbstractHelper implements
     }
 
     /**
+     * Reset entity hash stack
+     */
+    public function resetEntityHashStack()
+    {
+        $this->entityHashStack = [];
+    }
+
+    /**
      * Convert an individual entity to an array
      *
      * @deprecated
