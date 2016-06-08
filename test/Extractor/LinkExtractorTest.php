@@ -8,8 +8,8 @@ namespace ZFTest\Hal\Extractor;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use Zend\Http\Request;
-use Zend\Mvc\Router\Http\TreeRouteStack;
-use Zend\Mvc\Router\RouteMatch;
+use Zend\Router\Http\TreeRouteStack;
+use Zend\Router\RouteMatch;
 use Zend\View\Helper\Url as UrlHelper;
 use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Link\Link;
@@ -18,8 +18,8 @@ class LinkExtractorTest extends TestCase
 {
     public function testExtractGivenIncompleteLinkShouldThrowException()
     {
-        $serverUrlHelper = $this->getMock('Zend\View\Helper\ServerUrl');
-        $urlHelper       = $this->getMock('Zend\View\Helper\Url');
+        $serverUrlHelper = $this->createMock('Zend\View\Helper\ServerUrl');
+        $urlHelper       = $this->createMock('Zend\View\Helper\Url');
 
         $linkExtractor = new LinkExtractor($serverUrlHelper, $urlHelper);
 
@@ -38,8 +38,8 @@ class LinkExtractorTest extends TestCase
 
     public function testExtractGivenLinkWithUrlShouldReturnThisOne()
     {
-        $serverUrlHelper = $this->getMock('Zend\View\Helper\ServerUrl');
-        $urlHelper       = $this->getMock('Zend\View\Helper\Url');
+        $serverUrlHelper = $this->createMock('Zend\View\Helper\ServerUrl');
+        $urlHelper       = $this->createMock('Zend\View\Helper\Url');
 
         $linkExtractor = new LinkExtractor($serverUrlHelper, $urlHelper);
 
@@ -56,8 +56,8 @@ class LinkExtractorTest extends TestCase
 
     public function testExtractShouldComposeAnyPropertiesInLink()
     {
-        $serverUrlHelper = $this->getMock('Zend\View\Helper\ServerUrl');
-        $urlHelper       = $this->getMock('Zend\View\Helper\Url');
+        $serverUrlHelper = $this->createMock('Zend\View\Helper\ServerUrl');
+        $urlHelper       = $this->createMock('Zend\View\Helper\Url');
 
         $linkExtractor = new LinkExtractor($serverUrlHelper, $urlHelper);
 
@@ -84,7 +84,7 @@ class LinkExtractorTest extends TestCase
      */
     public function testPassingFalseReuseParamsOptionShouldOmitMatchedParametersInGeneratedLink()
     {
-        $serverUrlHelper = $this->getMock('Zend\View\Helper\ServerUrl');
+        $serverUrlHelper = $this->createMock('Zend\View\Helper\ServerUrl');
         $urlHelper       = new UrlHelper;
 
         $linkExtractor = new LinkExtractor($serverUrlHelper, $urlHelper);

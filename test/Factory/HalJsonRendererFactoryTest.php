@@ -8,8 +8,10 @@ namespace ZFTest\Hal\Factory;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use Zend\ServiceManager\ServiceManager;
+use ZF\ApiProblem\Factory\ApiProblemRendererFactory;
 use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Factory\HalJsonRendererFactory;
+use ZF\Hal\View\HalJsonRenderer;
 
 class HalJsonRendererFactoryTest extends TestCase
 {
@@ -23,10 +25,10 @@ class HalJsonRendererFactoryTest extends TestCase
 
         $services->setService('ViewHelperManager', $viewHelperManager);
 
-        $services->setService('ZF\ApiProblem\ApiProblemRenderer', new ApiProblemRenderer());
+        $services->setInvokableClass(ApiProblemRenderer::class, ApiProblemRenderer::class);
 
         $factory = new HalJsonRendererFactory();
-        $renderer = $factory->createService($services);
+        $renderer = $factory($services,'ZF\Hal\JsonRenderer');
 
         $this->assertInstanceOf('ZF\Hal\View\HalJsonRenderer', $renderer);
     }

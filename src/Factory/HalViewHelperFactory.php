@@ -6,34 +6,48 @@
 
 namespace ZF\Hal\Factory;
 
-use Zend\ServiceManager\FactoryInterface;
+use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
+use Zend\ServiceManager\Exception\ServiceNotCreatedException;
+use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Zend\ServiceManager\Factory\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use ZF\Hal\Exception;
 use ZF\Hal\Extractor\LinkCollectionExtractor;
 use ZF\Hal\Extractor\LinkExtractor;
+use ZF\Hal\Metadata\MetadataMap;
 use ZF\Hal\Plugin;
 
 class HalViewHelperFactory implements FactoryInterface
 {
     /**
-     * @param  ServiceLocatorInterface $serviceLocator
-     * @return Plugin\Hal
+     * Create an object
+     *
+     * @param  ContainerInterface $container
+     * @param  string             $requestedName
+     * @param  null|array         $options
+     *
+     * @return object
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     *     creating a service.
+     * @throws ContainerException if any other error occurs
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = NULL)
     {
-        $services        = $serviceLocator->getServiceLocator();
-        $halConfig       = $services->get('ZF\Hal\HalConfig');
+        $halConfig       = $container->get('ZF\Hal\HalConfig');
         /* @var $rendererOptions \ZF\Hal\RendererOptions */
-        $rendererOptions = $services->get('ZF\Hal\RendererOptions');
-        $metadataMap     = $services->get('ZF\Hal\MetadataMap');
+        $rendererOptions = $container->get('ZF\Hal\RendererOptions');
+        /** @var MetadataMap $metadataMap */
+        $metadataMap     = $container->get('ZF\Hal\MetadataMap');
         $hydrators       = $metadataMap->getHydratorManager();
 
-        $serverUrlHelper = $serviceLocator->get('ServerUrl');
+        $serverUrlHelper = $container->get('ViewHelperManager')->get('ServerUrl');
         if (isset($halConfig['options']['use_proxy'])) {
             $serverUrlHelper->setUseProxy($halConfig['options']['use_proxy']);
         }
 
-        $urlHelper = $serviceLocator->get('Url');
+        $urlHelper = $container->get('ViewHelperManager')->get('Url');
 
         $helper = new Plugin\Hal($hydrators);
         $helper
