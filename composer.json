@@ -22,10 +22,6 @@
     {
       "type": "composer",
       "url": "https://packages.zendframework.com"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/AGmakonts/zf-api-problem.git"
     }
   ],
   "extra": {
@@ -36,7 +32,7 @@
   },
   "require": {
     "php": ">=5.5",
-    "zfcampus/zf-api-problem": "dev-feature/zf3-support",
+    "zfcampus/zf-api-problem": "2.0.*",
     "zendframework/zend-escaper": "2.5.*",
     "zendframework/zend-eventmanager": "3.0.*",
     "zendframework/zend-hydrator": "2.2.*",
