@@ -38,7 +38,7 @@
   },
   "require": {
     "php": ">=5.5",
-    "zfcampus/zf-api-problem": "dev-frature/zf3-support",
+    "zfcampus/zf-api-problem": "dev-feature/zf3-support",
     "zendframework/zend-escaper": "2.5.*",
     "zendframework/zend-eventmanager": "3.0.*",
     "zendframework/zend-hydrator": "2.2.*",
