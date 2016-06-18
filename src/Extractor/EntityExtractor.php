@@ -39,6 +39,7 @@ class EntityExtractor implements ExtractionInterface
      */
     public function extract($entity)
     {
+        $entity = (!is_object($entity)) ? new \stdClass() : $entity;
         if (isset($this->serializedEntities[$entity])) {
             return $this->serializedEntities[$entity];
         }
