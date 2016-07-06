@@ -20,8 +20,12 @@ All notable changes to this project will be documented in this file, in reverse 
 
 - [#111](https://github.com/zfcampus/zf-hal/pull/111) removes some code errantly
   left in a comment from a previous merge conflict.
-- [#112](https://github.com/zfcampus/zf-hal/pull/112) conditionals based on PHP
-  5.4, as the minimum version is now 5.5.
+- [#112](https://github.com/zfcampus/zf-hal/pull/112) removes conditionals based
+  on PHP 5.4, as the minimum version is now 5.5.
+- [#127](https://github.com/zfcampus/zf-hal/pull/127) fixes an issue in the
+  `HalJsonStrategy` plugin whereby the wrong `Content-Type` header was being
+  used when an `ApiProblem` response was handled; these now correctly return
+  `application/problem+json` instead of `application/hal+json`.
 
 ## 1.3.0 - 2015-09-22
 
