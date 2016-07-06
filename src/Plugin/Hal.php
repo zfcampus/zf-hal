@@ -19,8 +19,6 @@ use Zend\Mvc\Controller\Plugin\PluginInterface as ControllerPluginInterface;
 use Zend\Paginator\Paginator;
 use Zend\Stdlib\DispatchableInterface;
 use Zend\View\Helper\AbstractHelper;
-use Zend\View\Helper\ServerUrl;
-use Zend\View\Helper\Url;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
@@ -31,6 +29,7 @@ use ZF\Hal\Extractor\LinkCollectionExtractorInterface;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Link\LinkCollectionAwareInterface;
+use ZF\Hal\Link\LinkUrlBuilder;
 use ZF\Hal\Link\PaginationInjector;
 use ZF\Hal\Link\PaginationInjectorInterface;
 use ZF\Hal\Link\SelfLinkInjector;
@@ -104,14 +103,9 @@ class Hal extends AbstractHelper implements
     protected $selfLinkInjector;
 
     /**
-     * @var ServerUrl
+     * @var LinkUrlBuilder
      */
-    protected $serverUrlHelper;
-
-    /**
-     * @var Url
-     */
-    protected $urlHelper;
+    protected $linkUrlBuilder;
 
     /**
      * @var LinkCollectionExtractorInterface
@@ -300,6 +294,50 @@ class Hal extends AbstractHelper implements
     }
 
     /**
+     * @param  LinkUrlBuilder $builder
+     * @return self
+     */
+    public function setLinkUrlBuilder(LinkUrlBuilder $builder)
+    {
+        $this->linkUrlBuilder = $builder;
+        return $this;
+    }
+
+    /**
+     * @deprecated Since 1.4.0; use setLinkUrlBuilder() instead.
+     * @param callable $helper
+     * @throws Exception\DeprecatedMethodException
+     */
+    public function setServerUrlHelper(callable $helper)
+    {
+        throw new Exception\DeprecatedMethodException(sprintf(
+            '%s can no longer be used to influence URL generation; please '
+            . 'use %s::setLinkUrlBuilder() instead, providing a configured '
+            . '%s instance',
+            __METHOD__,
+            __CLASS__,
+            LinkUrlBuilder::class
+        ));
+    }
+
+    /**
+     * @deprecated Since 1.4.0; use setLinkUrlBuilder() instead.
+     * @param callable $helper
+     * @throws Exception\DeprecatedMethodException
+     */
+    public function setUrlHelper(callable $helper)
+    {
+        throw new Exception\DeprecatedMethodException(sprintf(
+            '%s can no longer be used to influence URL generation; please '
+            . 'use %s::setLinkUrlBuilder() instead, providing a configured '
+            . '%s instance',
+            __METHOD__,
+            __CLASS__,
+            LinkUrlBuilder::class
+        ));
+    }
+
+    /**
      * @return PaginationInjectorInterface
      */
     public function getPaginationInjector()
@@ -338,26 +376,6 @@ class Hal extends AbstractHelper implements
     public function setSelfLinkInjector(SelfLinkInjectorInterface $injector)
     {
         $this->selfLinkInjector = $injector;
-        return $this;
-    }
-
-    /**
-     * @param ServerUrl $helper
-     * @return self
-     */
-    public function setServerUrlHelper(ServerUrl $helper)
-    {
-        $this->serverUrlHelper = $helper;
-        return $this;
-    }
-
-    /**
-     * @param Url $helper
-     * @return self
-     */
-    public function setUrlHelper(Url $helper)
-    {
-        $this->urlHelper = $helper;
         return $this;
     }
 
@@ -755,18 +773,12 @@ class Hal extends AbstractHelper implements
         ]);
         $events->trigger(__FUNCTION__, $this, $eventParams);
 
-        $path = call_user_func(
-            $this->urlHelper,
-            $eventParams['route'],
+        return $this->linkUrlBuilder->buildLinkUrl(
+            $route,
             $params->getArrayCopy(),
+            [],
             $reUseMatchedParams
         );
-
-        if (substr($path, 0, 4) == 'http') {
-            return $path;
-        }
-
-        return call_user_func($this->serverUrlHelper, $path);
     }
 
     /**
