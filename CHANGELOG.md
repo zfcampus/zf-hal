@@ -26,6 +26,11 @@ All notable changes to this project will be documented in this file, in reverse 
   users to provide substitutions for their functionality. (Extractors pull links
   and link collections in order to generate the relational links for a HAL-JSON
   payload.)
+- [#139](https://github.com/zfcampus/zf-hal/pull/139) adds the new method
+  `Hal::resetEntityHashStack()`; this method can be used when rendering multiple
+  responses and/or payloads within the same request cycle, in order to allow
+  re-using the same entity instances (normally, they would be skipped when
+  discovered on subsequent iterations).
 
 ### Deprecated
 
