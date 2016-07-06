@@ -151,14 +151,12 @@ class ResourceFactory
 
         // process any callbacks
         foreach ($params as $key => $param) {
-            // bind to the object if supported
-            if ($param instanceof Closure
-                && version_compare(PHP_VERSION, '5.4.0') >= 0
-            ) {
+            // bind to the object
+            if ($param instanceof Closure) {
                 $param = $param->bindTo($object);
             }
 
-            // pass the object for callbacks and non-bound closures
+            // pass the object for callbacks
             if (is_callable($param)) {
                 $params[$key] = call_user_func_array($param, [$object]);
             }
