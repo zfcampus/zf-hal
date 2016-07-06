@@ -14,6 +14,8 @@ use Zend\Stdlib\ArrayUtils;
  */
 class Collection implements Link\LinkCollectionAwareInterface
 {
+    use Link\LinkCollectionAwareTrait;
+
     /**
      * Additional attributes to render with the collection
      *
@@ -61,11 +63,6 @@ class Collection implements Link\LinkCollectionAwareInterface
      * @var string
      */
     protected $routeIdentifierName = 'id';
-
-    /**
-     * @var Link\LinkCollection
-     */
-    protected $links;
 
     /**
      * Current page
@@ -246,18 +243,6 @@ class Collection implements Link\LinkCollectionAwareInterface
     public function setEntityIdentifierName($identifier)
     {
         $this->entityIdentifierName = $identifier;
-        return $this;
-    }
-
-    /**
-     * Set link collection
-     *
-     * @param  Link\LinkCollection $links
-     * @return self
-     */
-    public function setLinks(Link\LinkCollection $links)
-    {
-        $this->links = $links;
         return $this;
     }
 
@@ -463,19 +448,6 @@ class Collection implements Link\LinkCollectionAwareInterface
             __CLASS__
         ), E_USER_DEPRECATED);
         return $this->setEntityRouteParams($params);
-    }
-
-    /**
-     * Get link collection
-     *
-     * @return Link\LinkCollection
-     */
-    public function getLinks()
-    {
-        if (!$this->links instanceof Link\LinkCollection) {
-            $this->setLinks(new Link\LinkCollection());
-        }
-        return $this->links;
     }
 
     /**
