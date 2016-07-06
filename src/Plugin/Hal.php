@@ -8,6 +8,7 @@ namespace ZF\Hal\Plugin;
 
 use ArrayObject;
 use Countable;
+use Zend\EventManager\EventInterface;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerAwareTrait;
@@ -24,8 +25,8 @@ use ZF\ApiProblem\ApiProblem;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
 use ZF\Hal\EntityHydratorManager;
-use ZF\Hal\Extractor\EntityExtractor;
 use ZF\Hal\Exception;
+use ZF\Hal\Extractor\EntityExtractor;
 use ZF\Hal\Extractor\LinkCollectionExtractorInterface;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
@@ -106,7 +107,7 @@ class Hal extends AbstractHelper implements
     protected $urlHelper;
 
     /**
-     * @var LinkCollectionExtractor
+     * @var LinkCollectionExtractorInterface
      */
     protected $linkCollectionExtractor;
 
@@ -158,7 +159,7 @@ class Hal extends AbstractHelper implements
         ]);
         $this->events = $events;
 
-        $events->attach('getIdFromEntity', function ($e) {
+        $events->attach('getIdFromEntity', function (EventInterface $e) {
             $entity = $e->getParam('entity');
 
             // Found id in array
