@@ -385,14 +385,6 @@ class Hal extends AbstractHelper implements
      *
      * @param  ExtractionInterface $hydrator
      * @return self
-        return $this;
-    }
-
-    /**
-     * Set the default hydrator to use if none specified for a class.
-     *
-     * @param  ExtractionInterface $hydrator
-     * @return self
      */
     public function setDefaultHydrator(ExtractionInterface $hydrator)
     {
@@ -1060,7 +1052,6 @@ class Hal extends AbstractHelper implements
         $entityRouteParams    = $halCollection->getEntityRouteParams();
         $entityRouteOptions   = $halCollection->getEntityRouteOptions();
         $metadataMap          = $this->getMetadataMap();
-        $entityMetadata       = null;
 
         foreach ($halCollection->getCollection() as $entity) {
             $eventParams = new ArrayObject([
