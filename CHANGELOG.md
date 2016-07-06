@@ -39,7 +39,10 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Fixed
 
-- Nothing.
+- [#111](https://github.com/zfcampus/zf-hal/pull/111) removes some code errantly
+  left in a comment from a previous merge conflict.
+- [#112](https://github.com/zfcampus/zf-hal/pull/112) conditionals based on PHP
+  5.4, as the minimum version is now 5.5.
 
 ## 1.3.0 - 2015-09-22
 

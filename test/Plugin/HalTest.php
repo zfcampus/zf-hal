@@ -792,13 +792,12 @@ class HalTest extends TestCase
         $this->assertArrayHasKey('injected', $rendered);
         $this->assertTrue($rendered['injected']);
 
-        $that = $this;
-        $this->plugin->getEventManager()->attach('renderCollection.post', function ($e) use ($that) {
+        $this->plugin->getEventManager()->attach('renderCollection.post', function ($e) {
             $collection = $e->getParam('collection');
             $payload = $e->getParam('payload');
 
-            $that->assertInstanceOf('ArrayObject', $payload);
-            $that->assertInstanceOf('ZF\Hal\Collection', $collection);
+            $this->assertInstanceOf('ArrayObject', $payload);
+            $this->assertInstanceOf('ZF\Hal\Collection', $collection);
 
             $payload['_post'] = true;
         });
