@@ -6,33 +6,36 @@
 
 namespace ZF\Hal\Factory;
 
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Zend\ServiceManager\AbstractPluginManager;
 use ZF\Hal\Exception;
+use ZF\Hal\Extractor\LinkCollectionExtractor;
+use ZF\Hal\Link;
 use ZF\Hal\Plugin;
 
-class HalViewHelperFactory implements FactoryInterface
+class HalViewHelperFactory
 {
     /**
-     * @param  ServiceLocatorInterface $serviceLocator
+     * @param  \Interop\Container\ContainerInterface|\Zend\ServiceManager\ServiceLocatorInterface $container
      * @return Plugin\Hal
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke($container)
     {
-        $services        = $serviceLocator->getServiceLocator();
+        $container = ($container instanceof AbstractPluginManager)
+            ? $container->getServiceLocator()
+            : $container;
 
         /* @var $rendererOptions \ZF\Hal\RendererOptions */
-        $rendererOptions = $services->get('ZF\Hal\RendererOptions');
-        $metadataMap     = $services->get('ZF\Hal\MetadataMap');
+        $rendererOptions = $container->get('ZF\Hal\RendererOptions');
+        $metadataMap     = $container->get('ZF\Hal\MetadataMap');
         $hydrators       = $metadataMap->getHydratorManager();
 
         $helper = new Plugin\Hal($hydrators);
         $helper->setMetadataMap($metadataMap);
 
-        $linkUrlBuilder = $services->get('ZF\Hal\Link\LinkUrlBuilder');
+        $linkUrlBuilder = $container->get(Link\LinkUrlBuilder::class);
         $helper->setLinkUrlBuilder($linkUrlBuilder);
 
-        $linkCollectionExtractor = $services->get('ZF\Hal\Extractor\LinkCollectionExtractor');
+        $linkCollectionExtractor = $container->get(LinkCollectionExtractor::class);
         $helper->setLinkCollectionExtractor($linkCollectionExtractor);
 
         $defaultHydrator = $rendererOptions->getDefaultHydrator();
@@ -57,5 +60,17 @@ class HalViewHelperFactory implements FactoryInterface
         }
 
         return $helper;
+    }
+
+    /**
+     * Proxies to __invoke() to provide backwards compatibility.
+     *
+     * @deprecated since 1.4.0; use __invoke instead.
+     * @param  \Zend\ServiceManager\ServiceLocatorInterface $container
+     * @return Plugin\Hal
+     */
+    public function createService($container)
+    {
+        return $this($container);
     }
 }

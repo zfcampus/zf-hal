@@ -304,6 +304,40 @@ class Hal extends AbstractHelper implements
     }
 
     /**
+     * @deprecated Since 1.4.0; use setLinkUrlBuilder() instead.
+     * @param callable $helper
+     * @throws Exception\DeprecatedMethodException
+     */
+    public function setServerUrlHelper(callable $helper)
+    {
+        throw new Exception\DeprecatedMethodException(sprintf(
+            '%s can no longer be used to influence URL generation; please '
+            . 'use %s::setLinkUrlBuilder() instead, providing a configured '
+            . '%s instance',
+            __METHOD__,
+            __CLASS__,
+            LinkUrlBuilder::class
+        ));
+    }
+
+    /**
+     * @deprecated Since 1.4.0; use setLinkUrlBuilder() instead.
+     * @param callable $helper
+     * @throws Exception\DeprecatedMethodException
+     */
+    public function setUrlHelper(callable $helper)
+    {
+        throw new Exception\DeprecatedMethodException(sprintf(
+            '%s can no longer be used to influence URL generation; please '
+            . 'use %s::setLinkUrlBuilder() instead, providing a configured '
+            . '%s instance',
+            __METHOD__,
+            __CLASS__,
+            LinkUrlBuilder::class
+        ));
+    }
+
+    /**
      * @return PaginationInjectorInterface
      */
     public function getPaginationInjector()

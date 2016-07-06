@@ -6,20 +6,17 @@
 
 namespace ZF\Hal\Factory;
 
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
 use ZF\Hal\Extractor\LinkCollectionExtractor;
+use ZF\Hal\Extractor\LinkExtractor;
 
-class LinkCollectionExtractorFactory implements FactoryInterface
+class LinkCollectionExtractorFactory
 {
     /**
-     * @param  ServiceLocatorInterface $serviceLocator
+     * @param  \Interop\Container\ContainerInterface|\Zend\ServiceManager\ServiceLocatorInterface $container
      * @return LinkCollectionExtractor
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke($container)
     {
-        $linkExtractor = $serviceLocator->get('ZF\Hal\Extractor\LinkExtractor');
-
-        return new LinkCollectionExtractor($linkExtractor);
+        return new LinkCollectionExtractor($container->get(LinkExtractor::class));
     }
 }

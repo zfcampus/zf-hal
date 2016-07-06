@@ -17,7 +17,7 @@ class LinkUrlBuilderFactoryTest extends TestCase
         $serviceManager = $this->getServiceManager();
 
         $factory = new LinkUrlBuilderFactory();
-        $builder = $factory->createService($serviceManager);
+        $builder = $factory($serviceManager);
 
         $this->assertInstanceOf('ZF\Hal\Link\LinkUrlBuilder', $builder);
     }
@@ -40,7 +40,7 @@ class LinkUrlBuilderFactoryTest extends TestCase
             ->with($options['options']['use_proxy']);
 
         $factory = new LinkUrlBuilderFactory();
-        $factory->createService($serviceManager);
+        $factory($serviceManager);
     }
 
     private function getServiceManager($config = [])

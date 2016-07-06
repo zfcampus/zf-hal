@@ -19,6 +19,7 @@ use Zend\View\Helper\Url as UrlHelper;
 use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
+use ZF\Hal\Exception;
 use ZF\Hal\Extractor\LinkCollectionExtractor;
 use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Link\Link;
@@ -2113,5 +2114,31 @@ class HalTest extends TestCase
 
         $this->plugin->renderEntity($halEntity);
         $this->assertTrue($triggered);
+    }
+
+    /**
+     * @group 125
+     */
+    public function testSetUrlHelperRaisesExceptionIndicatingDeprecation()
+    {
+        $this->setExpectedException(
+            Exception\DeprecatedMethodException::class,
+            'can no longer be used to influence URL generation'
+        );
+        $this->plugin->setUrlHelper(function () {
+        });
+    }
+
+    /**
+     * @group 125
+     */
+    public function testSetServerUrlHelperRaisesExceptionIndicatingDeprecation()
+    {
+        $this->setExpectedException(
+            Exception\DeprecatedMethodException::class,
+            'can no longer be used to influence URL generation'
+        );
+        $this->plugin->setServerUrlHelper(function () {
+        });
     }
 }

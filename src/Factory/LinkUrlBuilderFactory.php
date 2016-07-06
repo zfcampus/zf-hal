@@ -6,21 +6,19 @@
 
 namespace ZF\Hal\Factory;
 
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
 use ZF\Hal\Link\LinkUrlBuilder;
 
-class LinkUrlBuilderFactory implements FactoryInterface
+class LinkUrlBuilderFactory
 {
     /**
-     * @param  ServiceLocatorInterface $serviceLocator
+     * @param  \Interop\Container\ContainerInterface|\Zend\ServiceManager\ServiceLocatorInterface $container
      * @return LinkUrlBuilder
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke($container)
     {
-        $halConfig = $serviceLocator->get('ZF\Hal\HalConfig');
+        $halConfig = $container->get('ZF\Hal\HalConfig');
 
-        $viewHelperManager = $serviceLocator->get('ViewHelperManager');
+        $viewHelperManager = $container->get('ViewHelperManager');
 
         $serverUrlHelper = $viewHelperManager->get('ServerUrl');
         if (isset($halConfig['options']['use_proxy'])) {
