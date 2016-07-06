@@ -8,6 +8,8 @@ namespace ZF\Hal\View;
 
 use Zend\View\Strategy\JsonStrategy;
 use Zend\View\ViewEvent;
+use ZF\ApiProblem\View\ApiProblemModel;
+use Zend\Http\Response;
 
 /**
  * Extension of the JSON strategy to handle the HalJsonModel and provide
@@ -79,13 +81,15 @@ class HalJsonStrategy extends JsonStrategy
         $contentType = $this->contentType;
         $response    = $e->getResponse();
 
-        if ($model instanceof HalJsonModel
+        if ($model instanceof ApiProblemModel) {
+            $contentType = 'application/problem+json';
+        } elseif ($model instanceof HalJsonModel
             && ($model->isCollection() || $model->isEntity())
         ) {
             $contentType = 'application/hal+json';
         }
 
-        // Populate response
+        /** @var Response $response */
         $response->setContent($result);
         $headers = $response->getHeaders();
         $headers->addHeaderLine('content-type', $contentType);
