@@ -13,12 +13,33 @@ All notable changes to this project will be documented in this file, in reverse 
   `ZF\Hal\Link\SelfLinkInjector`; these are now used as collaborators to the
   `Hal` plugin to simplify internal logic, and allow users to provide alternate
   strategies for generating the `self` relational link.
+- [#125](https://github.com/zfcampus/zf-hal/pull/125) adds a new service,
+  `ZF\Hal\Link\LinkUrlBuilder`. This class composes the `ServerUrl` and `Url`
+  view helpers in order to provide the functionality required to build a
+  route-based link URL. The `Hal` plugin now consumes this instead of
+  implementing the logic internally.
+
+  The upshot is: you can replace the URL generation semantics for your
+  application entirely by pointing the service to your own implementation.
+- [#125](https://github.com/zfcampus/zf-hal/pull/125) adds service factories for
+  each of the `LinkExtractor` and `LinkCollectionExtractor`, which now allows
+  users to provide substitutions for their functionality. (Extractors pull links
+  and link collections in order to generate the relational links for a HAL-JSON
+  payload.)
 
 ### Deprecated
 
 - [#99](https://github.com/zfcampus/zf-hal/pull/99) deprecates usage of property
   access on `ZF\Hal\Entity` to retrieve the identifier and underlying entity
   instance.
+- [#125](https://github.com/zfcampus/zf-hal/pull/125) deprecates the usage of
+  `Hal::setServerUrlHelper()` and `Hal::setUrlHelper()`; these will each now
+  raise an exception indicating the user should use a `LinkUrlBuilder` for URL
+  generation instead.
+- [#125](https://github.com/zfcampus/zf-hal/pull/125) deprecates passing a
+  `ServerUrlHelper` and `UrlHelper` to the constructor of
+  `ZF\Hal\Exctractor\LinkExtractor`; it now expects a `LinkUrlBuilder` instance
+  instead. (This class is primarily an internal detail of the `Hal` plugin.)
 
 ### Removed
 
