@@ -1180,6 +1180,11 @@ class Hal extends AbstractHelper implements
 
     /**
      * Reset entity hash stack
+     *
+     * Call this method if you are rendering multiple responses within the same
+     * request cycle that may encounter the same entity instances.
+     *
+     * @return void
      */
     public function resetEntityHashStack()
     {
