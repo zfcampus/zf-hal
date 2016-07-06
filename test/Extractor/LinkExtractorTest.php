@@ -13,15 +13,17 @@ use Zend\Mvc\Router\RouteMatch;
 use Zend\View\Helper\Url as UrlHelper;
 use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Link\Link;
+use ZF\Hal\Link\LinkUrlBuilder;
 
 class LinkExtractorTest extends TestCase
 {
     public function testExtractGivenIncompleteLinkShouldThrowException()
     {
-        $serverUrlHelper = $this->getMock('Zend\View\Helper\ServerUrl');
-        $urlHelper       = $this->getMock('Zend\View\Helper\Url');
+        $linkUrlBuilder = $this->getMockBuilder('ZF\Hal\Link\LinkUrlBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $linkExtractor = new LinkExtractor($serverUrlHelper, $urlHelper);
+        $linkExtractor = new LinkExtractor($linkUrlBuilder);
 
         $link = $this->getMockBuilder('ZF\Hal\Link\Link')
             ->disableOriginalConstructor()
@@ -38,10 +40,11 @@ class LinkExtractorTest extends TestCase
 
     public function testExtractGivenLinkWithUrlShouldReturnThisOne()
     {
-        $serverUrlHelper = $this->getMock('Zend\View\Helper\ServerUrl');
-        $urlHelper       = $this->getMock('Zend\View\Helper\Url');
+        $linkUrlBuilder = $this->getMockBuilder('ZF\Hal\Link\LinkUrlBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $linkExtractor = new LinkExtractor($serverUrlHelper, $urlHelper);
+        $linkExtractor = new LinkExtractor($linkUrlBuilder);
 
         $params = [
             'rel' => 'resource',
@@ -56,10 +59,11 @@ class LinkExtractorTest extends TestCase
 
     public function testExtractShouldComposeAnyPropertiesInLink()
     {
-        $serverUrlHelper = $this->getMock('Zend\View\Helper\ServerUrl');
-        $urlHelper       = $this->getMock('Zend\View\Helper\Url');
+        $linkUrlBuilder = $this->getMockBuilder('ZF\Hal\Link\LinkUrlBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $linkExtractor = new LinkExtractor($serverUrlHelper, $urlHelper);
+        $linkExtractor = new LinkExtractor($linkUrlBuilder);
 
         $link = Link::factory([
             'rel'   => 'resource',
@@ -87,7 +91,9 @@ class LinkExtractorTest extends TestCase
         $serverUrlHelper = $this->getMock('Zend\View\Helper\ServerUrl');
         $urlHelper       = new UrlHelper;
 
-        $linkExtractor = new LinkExtractor($serverUrlHelper, $urlHelper);
+        $linkUrlBuilder = new LinkUrlBuilder($serverUrlHelper, $urlHelper);
+
+        $linkExtractor = new LinkExtractor($linkUrlBuilder);
 
         $match = $this->matchUrl('/resource/foo', $urlHelper);
         $this->assertEquals('foo', $match->getParam('id', false));
