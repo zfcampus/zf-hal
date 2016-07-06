@@ -6,11 +6,14 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Added
 
-- Nothing.
+- [#99](https://github.com/zfcampus/zf-hal/pull/99) adds accessors for the
+  `$entity` and `$id` properties of `ZF\Hal\Entity`.
 
 ### Deprecated
 
-- Nothing.
+- [#99](https://github.com/zfcampus/zf-hal/pull/99) deprecates usage of property
+  access on `ZF\Hal\Entity` to retrieve the identifier and underlying entity
+  instance.
 
 ### Removed
 
