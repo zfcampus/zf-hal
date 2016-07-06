@@ -8,6 +8,11 @@ All notable changes to this project will be documented in this file, in reverse 
 
 - [#99](https://github.com/zfcampus/zf-hal/pull/99) adds accessors for the
   `$entity` and `$id` properties of `ZF\Hal\Entity`.
+- [#124](https://github.com/zfcampus/zf-hal/pull/124) adds a new interface
+  `ZF\Hal\Link\SelfLinkInjectorInterface` and default implementation
+  `ZF\Hal\Link\SelfLinkInjector`; these are now used as collaborators to the
+  `Hal` plugin to simplify internal logic, and allow users to provide alternate
+  strategies for generating the `self` relational link.
 
 ### Deprecated
 
