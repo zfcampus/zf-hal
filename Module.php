@@ -6,6 +6,7 @@
 
 namespace ZF\Hal;
 
+use Zend\Loader\StandardAutoloader;
 use Zend\Mvc\MvcEvent;
 
 /**
@@ -20,13 +21,13 @@ class Module
      */
     public function getAutoloaderConfig()
     {
-        return array(
-            'Zend\Loader\StandardAutoloader' => array(
-                'namespaces' => array(
+        return [
+            StandardAutoloader::class => [
+                'namespaces' => [
                     __NAMESPACE__ => __DIR__ . '/src/',
-                ),
-            ),
-        );
+                ],
+            ],
+        ];
     }
 
     /**
@@ -44,12 +45,12 @@ class Module
      *
      * Attaches a render event.
      *
-     * @param  \Zend\Mvc\MvcEvent $e
+     * @param  MvcEvent $e
      */
-    public function onBootstrap($e)
+    public function onBootstrap(MvcEvent $e)
     {
         $events = $e->getTarget()->getEventManager();
-        $events->attach(MvcEvent::EVENT_RENDER, array($this, 'onRender'), 100);
+        $events->attach(MvcEvent::EVENT_RENDER, [$this, 'onRender'], 100);
     }
 
     /**
@@ -57,9 +58,9 @@ class Module
      *
      * Attaches a rendering/response strategy to the View.
      *
-     * @param  \Zend\Mvc\MvcEvent $e
+     * @param  MvcEvent $e
      */
-    public function onRender($e)
+    public function onRender(MvcEvent $e)
     {
         $result = $e->getResult();
         if (!$result instanceof View\HalJsonModel) {
