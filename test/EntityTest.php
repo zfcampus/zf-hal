@@ -81,4 +81,32 @@ class EntityTest extends TestCase
         $hal = new Entity(['foo' => 'bar'], null);
         $this->assertNull($hal->getId());
     }
+
+    public function magicProperties()
+    {
+        return [
+            'entity' => ['entity'],
+            'id'     => ['id'],
+        ];
+    }
+
+    /**
+     * @group 99
+     * @dataProvider magicProperties
+     */
+    public function testPropertyRetrievalEmitsDeprecationNotice($property)
+    {
+        $entity    = ['foo' => 'bar'];
+        $hal       = new Entity($entity, 'id');
+        $triggered = false;
+
+        set_error_handler(function ($errno, $errstr) use (&$triggered) {
+            $triggered = true;
+            $this->assertContains('Direct property access', $errstr);
+        }, E_USER_DEPRECATED);
+        $hal->$property;
+        restore_error_handler();
+
+        $this->assertTrue($triggered, 'Deprecation notice was not triggered!');
+    }
 }

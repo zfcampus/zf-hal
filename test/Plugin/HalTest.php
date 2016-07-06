@@ -1937,7 +1937,7 @@ class HalTest extends TestCase
         $user = $embedded['user'];
         $this->assertRelationalLinkContains('/user/matthew', 'self', $user);
 
-        foreach ($child->entity as $key => $value) {
+        foreach ($child->getEntity() as $key => $value) {
             $this->assertArrayHasKey($key, $user);
             $this->assertEquals($value, $user[$key]);
         }
@@ -1985,7 +1985,7 @@ class HalTest extends TestCase
             $user = $embedded['user'];
             $this->assertRelationalLinkContains('/user/matthew', 'self', $user);
 
-            foreach ($child->entity as $key => $value) {
+            foreach ($child->getEntity() as $key => $value) {
                 $this->assertArrayHasKey($key, $user);
                 $this->assertEquals($value, $user[$key]);
             }
@@ -2037,7 +2037,7 @@ class HalTest extends TestCase
             $user = $embedded['user'];
             $this->assertRelationalLinkContains('/user/matthew', 'self', $user);
 
-            foreach ($child->entity as $key => $value) {
+            foreach ($child->getEntity() as $key => $value) {
                 $this->assertArrayHasKey($key, $user);
                 $this->assertEquals($value, $user[$key]);
             }

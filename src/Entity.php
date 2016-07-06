@@ -50,8 +50,9 @@ class Entity implements Link\LinkCollectionAwareInterface
     {
         trigger_error(
             sprintf(
-                '%s is deprecated, use getters instead.',
-                __METHOD__
+                'Direct property access to %s::$%s is deprecated, use getters instead.',
+                __CLASS__,
+                $name
             ),
             E_USER_DEPRECATED
         );
