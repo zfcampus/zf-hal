@@ -1015,7 +1015,7 @@ class HalTest extends TestCase
 
         $entity = $this->plugin->createEntity($foo, 'api.foo', 'foo_id');
         $this->assertInstanceOf('ZF\Hal\Entity', $entity);
-        $this->assertSame($foo, $entity->entity);
+        $this->assertSame($foo, $entity->getEntity());
     }
 
     /**
@@ -1026,8 +1026,8 @@ class HalTest extends TestCase
         $entity = ['foo' => 'bar'];
         $hal    = $this->plugin->createEntity($entity, 'api.foo', 'foo_id');
         $this->assertInstanceOf('ZF\Hal\Entity', $hal);
-        $this->assertEquals($entity, $hal->entity);
-        $this->assertNull($hal->id);
+        $this->assertEquals($entity, $hal->getEntity());
+        $this->assertNull($hal->getId());
 
         $links = $hal->getLinks();
         $this->assertTrue($links->has('self'));
@@ -1937,7 +1937,7 @@ class HalTest extends TestCase
         $user = $embedded['user'];
         $this->assertRelationalLinkContains('/user/matthew', 'self', $user);
 
-        foreach ($child->entity as $key => $value) {
+        foreach ($child->getEntity() as $key => $value) {
             $this->assertArrayHasKey($key, $user);
             $this->assertEquals($value, $user[$key]);
         }
@@ -1985,7 +1985,7 @@ class HalTest extends TestCase
             $user = $embedded['user'];
             $this->assertRelationalLinkContains('/user/matthew', 'self', $user);
 
-            foreach ($child->entity as $key => $value) {
+            foreach ($child->getEntity() as $key => $value) {
                 $this->assertArrayHasKey($key, $user);
                 $this->assertEquals($value, $user[$key]);
             }
@@ -2037,7 +2037,7 @@ class HalTest extends TestCase
             $user = $embedded['user'];
             $this->assertRelationalLinkContains('/user/matthew', 'self', $user);
 
-            foreach ($child->entity as $key => $value) {
+            foreach ($child->getEntity() as $key => $value) {
                 $this->assertArrayHasKey($key, $user);
                 $this->assertEquals($value, $user[$key]);
             }
