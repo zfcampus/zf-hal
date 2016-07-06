@@ -145,7 +145,7 @@ class ChildEntitiesIntegrationTest extends TestCase
         ];
         $this->collection = [];
         foreach ($children as $info) {
-            $collection[] = call_user_func_array([$this, 'setUpChildEntity'], $info);
+            $this->collection[] = call_user_func_array([$this, 'setUpChildEntity'], $info);
         }
         $collection = new Collection($this->collection);
         $collection->setCollectionRoute('parent/child');
@@ -240,12 +240,13 @@ class ChildEntitiesIntegrationTest extends TestCase
         $this->assertObjectHasAttribute('_embedded', $test);
         $this->assertObjectHasAttribute('child', $test->_embedded);
         $this->assertInternalType('array', $test->_embedded->child);
+        $this->assertCount(2, $test->_embedded->child);
 
         foreach ($test->_embedded->child as $child) {
             $this->assertObjectHasAttribute('_links', $child);
             $this->assertObjectHasAttribute('self', $child->_links);
             $this->assertObjectHasAttribute('href', $child->_links->self);
-            $this->assertRegex(
+            $this->assertRegExp(
                 '#^http://localhost.localdomain/api/parent/anakin/child/[^/]+$#',
                 $child->_links->self->href
             );
@@ -268,7 +269,7 @@ class ChildEntitiesIntegrationTest extends TestCase
                     'child' => [
                         'type' => 'Segment',
                         'options' => [
-                            'route' => '/child[/:child_id]',
+                            'route' => '/child[/:child]',
                             'defaults' => [
                                 'controller' => 'Api\ChildController',
                             ],
@@ -292,7 +293,7 @@ class ChildEntitiesIntegrationTest extends TestCase
         $matches = $this->router->match($request);
         $this->assertInstanceOf('Zend\Mvc\Router\RouteMatch', $matches);
         $this->assertEquals('anakin', $matches->getParam('id'));
-        $this->assertEquals('luke', $matches->getParam('child_id'));
+        $this->assertEquals('luke', $matches->getParam('child'));
         $this->assertEquals('parent/child', $matches->getMatchedRouteName());
 
         // Emulate url helper factory and inject route matches
@@ -340,12 +341,13 @@ class ChildEntitiesIntegrationTest extends TestCase
         $this->assertObjectHasAttribute('_embedded', $test);
         $this->assertObjectHasAttribute('child', $test->_embedded);
         $this->assertInternalType('array', $test->_embedded->child);
+        $this->assertCount(2, $test->_embedded->child);
 
         foreach ($test->_embedded->child as $child) {
             $this->assertObjectHasAttribute('_links', $child);
             $this->assertObjectHasAttribute('self', $child->_links);
             $this->assertObjectHasAttribute('href', $child->_links->self);
-            $this->assertRegex(
+            $this->assertRegExp(
                 '#^http://localhost.localdomain/api/parent/anakin/child/[^/]+$#',
                 $child->_links->self->href
             );
