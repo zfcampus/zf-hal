@@ -8,20 +8,17 @@ namespace ZF\Hal;
 
 class Entity implements Link\LinkCollectionAwareInterface
 {
-    /**
-     * @var mixed
-     */
-    protected $id;
-
-    /**
-     * @var Link\LinkCollection
-     */
-    protected $links;
+    use Link\LinkCollectionAwareTrait;
 
     /**
      * @var object|array
      */
     protected $entity;
+
+    /**
+     * @var mixed
+     */
+    protected $id;
 
     /**
      * @param  object|array $entity
@@ -87,30 +84,5 @@ class Entity implements Link\LinkCollectionAwareInterface
     public function &getEntity()
     {
         return $this->entity;
-    }
-
-    /**
-     * Set link collection
-     *
-     * @param  Link\LinkCollection $links
-     * @return self
-     */
-    public function setLinks(Link\LinkCollection $links)
-    {
-        $this->links = $links;
-        return $this;
-    }
-
-    /**
-     * Get link collection
-     *
-     * @return Link\LinkCollection
-     */
-    public function getLinks()
-    {
-        if (!$this->links instanceof Link\LinkCollection) {
-            $this->setLinks(new Link\LinkCollection());
-        }
-        return $this->links;
     }
 }

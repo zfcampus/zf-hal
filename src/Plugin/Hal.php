@@ -10,6 +10,7 @@ use ArrayObject;
 use Countable;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
+use Zend\EventManager\EventManagerAwareTrait;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Hydrator\ExtractionInterface;
 use Zend\Hydrator\HydratorPluginManager;
@@ -43,6 +44,8 @@ class Hal extends AbstractHelper implements
     ControllerPluginInterface,
     EventManagerAwareInterface
 {
+    use EventManagerAwareTrait;
+
     /**
      * @var DispatchableInterface
      */
@@ -76,11 +79,6 @@ class Hal extends AbstractHelper implements
      * @var boolean
      */
     protected $renderCollections = true;
-
-    /**
-     * @var EventManagerInterface
-     */
-    protected $events;
 
     /**
      * @var HydratorPluginManager
@@ -144,21 +142,6 @@ class Hal extends AbstractHelper implements
     public function getController()
     {
         return $this->controller;
-    }
-
-    /**
-     * Retrieve the event manager instance
-     *
-     * Lazy-initializes one if none present.
-     *
-     * @return EventManagerInterface
-     */
-    public function getEventManager()
-    {
-        if (! $this->events) {
-            $this->setEventManager(new EventManager());
-        }
-        return $this->events;
     }
 
     /**
