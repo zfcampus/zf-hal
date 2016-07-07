@@ -20,14 +20,14 @@ Installation
 Run the following `composer` command:
 
 ```console
-$ composer require "zfcampus/zf-hal:~1.0-dev"
+$ composer require zfcampus/zf-hal
 ```
 
 Alternately, manually add the following to your `composer.json`, in the `require` section:
 
 ```javascript
 "require": {
-    "zfcampus/zf-hal": "~1.0-dev"
+    "zfcampus/zf-hal": "^1.4"
 }
 ```
 
@@ -37,15 +37,20 @@ Finally, add the module name to your project's `config/application.config.php` u
 key:
 
 ```php
-return array(
+return [
     /* ... */
-    'modules' => array(
+    'modules' => [
         /* ... */
         'ZF\Hal',
-    ),
+    ],
     /* ... */
-);
+];
 ```
+
+> ### zf-component-installer
+>
+> If you use [zf-component-installer](https://github.com/zendframework/zf-component-installer),
+> that plugin will install zf-hal as a module for you.
 
 Configuration
 =============
@@ -102,15 +107,15 @@ Each class in the metadata map may contain one or more of the following configur
 The `links` property is an array of arrays, each with the following structure:
 
 ```php
-array(
+[
     'rel'   => 'link relation',
     'url'   => 'string absolute URI to use', // OR
-    'route' => array(
+    'route' => [
         'name'    => 'route name for this link',
-        'params'  => array( /* any route params to use for link generation */ ),
-        'options' => array( /* any options to pass to the router */ ),
-    ),
-),
+        'params'  => [ /* any route params to use for link generation */ .,
+        'options' => [ /* any options to pass to the router */ .,
+    .,
+.,
 // repeat as needed for any additional relational links
 ```
 
@@ -119,7 +124,9 @@ array(
 The options key is used to configure general options of the Hal plugin.
 For now we have only one option available who contains the following configuration key:
 
-- `use_proxy` - boolean; set to `true` when you are using a proxy (for using HTTP_X_FORWARDED_PROTO, HTTP_X_FORWARDED_HOST, and HTTP_X_FORWARDED_PROTO instead of SSL HTTPS, HTTP_HOST, SERVER_PORT)
+- `use_proxy` - boolean; set to `true` when you are using a proxy (for using
+  `HTTP_X_FORWARDED_PROTO`, `HTTP_X_FORWARDED_HOST`, and
+  `HTTP_X_FORWARDED_PROTO` instead of `SSL HTTPS`, `HTTP_HOST, SERVER_PORT`)
 
 ### System Configuration
 
@@ -128,16 +135,16 @@ a ZF2-based application.
 
 ```php
 // Creates a "HalJson" selector for use with zfcampus/zf-content-negotiation
-'zf-content-negotiation' => array(
-    'selectors' => array(
-        'HalJson' => array(
-            'ZF\Hal\View\HalJsonModel' => array(
+'zf-content-negotiation' => [
+    'selectors' => [
+        'HalJson' => [
+            'ZF\Hal\View\HalJsonModel' => [
                 'application/json',
                 'application/*+json',
-            ),
-        ),
-    ),
-),
+            ],
+        ],
+    ],
+],
 ```
 
 ZF2 Events
@@ -173,7 +180,7 @@ class Module
 
         // The HAL plugin's EventManager instance does not compose a SharedEventManager,
         // so you must attach directly to it.
-        $hal->getEventManager()->attach('renderEntity', array($this, 'onRenderEntity'));
+        $hal->getEventManager()->attach('renderEntity', [$this, 'onRenderEntity']);
     }
 
     public function onRenderEntity($e)
@@ -185,12 +192,12 @@ class Module
         }
 
         // Add a "describedBy" relational link
-        $entity->getLinks()->add(\ZF\Hal\Link\Link::factory(array(
+        $entity->getLinks()->add(\ZF\Hal\Link\Link::factory([
             'rel' => 'describedBy',
-            'route' => array(
+            'route' => [
                 'name' => 'my/api/docs',
-            ),
-        )));
+            ],
+        ]));
     }
 }
 ```
