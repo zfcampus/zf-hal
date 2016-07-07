@@ -8,6 +8,7 @@ namespace ZFTest\Hal\Plugin;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use ReflectionObject;
+use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\Router\Exception as V2RouterException;
 use Zend\Mvc\Router\Http\Segment as V2Segment;
@@ -106,10 +107,8 @@ class HalTest extends TestCase
         $event->setRouter($router);
         $router->setRequestUri(new Http('http://localhost.localdomain/resource'));
 
-        $controller = $this->controller = $this->createMock('Zend\Mvc\Controller\AbstractRestfulController');
-        $controller->expects($this->any())
-            ->method('getEvent')
-            ->will($this->returnValue($event));
+        $controller = $this->controller = $this->prophesize(AbstractRestfulController::class);
+        $controller->getEvent()->willReturn($event);
 
         $this->urlHelper = $urlHelper = new UrlHelper();
         $urlHelper->setRouter($router);
@@ -118,8 +117,8 @@ class HalTest extends TestCase
         $serverUrlHelper->setScheme('http');
         $serverUrlHelper->setHost('localhost.localdomain');
 
-        $this->plugin = $plugin = new HalHelper(new Hydrator\HydratorPluginManager(new ServiceManager()));
-        $plugin->setController($controller);
+        $this->plugin = $plugin = new HalHelper();
+        $plugin->setController($controller->reveal());
 
         $linkUrlBuilder = new LinkUrlBuilder($serverUrlHelper, $urlHelper);
         $plugin->setLinkUrlBuilder($linkUrlBuilder);
@@ -833,27 +832,16 @@ class HalTest extends TestCase
 
     public function testFromLinkShouldUseLinkExtractor()
     {
+        $link = new Link('foo');
         $extraction = true;
 
-        $linkExtractor = $this->getMockBuilder('ZF\Hal\Extractor\LinkExtractor')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $linkExtractor
-            ->expects($this->once())
-            ->method('extract')
-            ->will($this->returnValue($extraction));
+        $linkExtractor = $this->prophesize(LinkExtractor::class);
+        $linkExtractor->extract($link)->willReturn($extraction);
 
-        $linkCollectionExtractor = $this->getMockBuilder('ZF\Hal\Extractor\LinkCollectionExtractor')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $linkCollectionExtractor
-            ->expects($this->once())
-            ->method('getLinkExtractor')
-            ->will($this->returnValue($linkExtractor));
+        $linkCollectionExtractor = $this->prophesize(LinkCollectionExtractor::class);
+        $linkCollectionExtractor->getLinkExtractor()->willReturn($linkExtractor->reveal());
 
-        $this->plugin->setLinkCollectionExtractor($linkCollectionExtractor);
-
-        $link = new Link('foo');
+        $this->plugin->setLinkCollectionExtractor($linkCollectionExtractor->reveal());
 
         $result = $this->plugin->fromLink($link);
 
@@ -862,19 +850,13 @@ class HalTest extends TestCase
 
     public function testFromLinkCollectionShouldUseLinkCollectionExtractor()
     {
+        $linkCollection = new LinkCollection();
         $extraction = true;
 
-        $linkCollectionExtractor = $this->getMockBuilder('ZF\Hal\Extractor\LinkCollectionExtractor')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $linkCollectionExtractor
-            ->expects($this->once())
-            ->method('extract')
-            ->will($this->returnValue($extraction));
+        $linkCollectionExtractor = $this->prophesize(LinkCollectionExtractor::class);
+        $linkCollectionExtractor->extract($linkCollection)->willReturn($extraction);
 
-        $this->plugin->setLinkCollectionExtractor($linkCollectionExtractor);
-
-        $linkCollection = new LinkCollection();
+        $this->plugin->setLinkCollectionExtractor($linkCollectionExtractor->reveal());
 
         $result = $this->plugin->fromLinkCollection($linkCollection);
 
