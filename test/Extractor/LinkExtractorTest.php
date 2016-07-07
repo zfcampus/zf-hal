@@ -90,7 +90,7 @@ class LinkExtractorTest extends TestCase
      */
     public function testPassingFalseReuseParamsOptionShouldOmitMatchedParametersInGeneratedLink()
     {
-        $serverUrlHelper = $this->createMock('Zend\View\Helper\ServerUrl');
+        $serverUrlHelper = $this->getMockBuilder('Zend\View\Helper\ServerUrl')->getMock();
         $urlHelper       = new UrlHelper;
 
         $linkUrlBuilder = new LinkUrlBuilder($serverUrlHelper, $urlHelper);

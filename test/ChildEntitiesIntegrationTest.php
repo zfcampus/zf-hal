@@ -11,7 +11,9 @@ use Zend\Http\Request;
 use Zend\Hydrator\HydratorPluginManager;
 use Zend\Mvc\Controller\PluginManager as ControllerPluginManager;
 use Zend\Mvc\Router\Http\TreeRouteStack as V2TreeRouteStack;
+use Zend\Mvc\Router\RouteMatch as V2RouteMatch;
 use Zend\Router\Http\TreeRouteStack;
+use Zend\Router\RouteMatch;
 use Zend\ServiceManager\ServiceManager;
 use Zend\View\HelperPluginManager;
 use Zend\View\Helper\ServerUrl as ServerUrlHelper;
@@ -178,7 +180,8 @@ class ChildEntitiesIntegrationTest extends TestCase
         $request = new Request();
         $request->setUri($uri);
         $matches = $this->router->match($request);
-        $this->assertInstanceOf('Zend\Router\RouteMatch', $matches);
+        $routeClass = class_exists(V2RouteMatch::class) ? V2RouteMatch::class : RouteMatch::class;
+        $this->assertInstanceOf($routeClass, $matches);
         $this->assertEquals('anakin', $matches->getParam('parent'));
         $this->assertEquals('parent', $matches->getMatchedRouteName());
 
@@ -203,7 +206,8 @@ class ChildEntitiesIntegrationTest extends TestCase
         $request = new Request();
         $request->setUri($uri);
         $matches = $this->router->match($request);
-        $this->assertInstanceOf('Zend\Router\RouteMatch', $matches);
+        $routeClass = class_exists(V2RouteMatch::class) ? V2RouteMatch::class : RouteMatch::class;
+        $this->assertInstanceOf($routeClass, $matches);
         $this->assertEquals('anakin', $matches->getParam('parent'));
         $this->assertEquals('luke', $matches->getParam('child'));
         $this->assertEquals('parent/child', $matches->getMatchedRouteName());
@@ -229,7 +233,8 @@ class ChildEntitiesIntegrationTest extends TestCase
         $request = new Request();
         $request->setUri($uri);
         $matches = $this->router->match($request);
-        $this->assertInstanceOf('Zend\Router\RouteMatch', $matches);
+        $routeClass = class_exists(V2RouteMatch::class) ? V2RouteMatch::class : RouteMatch::class;
+        $this->assertInstanceOf($routeClass, $matches);
         $this->assertEquals('anakin', $matches->getParam('parent'));
         $this->assertNull($matches->getParam('child'));
         $this->assertEquals('parent/child', $matches->getMatchedRouteName());
@@ -304,7 +309,8 @@ class ChildEntitiesIntegrationTest extends TestCase
         $request = new Request();
         $request->setUri($uri);
         $matches = $this->router->match($request);
-        $this->assertInstanceOf('Zend\Router\RouteMatch', $matches);
+        $routeClass = class_exists(V2RouteMatch::class) ? V2RouteMatch::class : RouteMatch::class;
+        $this->assertInstanceOf($routeClass, $matches);
         $this->assertEquals('anakin', $matches->getParam('id'));
         $this->assertEquals('luke', $matches->getParam('child'));
         $this->assertEquals('parent/child', $matches->getMatchedRouteName());
@@ -332,7 +338,8 @@ class ChildEntitiesIntegrationTest extends TestCase
         $request = new Request();
         $request->setUri($uri);
         $matches = $this->router->match($request);
-        $this->assertInstanceOf('Zend\Router\RouteMatch', $matches);
+        $routeClass = class_exists(V2RouteMatch::class) ? V2RouteMatch::class : RouteMatch::class;
+        $this->assertInstanceOf($routeClass, $matches);
         $this->assertEquals('anakin', $matches->getParam('id'));
         $this->assertNull($matches->getParam('child_id'));
         $this->assertEquals('parent/child', $matches->getMatchedRouteName());

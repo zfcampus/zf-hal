@@ -34,7 +34,7 @@ class HalViewHelperFactoryTest extends TestCase
         }
         $services->setService(RendererOptions::class, $rendererOptions);
 
-        $metadataMap = $this->createMock('ZF\Hal\Metadata\MetadataMap');
+        $metadataMap = $this->getMockBuilder('ZF\Hal\Metadata\MetadataMap')->getMock();
         $metadataMap
             ->expects($this->once())
             ->method('getHydratorManager')

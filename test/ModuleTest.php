@@ -27,7 +27,7 @@ class ModuleTest extends TestCase
 
     public function testOnRenderWhenMvcEventResultIsNotHalJsonModel()
     {
-        $mvcEvent = $this->createMock('Zend\Mvc\MvcEvent');
+        $mvcEvent = $this->getMockBuilder('Zend\Mvc\MvcEvent')->getMock();
         $mvcEvent
             ->expects($this->once())
             ->method('getResult')
@@ -45,7 +45,7 @@ class ModuleTest extends TestCase
 
         $view = new View();
 
-        $eventManager = $this->createMock('Zend\EventManager\EventManager');
+        $eventManager = $this->getMockBuilder('Zend\EventManager\EventManager')->getMock();
         $eventManager
             ->expects($this->exactly(2))
             ->method('attach');
@@ -56,13 +56,13 @@ class ModuleTest extends TestCase
         $serviceManager->setService('ZF\Hal\JsonStrategy', $strategy);
         $serviceManager->setService('View', $view);
 
-        $application = $this->createMock('Zend\Mvc\ApplicationInterface');
+        $application = $this->getMockBuilder('Zend\Mvc\ApplicationInterface')->getMock();
         $application
             ->expects($this->once())
             ->method('getServiceManager')
             ->will($this->returnValue($serviceManager));
 
-        $mvcEvent = $this->createMock('Zend\Mvc\MvcEvent');
+        $mvcEvent = $this->getMockBuilder('Zend\Mvc\MvcEvent')->getMock();
         $mvcEvent
             ->expects($this->at(0))
             ->method('getResult')
