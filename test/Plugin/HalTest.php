@@ -252,7 +252,7 @@ class HalTest extends TestCase
                 'entity_identifier_name' => 'custom_id',
             ],
         ]);
-        
+
         $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
 
         $this->plugin->setMetadataMap($metadata);
@@ -908,7 +908,7 @@ class HalTest extends TestCase
                 'entity_route_name'   => 'hostname/embedded',
             ],
         ]);
-        
+
         $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
 
         $this->plugin->setMetadataMap($metadata);

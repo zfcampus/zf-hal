@@ -32,11 +32,11 @@ use ZF\Hal\View\HalJsonRenderer;
  */
 class ChildEntitiesIntegrationTest extends TestCase
 {
-    
+
     protected $router;
     protected $helpers;
     protected $renderer;
-    
+
     public function setUp()
     {
         $this->setupRouter();
@@ -71,7 +71,7 @@ class ChildEntitiesIntegrationTest extends TestCase
         $helpers->setService('serverUrl', $serverUrlHelper);
         $helpers->setService('Hal', $linksHelper);
 
-        $this->plugins = $plugins = new ControllerPluginManager( new ServiceManager());
+        $this->plugins = $plugins = new ControllerPluginManager(new ServiceManager());
         $plugins->setService('Hal', $linksHelper);
     }
 

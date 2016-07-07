@@ -42,7 +42,7 @@ class ModuleTest extends TestCase
     public function testOnRenderAttachesJsonStrategy()
     {
         $strategy = new HalJsonStrategy(new HalJsonRenderer(new ApiProblemRenderer()));
-        
+
         $view = new View();
 
         $eventManager = $this->createMock('Zend\EventManager\EventManager');

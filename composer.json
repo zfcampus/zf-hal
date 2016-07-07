@@ -50,5 +50,14 @@
         "psr-4": {
             "ZFTest\\Hal\\": "test/"
         }
+    },
+    "scripts": {
+        "check": [
+            "@cs-check",
+            "@test"
+        ],
+        "cs-check": "phpcs",
+        "cs-fix": "phpcbf",
+        "test": "phpunit"
     }
 }

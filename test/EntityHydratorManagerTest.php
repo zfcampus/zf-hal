@@ -89,7 +89,7 @@ class EntityHydratorManagerTest extends TestCase
                 'hydrator' => $hydratorClass,
             ],
         ]);
-        
+
         $metadataMap->setHydratorManager(new HydratorPluginManager(new ServiceManager()));
 
         $hydratorPluginManager = new HydratorPluginManager(new ServiceManager());
