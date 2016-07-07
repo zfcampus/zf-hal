@@ -8,8 +8,13 @@ namespace ZFTest\Hal;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use Zend\Http\Request;
+use Zend\Hydrator\HydratorPluginManager;
 use Zend\Mvc\Controller\PluginManager as ControllerPluginManager;
-use Zend\Mvc\Router\Http\TreeRouteStack;
+use Zend\Mvc\Router\Http\TreeRouteStack as V2TreeRouteStack;
+use Zend\Mvc\Router\RouteMatch as V2RouteMatch;
+use Zend\Router\Http\TreeRouteStack;
+use Zend\Router\RouteMatch;
+use Zend\ServiceManager\ServiceManager;
 use Zend\View\HelperPluginManager;
 use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use Zend\View\Helper\Url as UrlHelper;
@@ -29,6 +34,11 @@ use ZF\Hal\View\HalJsonRenderer;
  */
 class ChildEntitiesIntegrationTest extends TestCase
 {
+
+    protected $router;
+    protected $helpers;
+    protected $renderer;
+
     public function setUp()
     {
         $this->setupRouter();
@@ -58,13 +68,13 @@ class ChildEntitiesIntegrationTest extends TestCase
         $linkCollectionExtractor = new LinkCollectionExtractor($linkExtractor);
         $linksHelper->setLinkCollectionExtractor($linkCollectionExtractor);
 
-        $this->helpers = $helpers = new HelperPluginManager();
+        $this->helpers = $helpers = new HelperPluginManager(new ServiceManager());
         $helpers->setService('url', $urlHelper);
         $helpers->setService('serverUrl', $serverUrlHelper);
-        $helpers->setService('hal', $linksHelper);
+        $helpers->setService('Hal', $linksHelper);
 
-        $this->plugins = $plugins = new ControllerPluginManager();
-        $plugins->setService('hal', $linksHelper);
+        $this->plugins = $plugins = new ControllerPluginManager(new ServiceManager());
+        $plugins->setService('Hal', $linksHelper);
     }
 
     public function setupRenderer()
@@ -101,7 +111,10 @@ class ChildEntitiesIntegrationTest extends TestCase
                 ],
             ],
         ];
-        $this->router = $router = new TreeRouteStack();
+
+        $class = class_exists(V2TreeRouteStack::class) ? V2TreeRouteStack::class : TreeRouteStack::class;
+
+        $this->router = $router = new $class();
         $router->addRoutes($routes);
     }
 
@@ -167,7 +180,8 @@ class ChildEntitiesIntegrationTest extends TestCase
         $request = new Request();
         $request->setUri($uri);
         $matches = $this->router->match($request);
-        $this->assertInstanceOf('Zend\Mvc\Router\RouteMatch', $matches);
+        $routeClass = class_exists(V2RouteMatch::class) ? V2RouteMatch::class : RouteMatch::class;
+        $this->assertInstanceOf($routeClass, $matches);
         $this->assertEquals('anakin', $matches->getParam('parent'));
         $this->assertEquals('parent', $matches->getMatchedRouteName());
 
@@ -192,7 +206,8 @@ class ChildEntitiesIntegrationTest extends TestCase
         $request = new Request();
         $request->setUri($uri);
         $matches = $this->router->match($request);
-        $this->assertInstanceOf('Zend\Mvc\Router\RouteMatch', $matches);
+        $routeClass = class_exists(V2RouteMatch::class) ? V2RouteMatch::class : RouteMatch::class;
+        $this->assertInstanceOf($routeClass, $matches);
         $this->assertEquals('anakin', $matches->getParam('parent'));
         $this->assertEquals('luke', $matches->getParam('child'));
         $this->assertEquals('parent/child', $matches->getMatchedRouteName());
@@ -218,7 +233,8 @@ class ChildEntitiesIntegrationTest extends TestCase
         $request = new Request();
         $request->setUri($uri);
         $matches = $this->router->match($request);
-        $this->assertInstanceOf('Zend\Mvc\Router\RouteMatch', $matches);
+        $routeClass = class_exists(V2RouteMatch::class) ? V2RouteMatch::class : RouteMatch::class;
+        $this->assertInstanceOf($routeClass, $matches);
         $this->assertEquals('anakin', $matches->getParam('parent'));
         $this->assertNull($matches->getParam('child'));
         $this->assertEquals('parent/child', $matches->getMatchedRouteName());
@@ -278,7 +294,9 @@ class ChildEntitiesIntegrationTest extends TestCase
                 ],
             ],
         ];
-        $this->router = $router = new TreeRouteStack();
+
+        $class = class_exists(V2TreeRouteStack::class) ? V2TreeRouteStack::class : TreeRouteStack::class;
+        $this->router = $router = new $class();
         $router->addRoutes($routes);
         $this->helpers->get('url')->setRouter($router);
     }
@@ -291,7 +309,8 @@ class ChildEntitiesIntegrationTest extends TestCase
         $request = new Request();
         $request->setUri($uri);
         $matches = $this->router->match($request);
-        $this->assertInstanceOf('Zend\Mvc\Router\RouteMatch', $matches);
+        $routeClass = class_exists(V2RouteMatch::class) ? V2RouteMatch::class : RouteMatch::class;
+        $this->assertInstanceOf($routeClass, $matches);
         $this->assertEquals('anakin', $matches->getParam('id'));
         $this->assertEquals('luke', $matches->getParam('child'));
         $this->assertEquals('parent/child', $matches->getMatchedRouteName());
@@ -319,7 +338,8 @@ class ChildEntitiesIntegrationTest extends TestCase
         $request = new Request();
         $request->setUri($uri);
         $matches = $this->router->match($request);
-        $this->assertInstanceOf('Zend\Mvc\Router\RouteMatch', $matches);
+        $routeClass = class_exists(V2RouteMatch::class) ? V2RouteMatch::class : RouteMatch::class;
+        $this->assertInstanceOf($routeClass, $matches);
         $this->assertEquals('anakin', $matches->getParam('id'));
         $this->assertNull($matches->getParam('child_id'));
         $this->assertEquals('parent/child', $matches->getMatchedRouteName());

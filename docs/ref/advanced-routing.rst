@@ -3,8 +3,9 @@
 Advanced Routing
 ================
 
-The recommended route for a resource is a ``Zend\Mvc\Router\Http\Segment``
-route, with an identifier:
+The recommended route for a resource is a ``Zend\Router\Http\Segment``
+route (or ``Zend\Mvc\Router\Http\Segment``, if using zend-mvc v2 releases), with
+an identifier:
 
 .. code-block:: php
 

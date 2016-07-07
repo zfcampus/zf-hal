@@ -7,6 +7,7 @@
 namespace ZF\Hal\Metadata;
 
 use Zend\Hydrator\HydratorPluginManager;
+use Zend\ServiceManager\ServiceManager;
 use ZF\Hal\Exception;
 
 class MetadataMap
@@ -57,7 +58,7 @@ class MetadataMap
     public function getHydratorManager()
     {
         if (null === $this->hydrators) {
-            $this->setHydratorManager(new HydratorPluginManager());
+            $this->setHydratorManager(new HydratorPluginManager(new ServiceManager()));
         }
         return $this->hydrators;
     }

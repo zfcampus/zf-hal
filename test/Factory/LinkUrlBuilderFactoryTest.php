@@ -8,7 +8,9 @@ namespace ZFTest\Hal\Factory;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use Zend\ServiceManager\ServiceManager;
+use Zend\View\Helper;
 use ZF\Hal\Factory\LinkUrlBuilderFactory;
+use ZF\Hal\Link\LinkUrlBuilder;
 
 class LinkUrlBuilderFactoryTest extends TestCase
 {
@@ -19,7 +21,7 @@ class LinkUrlBuilderFactoryTest extends TestCase
         $factory = new LinkUrlBuilderFactory();
         $builder = $factory($serviceManager);
 
-        $this->assertInstanceOf('ZF\Hal\Link\LinkUrlBuilder', $builder);
+        $this->assertInstanceOf(LinkUrlBuilder::class, $builder);
     }
 
     public function testOptionUseProxyIfPresentInConfig()
@@ -31,13 +33,9 @@ class LinkUrlBuilderFactoryTest extends TestCase
         ];
         $serviceManager = $this->getServiceManager($options);
 
-        $viewHelperManager = $serviceManager->get('ViewHelperManager');
-        $serverUrlHelper = $viewHelperManager->get('ServerUrl');
-
-        $serverUrlHelper
-            ->expects($this->once())
-            ->method('setUseProxy')
-            ->with($options['options']['use_proxy']);
+        $this->serverUrlHelper
+            ->setUseProxy($options['options']['use_proxy'])
+            ->shouldBeCalled();
 
         $factory = new LinkUrlBuilderFactory();
         $factory($serviceManager);
@@ -52,11 +50,11 @@ class LinkUrlBuilderFactoryTest extends TestCase
         $viewHelperManager = new ServiceManager();
         $serviceManager->setService('ViewHelperManager', $viewHelperManager);
 
-        $serverUrlHelper = $this->getMock('Zend\View\Helper\ServerUrl');
-        $viewHelperManager->setService('ServerUrl', $serverUrlHelper);
+        $this->serverUrlHelper = $serverUrlHelper = $this->prophesize(Helper\ServerUrl::class);
+        $viewHelperManager->setService('ServerUrl', $serverUrlHelper->reveal());
 
-        $urlHelper = $this->getMock('Zend\View\Helper\Url');
-        $viewHelperManager->setService('Url', $urlHelper);
+        $this->urlHelper = $urlHelper = $this->prophesize(Helper\Url::class);
+        $viewHelperManager->setService('Url', $urlHelper->reveal());
 
         return $serviceManager;
     }

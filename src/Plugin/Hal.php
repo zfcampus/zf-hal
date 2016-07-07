@@ -8,6 +8,7 @@ namespace ZF\Hal\Plugin;
 
 use ArrayObject;
 use Countable;
+use Zend\EventManager\Event;
 use Zend\EventManager\EventInterface;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
@@ -17,6 +18,7 @@ use Zend\Hydrator\ExtractionInterface;
 use Zend\Hydrator\HydratorPluginManager;
 use Zend\Mvc\Controller\Plugin\PluginInterface as ControllerPluginInterface;
 use Zend\Paginator\Paginator;
+use Zend\ServiceManager\ServiceManager;
 use Zend\Stdlib\DispatchableInterface;
 use Zend\View\Helper\AbstractHelper;
 use ZF\ApiProblem\ApiProblem;
@@ -125,7 +127,7 @@ class Hal extends AbstractHelper implements
     public function __construct(HydratorPluginManager $hydrators = null)
     {
         if (null === $hydrators) {
-            $hydrators = new HydratorPluginManager();
+            $hydrators = new HydratorPluginManager(new ServiceManager());
         }
         $this->hydrators = $hydrators;
     }
@@ -1048,6 +1050,7 @@ class Hal extends AbstractHelper implements
         $entityRouteOptions   = $halCollection->getEntityRouteOptions();
         $metadataMap          = $this->getMetadataMap();
 
+
         foreach ($halCollection->getCollection() as $entity) {
             $eventParams = new ArrayObject([
                 'collection'   => $halCollection,
@@ -1153,22 +1156,18 @@ class Hal extends AbstractHelper implements
             return (null !== $r && false !== $r);
         };
 
-        $results = $this->getEventManager()->trigger(
-            __FUNCTION__,
-            $this,
-            $params,
-            $callback
+        $results = $this->getEventManager()->triggerEventUntil(
+            $callback,
+            new Event(__FUNCTION__, $this, $params)
         );
 
         if ($results->stopped()) {
             return $results->last();
         }
 
-        $results = $this->getEventManager()->trigger(
-            'getIdFromResource',
-            $this,
-            $params,
-            $callback
+        $results = $this->getEventManager()->triggerEventUntil(
+            $callback,
+            new Event('getIdFromResource', $this, $params)
         );
 
         if ($results->stopped()) {

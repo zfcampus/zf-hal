@@ -1,32 +1,27 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Hal\Factory;
 
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Interop\Container\ContainerInterface;
 
-class HalConfigFactory implements FactoryInterface
+class HalConfigFactory
 {
     /**
-     * @param  ServiceLocatorInterface $serviceLocator
-     * @return array
+     * @param ContainerInterface $container
+     * @return array|\ArrayAccess
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container)
     {
-        $config = [];
-        if ($serviceLocator->has('config')) {
-            $config = $serviceLocator->get('config');
-        }
+        $config = $container->has('config')
+            ? $container->get('config')
+            : [];
 
-        $halConfig = [];
-        if (isset($config['zf-hal']) && is_array($config['zf-hal'])) {
-            $halConfig = $config['zf-hal'];
-        }
-
-        return $halConfig;
+        return (isset($config['zf-hal']) && is_array($config['zf-hal']))
+            ? $config['zf-hal']
+            : [];
     }
 }

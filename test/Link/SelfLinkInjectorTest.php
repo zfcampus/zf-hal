@@ -6,6 +6,7 @@
 
 namespace ZFTest\Hal\Link;
 
+use Prophecy\Argument;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
 use ZF\Hal\Link\LinkCollection;
@@ -16,19 +17,13 @@ class SelfLinkInjectorTest extends TestCase
 {
     public function testInjectSelfLinkAlreadyAddedShouldBePrevented()
     {
-        $linkCollection = $this->getMock(LinkCollection::class);
+        $linkCollection = $this->prophesize(LinkCollection::class);
 
-        $linkCollection
-            ->method('has')
-            ->with('self')
-            ->will($this->returnValue(true));
-
-        $linkCollection
-            ->expects($this->never())
-            ->method('add');
+        $linkCollection->has('self')->willReturn(true);
+        $linkCollection->add(Argument::any())->shouldNotBeCalled();
 
         $resource = new Entity([]);
-        $resource->setLinks($linkCollection);
+        $resource->setLinks($linkCollection->reveal());
 
         $injector = new SelfLinkInjector();
         $injector->injectSelfLink($resource, 'foo');
