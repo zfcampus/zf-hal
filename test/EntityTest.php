@@ -40,8 +40,8 @@ class EntityTest extends TestCase
     {
         $entity = new stdClass;
         $hal    = new Entity($entity, 'id');
-        $this->assertSame($entity, $hal->entity);
-        $this->assertEquals('id', $hal->id);
+        $this->assertSame($entity, $hal->getEntity());
+        $this->assertEquals('id', $hal->getId());
     }
 
     public function testComposesLinkCollectionByDefault()
@@ -64,12 +64,12 @@ class EntityTest extends TestCase
     {
         $entity = ['foo' => 'bar'];
         $hal    = new Entity($entity, 'id');
-        $this->assertEquals($entity, $hal->entity);
+        $this->assertEquals($entity, $hal->getEntity());
 
-        $entity =& $hal->entity;
+        $entity =& $hal->getEntity();
         $entity['foo'] = 'baz';
 
-        $secondRetrieval =& $hal->entity;
+        $secondRetrieval =& $hal->getEntity();
         $this->assertEquals('baz', $secondRetrieval['foo']);
     }
 
@@ -79,6 +79,34 @@ class EntityTest extends TestCase
     public function testConstructorAllowsNullIdentifier()
     {
         $hal = new Entity(['foo' => 'bar'], null);
-        $this->assertNull($hal->id);
+        $this->assertNull($hal->getId());
+    }
+
+    public function magicProperties()
+    {
+        return [
+            'entity' => ['entity'],
+            'id'     => ['id'],
+        ];
+    }
+
+    /**
+     * @group 99
+     * @dataProvider magicProperties
+     */
+    public function testPropertyRetrievalEmitsDeprecationNotice($property)
+    {
+        $entity    = ['foo' => 'bar'];
+        $hal       = new Entity($entity, 'id');
+        $triggered = false;
+
+        set_error_handler(function ($errno, $errstr) use (&$triggered) {
+            $triggered = true;
+            $this->assertContains('Direct property access', $errstr);
+        }, E_USER_DEPRECATED);
+        $hal->$property;
+        restore_error_handler();
+
+        $this->assertTrue($triggered, 'Deprecation notice was not triggered!');
     }
 }

@@ -8,6 +8,7 @@ namespace ZF\Hal\Plugin;
 
 use ArrayObject;
 use Countable;
+use Zend\EventManager\Event;
 use Zend\EventManager\EventInterface;
 use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
@@ -17,10 +18,9 @@ use Zend\Hydrator\ExtractionInterface;
 use Zend\Hydrator\HydratorPluginManager;
 use Zend\Mvc\Controller\Plugin\PluginInterface as ControllerPluginInterface;
 use Zend\Paginator\Paginator;
+use Zend\ServiceManager\ServiceManager;
 use Zend\Stdlib\DispatchableInterface;
 use Zend\View\Helper\AbstractHelper;
-use Zend\View\Helper\ServerUrl;
-use Zend\View\Helper\Url;
 use ZF\ApiProblem\ApiProblem;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
@@ -31,8 +31,11 @@ use ZF\Hal\Extractor\LinkCollectionExtractorInterface;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Link\LinkCollectionAwareInterface;
+use ZF\Hal\Link\LinkUrlBuilder;
 use ZF\Hal\Link\PaginationInjector;
 use ZF\Hal\Link\PaginationInjectorInterface;
+use ZF\Hal\Link\SelfLinkInjector;
+use ZF\Hal\Link\SelfLinkInjectorInterface;
 use ZF\Hal\Metadata\Metadata;
 use ZF\Hal\Metadata\MetadataMap;
 use ZF\Hal\Resource;
@@ -97,14 +100,14 @@ class Hal extends AbstractHelper implements
     protected $paginationInjector;
 
     /**
-     * @var ServerUrl
+     * @var SelfLinkInjectorInterface
      */
-    protected $serverUrlHelper;
+    protected $selfLinkInjector;
 
     /**
-     * @var Url
+     * @var LinkUrlBuilder
      */
-    protected $urlHelper;
+    protected $linkUrlBuilder;
 
     /**
      * @var LinkCollectionExtractorInterface
@@ -124,7 +127,7 @@ class Hal extends AbstractHelper implements
     public function __construct(HydratorPluginManager $hydrators = null)
     {
         if (null === $hydrators) {
-            $hydrators = new HydratorPluginManager();
+            $hydrators = new HydratorPluginManager(new ServiceManager());
         }
         $this->hydrators = $hydrators;
     }
@@ -293,6 +296,50 @@ class Hal extends AbstractHelper implements
     }
 
     /**
+     * @param  LinkUrlBuilder $builder
+     * @return self
+     */
+    public function setLinkUrlBuilder(LinkUrlBuilder $builder)
+    {
+        $this->linkUrlBuilder = $builder;
+        return $this;
+    }
+
+    /**
+     * @deprecated Since 1.4.0; use setLinkUrlBuilder() instead.
+     * @param callable $helper
+     * @throws Exception\DeprecatedMethodException
+     */
+    public function setServerUrlHelper(callable $helper)
+    {
+        throw new Exception\DeprecatedMethodException(sprintf(
+            '%s can no longer be used to influence URL generation; please '
+            . 'use %s::setLinkUrlBuilder() instead, providing a configured '
+            . '%s instance',
+            __METHOD__,
+            __CLASS__,
+            LinkUrlBuilder::class
+        ));
+    }
+
+    /**
+     * @deprecated Since 1.4.0; use setLinkUrlBuilder() instead.
+     * @param callable $helper
+     * @throws Exception\DeprecatedMethodException
+     */
+    public function setUrlHelper(callable $helper)
+    {
+        throw new Exception\DeprecatedMethodException(sprintf(
+            '%s can no longer be used to influence URL generation; please '
+            . 'use %s::setLinkUrlBuilder() instead, providing a configured '
+            . '%s instance',
+            __METHOD__,
+            __CLASS__,
+            LinkUrlBuilder::class
+        ));
+    }
+
+    /**
      * @return PaginationInjectorInterface
      */
     public function getPaginationInjector()
@@ -314,22 +361,23 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * @param ServerUrl $helper
-     * @return self
+     * @return SelfLinkInjectorInterface
      */
-    public function setServerUrlHelper(ServerUrl $helper)
+    public function getSelfLinkInjector()
     {
-        $this->serverUrlHelper = $helper;
-        return $this;
+        if (! $this->selfLinkInjector instanceof SelfLinkInjectorInterface) {
+            $this->setSelfLinkInjector(new SelfLinkInjector());
+        }
+        return $this->selfLinkInjector;
     }
 
     /**
-     * @param Url $helper
+     * @param  SelfLinkInjectorInterface $injector
      * @return self
      */
-    public function setUrlHelper(Url $helper)
+    public function setSelfLinkInjector(SelfLinkInjectorInterface $injector)
     {
-        $this->urlHelper = $helper;
+        $this->selfLinkInjector = $injector;
         return $this;
     }
 
@@ -613,7 +661,7 @@ class Hal extends AbstractHelper implements
     public function renderEntity(Entity $halEntity, $renderEntity = true, $depth = 0, $maxDepth = null)
     {
         $this->getEventManager()->trigger(__FUNCTION__, $this, ['entity' => $halEntity]);
-        $entity      = $halEntity->entity;
+        $entity      = $halEntity->getEntity();
         $entityLinks = clone $halEntity->getLinks(); // Clone to prevent link duplication
 
         $metadataMap = $this->getMetadataMap();
@@ -727,18 +775,12 @@ class Hal extends AbstractHelper implements
         ]);
         $events->trigger(__FUNCTION__, $this, $eventParams);
 
-        $path = call_user_func(
-            $this->urlHelper,
-            $eventParams['route'],
+        return $this->linkUrlBuilder->buildLinkUrl(
+            $route,
             $params->getArrayCopy(),
+            [],
             $reUseMatchedParams
         );
-
-        if (substr($path, 0, 4) == 'http') {
-            return $path;
-        }
-
-        return call_user_func($this->serverUrlHelper, $path);
     }
 
     /**
@@ -918,36 +960,7 @@ class Hal extends AbstractHelper implements
      */
     public function injectSelfLink(LinkCollectionAwareInterface $resource, $route, $routeIdentifier = 'id')
     {
-        $links = $resource->getLinks();
-        if ($links->has('self')) {
-            return;
-        }
-
-        $self = new Link('self');
-        $self->setRoute($route);
-
-        $routeParams  = [];
-        $routeOptions = [];
-        if ($resource instanceof Entity
-            && null !== $resource->id
-        ) {
-            $routeParams = [
-                $routeIdentifier => $resource->id,
-            ];
-        }
-        if ($resource instanceof Collection) {
-            $routeParams  = $resource->getCollectionRouteParams();
-            $routeOptions = $resource->getCollectionRouteOptions();
-        }
-
-        if (!empty($routeParams)) {
-            $self->setRouteParams($routeParams);
-        }
-        if (!empty($routeOptions)) {
-            $self->setRouteOptions($routeOptions);
-        }
-
-        $links->add($self, true);
+        $this->getSelfLinkInjector()->injectSelfLink($resource, $route, $routeIdentifier);
     }
 
     /**
@@ -1036,6 +1049,7 @@ class Hal extends AbstractHelper implements
         $entityRouteParams    = $halCollection->getEntityRouteParams();
         $entityRouteOptions   = $halCollection->getEntityRouteOptions();
         $metadataMap          = $this->getMetadataMap();
+
 
         foreach ($halCollection->getCollection() as $entity) {
             $eventParams = new ArrayObject([
@@ -1142,22 +1156,18 @@ class Hal extends AbstractHelper implements
             return (null !== $r && false !== $r);
         };
 
-        $results = $this->getEventManager()->trigger(
-            __FUNCTION__,
-            $this,
-            $params,
-            $callback
+        $results = $this->getEventManager()->triggerEventUntil(
+            $callback,
+            new Event(__FUNCTION__, $this, $params)
         );
 
         if ($results->stopped()) {
             return $results->last();
         }
 
-        $results = $this->getEventManager()->trigger(
-            'getIdFromResource',
-            $this,
-            $params,
-            $callback
+        $results = $this->getEventManager()->triggerEventUntil(
+            $callback,
+            new Event('getIdFromResource', $this, $params)
         );
 
         if ($results->stopped()) {
@@ -1165,6 +1175,19 @@ class Hal extends AbstractHelper implements
         }
 
         return false;
+    }
+
+    /**
+     * Reset entity hash stack
+     *
+     * Call this method if you are rendering multiple responses within the same
+     * request cycle that may encounter the same entity instances.
+     *
+     * @return void
+     */
+    public function resetEntityHashStack()
+    {
+        $this->entityHashStack = [];
     }
 
     /**

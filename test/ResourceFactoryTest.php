@@ -8,11 +8,12 @@ namespace ZFTest\Hal;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use Zend\Hydrator\HydratorPluginManager;
+use Zend\ServiceManager\ServiceManager;
 use ZF\Hal\EntityHydratorManager;
 use ZF\Hal\Extractor\EntityExtractor;
 use ZF\Hal\Metadata\MetadataMap;
 use ZF\Hal\ResourceFactory;
-use ZFTest\Hal\Plugin\TestAsset;
+use ZFTest\Hal\Plugin\TestAsset as HalPluginTestAsset;
 
 /**
  * @subpackage UnitTest
@@ -24,10 +25,10 @@ class ResourceFactoryTest extends TestCase
      */
     public function testInjectsLinksFromMetadataWhenCreatingEntity()
     {
-        $object = new TestAsset\Entity('foo', 'Foo');
+        $object = new HalPluginTestAsset\Entity('foo', 'Foo');
 
         $metadata = new MetadataMap([
-            'ZFTest\Hal\Plugin\TestAsset\Entity' => [
+            HalPluginTestAsset\Entity::class => [
                 'hydrator'   => 'Zend\Hydrator\ObjectProperty',
                 'route_name' => 'hostname/resource',
                 'links'      => [
@@ -44,12 +45,13 @@ class ResourceFactoryTest extends TestCase
                 ],
             ],
         ]);
+        $metadata->setHydratorManager(new HydratorPluginManager(new ServiceManager()));
 
         $resourceFactory = $this->getResourceFactory($metadata);
 
         $entity = $resourceFactory->createEntityFromMetadata(
             $object,
-            $metadata->get('ZFTest\Hal\Plugin\TestAsset\Entity')
+            $metadata->get(HalPluginTestAsset\Entity::class)
         );
 
         $this->assertInstanceof('ZF\Hal\Entity', $entity);
@@ -78,22 +80,18 @@ class ResourceFactoryTest extends TestCase
      */
     public function testRouteParamsAllowsCallable()
     {
-        $object = new TestAsset\Entity('foo', 'Foo');
+        $object = new HalPluginTestAsset\Entity('foo', 'Foo');
 
-        $callback = $this->getMock('stdClass', ['callback']);
-        $callback->expects($this->atLeastOnce())
-                 ->method('callback')
-                 ->with($this->equalTo($object))
-                 ->will($this->returnValue('callback-param'));
+        $entityDefiningCallback = new TestAsset\EntityDefiningCallback($this, $object);
 
         $test = $this;
 
         $metadata = new MetadataMap([
-            'ZFTest\Hal\Plugin\TestAsset\Entity' => [
+            HalPluginTestAsset\Entity::class => [
                 'hydrator'     => 'Zend\Hydrator\ObjectProperty',
                 'route_name'   => 'hostname/resource',
                 'route_params' => [
-                    'test-1' => [$callback, 'callback'],
+                    'test-1' => [$entityDefiningCallback, 'callback'],
                     'test-2' => function ($expected) use ($object, $test) {
                         $test->assertSame($expected, $object);
                         $test->assertSame($object, $this);
@@ -108,7 +106,7 @@ class ResourceFactoryTest extends TestCase
 
         $entity = $resourceFactory->createEntityFromMetadata(
             $object,
-            $metadata->get('ZFTest\Hal\Plugin\TestAsset\Entity')
+            $metadata->get(HalPluginTestAsset\Entity::class)
         );
 
         $this->assertInstanceof('ZF\Hal\Entity', $entity);
@@ -131,14 +129,14 @@ class ResourceFactoryTest extends TestCase
      */
     public function testInjectsLinksFromMetadataWhenCreatingCollection()
     {
-        $set = new TestAsset\Collection([
+        $set = new HalPluginTestAsset\Collection([
             (object) ['id' => 'foo', 'name' => 'foo'],
             (object) ['id' => 'bar', 'name' => 'bar'],
             (object) ['id' => 'baz', 'name' => 'baz'],
         ]);
 
         $metadata = new MetadataMap([
-            'ZFTest\Hal\Plugin\TestAsset\Collection' => [
+            HalPluginTestAsset\Collection::class => [
                 'is_collection'       => true,
                 'route_name'          => 'hostname/contacts',
                 'entity_route_name'   => 'hostname/embedded',
@@ -150,12 +148,13 @@ class ResourceFactoryTest extends TestCase
                 ],
             ],
         ]);
+        $metadata->setHydratorManager(new HydratorPluginManager(new ServiceManager()));
 
         $resourceFactory = $this->getResourceFactory($metadata);
 
         $collection = $resourceFactory->createCollectionFromMetadata(
             $set,
-            $metadata->get('ZFTest\Hal\Plugin\TestAsset\Collection')
+            $metadata->get(HalPluginTestAsset\Collection::class)
         );
 
         $this->assertInstanceof('ZF\Hal\Collection', $collection);
@@ -168,7 +167,7 @@ class ResourceFactoryTest extends TestCase
 
     private function getResourceFactory(MetadataMap $metadata)
     {
-        $hydratorPluginManager = new HydratorPluginManager();
+        $hydratorPluginManager = new HydratorPluginManager(new ServiceManager());
         $entityHydratorManager = new EntityHydratorManager($hydratorPluginManager, $metadata);
         $entityExtractor       = new EntityExtractor($entityHydratorManager);
 

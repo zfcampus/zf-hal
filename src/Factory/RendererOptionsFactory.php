@@ -1,32 +1,37 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Hal\Factory;
 
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
+use Zend\ServiceManager\Exception\ServiceNotCreatedException;
+use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use ZF\Hal\RendererOptions;
 
-class RendererOptionsFactory implements FactoryInterface
+class RendererOptionsFactory
 {
     /**
-     * @param  ServiceLocatorInterface $serviceLocator
+     * @param  ContainerInterface $container
      * @return RendererOptions
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     *     creating a service.
+     * @throws ContainerException if any other error occurs.
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container)
     {
-        $config = $serviceLocator->get('ZF\Hal\HalConfig');
+        $config = $container->get('ZF\Hal\HalConfig');
 
-        $rendererConfig = [];
-        if (isset($config['renderer']) && is_array($config['renderer'])) {
-            $rendererConfig = $config['renderer'];
-        }
+        $rendererConfig = (isset($config['renderer']) && is_array($config['renderer']))
+            ? $config['renderer']
+            : [];
 
         if (isset($rendererConfig['render_embedded_resources'])
-            && !isset($rendererConfig['render_embedded_entities'])
+            && ! isset($rendererConfig['render_embedded_entities'])
         ) {
             $rendererConfig['render_embedded_entities'] = $rendererConfig['render_embedded_resources'];
         }

@@ -4,6 +4,8 @@
  * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
+namespace ZF\Hal;
+
 return [
     'zf-hal' => [
         'renderer' => [
@@ -55,21 +57,24 @@ return [
     ],
     'service_manager' => [
         'factories' => [
-            'ZF\Hal\HalConfig'       => 'ZF\Hal\Factory\HalConfigFactory',
-            'ZF\Hal\JsonRenderer'    => 'ZF\Hal\Factory\HalJsonRendererFactory',
-            'ZF\Hal\JsonStrategy'    => 'ZF\Hal\Factory\HalJsonStrategyFactory',
-            'ZF\Hal\MetadataMap'     => 'ZF\Hal\Factory\MetadataMapFactory',
-            'ZF\Hal\RendererOptions' => 'ZF\Hal\Factory\RendererOptionsFactory',
+            Extractor\LinkExtractor::class => Factory\LinkExtractorFactory::class,
+            Extractor\LinkCollectionExtractor::class => Factory\LinkCollectionExtractorFactory::class,
+            HalConfig::class           => Factory\HalConfigFactory::class,
+            JsonRenderer::class        => Factory\HalJsonRendererFactory::class,
+            JsonStrategy::class        => Factory\HalJsonStrategyFactory::class,
+            Link\LinkUrlBuilder::class => Factory\LinkUrlBuilderFactory::class,
+            MetadataMap::class         => Factory\MetadataMapFactory::class,
+            RendererOptions::class     => Factory\RendererOptionsFactory::class,
         ],
     ],
     'view_helpers' => [
         'factories' => [
-            'Hal' => 'ZF\Hal\Factory\HalViewHelperFactory',
+            'Hal' => Factory\HalViewHelperFactory::class,
         ],
     ],
     'controller_plugins' => [
         'factories' => [
-            'Hal' => 'ZF\Hal\Factory\HalControllerPluginFactory',
+            'Hal' => Factory\HalControllerPluginFactory::class,
         ],
     ],
 ];

@@ -1,25 +1,25 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Hal\Factory;
 
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Interop\Container\ContainerInterface;
+use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\View\HalJsonRenderer;
 
-class HalJsonRendererFactory implements FactoryInterface
+class HalJsonRendererFactory
 {
     /**
-     * @param  ServiceLocatorInterface $serviceLocator
+     * @param ContainerInterface $container
      * @return HalJsonRenderer
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container)
     {
-        $helpers            = $serviceLocator->get('ViewHelperManager');
-        $apiProblemRenderer = $serviceLocator->get('ZF\ApiProblem\ApiProblemRenderer');
+        $helpers            = $container->get('ViewHelperManager');
+        $apiProblemRenderer = $container->get(ApiProblemRenderer::class);
 
         $renderer = new HalJsonRenderer($apiProblemRenderer);
         $renderer->setHelperPluginManager($helpers);

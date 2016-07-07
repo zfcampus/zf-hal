@@ -6,47 +6,23 @@
 
 namespace ZF\Hal\Extractor;
 
-use Zend\View\Helper\Url;
-use Zend\View\Helper\ServerUrl;
 use ZF\ApiProblem\Exception\DomainException;
 use ZF\Hal\Link\Link;
+use ZF\Hal\Link\LinkUrlBuilder;
 
 class LinkExtractor implements LinkExtractorInterface
 {
     /**
-     * @var ServerUrl
+     * @var LinkUrlBuilder
      */
-    protected $serverUrlHelper;
+    protected $linkUrlBuilder;
 
     /**
-     * @var Url
+     * @param  LinkUrlBuilder $linkUrlBuilder
      */
-    protected $urlHelper;
-
-    /**
-     * @var string
-     */
-    protected $serverUrlString;
-
-    /**
-     * @param  ServerUrl $serverUrlHelper
-     * @param  Url $urlHelper
-     */
-    public function __construct(ServerUrl $serverUrlHelper, Url $urlHelper)
+    public function __construct(LinkUrlBuilder $linkUrlBuilder)
     {
-        $this->serverUrlHelper = $serverUrlHelper;
-        $this->urlHelper       = $urlHelper;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getServerUrl()
-    {
-        if ($this->serverUrlString === null) {
-            $this->serverUrlString = call_user_func($this->serverUrlHelper);
-        }
-        return $this->serverUrlString;
+        $this->linkUrlBuilder = $linkUrlBuilder;
     }
 
     /**
@@ -76,19 +52,12 @@ class LinkExtractor implements LinkExtractorInterface
             unset($options['reuse_matched_params']);
         }
 
-        $path = call_user_func(
-            $this->urlHelper,
+        $representation['href'] = $this->linkUrlBuilder->buildLinkUrl(
             $object->getRoute(),
             $object->getRouteParams(),
             $options,
             $reuseMatchedParams
         );
-
-        if (substr($path, 0, 4) == 'http') {
-            $representation['href'] = $path;
-        } else {
-            $representation['href'] = $this->getServerUrl() . $path;
-        }
 
         return $representation;
     }

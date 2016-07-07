@@ -10,9 +10,15 @@ class Entity implements Link\LinkCollectionAwareInterface
 {
     use Link\LinkCollectionAwareTrait;
 
-    protected $id;
-
+    /**
+     * @var object|array
+     */
     protected $entity;
+
+    /**
+     * @var mixed
+     */
+    protected $id;
 
     /**
      * @param  object|array $entity
@@ -32,12 +38,21 @@ class Entity implements Link\LinkCollectionAwareInterface
     /**
      * Retrieve properties
      *
+     * @deprecated
      * @param  string $name
      * @throws Exception\InvalidArgumentException
      * @return mixed
      */
     public function &__get($name)
     {
+        trigger_error(
+            sprintf(
+                'Direct property access to %s::$%s is deprecated, use getters instead.',
+                __CLASS__,
+                $name
+            ),
+            E_USER_DEPRECATED
+        );
         $names = [
             'entity' => 'entity',
             'id'     => 'id',
@@ -51,5 +66,23 @@ class Entity implements Link\LinkCollectionAwareInterface
         }
         $prop = $names[$name];
         return $this->{$prop};
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * TODO: Get by reference is that really necessary?
+     *
+     * @return object|array
+     */
+    public function &getEntity()
+    {
+        return $this->entity;
     }
 }

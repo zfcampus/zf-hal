@@ -7,6 +7,8 @@
 namespace ZFTest\Hal\Factory;
 
 use PHPUnit_Framework_TestCase as TestCase;
+use Zend\Hydrator\HydratorPluginManager;
+use Zend\ServiceManager\AbstractPluginManager;
 use Zend\ServiceManager\ServiceManager;
 use ZF\Hal\Factory\HalControllerPluginFactory;
 use ZF\Hal\Plugin\Hal as HalPlugin;
@@ -21,19 +23,13 @@ class HalControllerPluginFactoryTest extends TestCase
         $viewHelperManager
             ->expects($this->once())
             ->method('get')
-            ->will($this->returnValue(new HalPlugin()));
+            ->will($this->returnValue(new HalPlugin(new HydratorPluginManager(new ServiceManager()))));
 
         $services = new ServiceManager();
         $services->setService('ViewHelperManager', $viewHelperManager);
 
-        $pluginManager = $this->getMock('Zend\ServiceManager\AbstractPluginManager');
-        $pluginManager
-            ->expects($this->once())
-            ->method('getServiceLocator')
-            ->will($this->returnValue($services));
-
         $factory = new HalControllerPluginFactory();
-        $plugin = $factory->createService($pluginManager);
+        $plugin = $factory($services, 'Hal');
 
         $this->assertInstanceOf('ZF\Hal\Plugin\Hal', $plugin);
     }

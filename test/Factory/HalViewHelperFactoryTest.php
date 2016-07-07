@@ -8,15 +8,19 @@ namespace ZFTest\Hal\Factory;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use ReflectionObject;
+use Zend\ServiceManager\AbstractPluginManager;
 use Zend\ServiceManager\ServiceManager;
 use Zend\Hydrator\HydratorPluginManager;
-use Zend\View\Helper\ServerUrl;
-use Zend\View\Helper\Url;
+use ZF\Hal\Extractor\LinkCollectionExtractor;
+use ZF\Hal\Link;
 use ZF\Hal\Factory\HalViewHelperFactory;
 use ZF\Hal\RendererOptions;
 
 class HalViewHelperFactoryTest extends TestCase
 {
+    private $pluginManager;
+    private $services;
+
     public function setupPluginManager($config = [])
     {
         $services = new ServiceManager();
@@ -28,33 +32,31 @@ class HalViewHelperFactoryTest extends TestCase
         } else {
             $rendererOptions = new RendererOptions();
         }
-        $services->setService('ZF\Hal\RendererOptions', $rendererOptions);
+        $services->setService(RendererOptions::class, $rendererOptions);
 
-        $metadataMap = $this->getMock('ZF\Hal\Metadata\MetadataMap');
+        $metadataMap = $this->getMockBuilder('ZF\Hal\Metadata\MetadataMap')->getMock();
         $metadataMap
             ->expects($this->once())
             ->method('getHydratorManager')
-            ->will($this->returnValue(new HydratorPluginManager()));
-
+            ->will($this->returnValue(new HydratorPluginManager($services)));
         $services->setService('ZF\Hal\MetadataMap', $metadataMap);
 
-        $this->pluginManager = $this->getMock('Zend\ServiceManager\AbstractPluginManager');
+        $linkUrlBuilder = $this->getMockBuilder(Link\LinkUrlBuilder::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $services->setService(Link\LinkUrlBuilder::class, $linkUrlBuilder);
 
-        $this->pluginManager
-            ->expects($this->at(1))
-            ->method('get')
-            ->with('ServerUrl')
-            ->will($this->returnValue(new ServerUrl()));
+        $linkCollectionExtractor = $this->getMockBuilder(LinkCollectionExtractor::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $services->setService(LinkCollectionExtractor::class, $linkCollectionExtractor);
 
-        $this->pluginManager
-            ->expects($this->at(2))
-            ->method('get')
-            ->with('Url')
-            ->will($this->returnValue(new Url()));
+        $pluginManagerMock = $this->getMockBuilder(AbstractPluginManager::class);
+        $pluginManagerMock->setConstructorArgs([$services]);
+        $this->pluginManager = $pluginManagerMock->getMock();
+        $services->setService('ViewHelperManager', $this->pluginManager);
 
-        $this->pluginManager
-            ->method('getServiceLocator')
-            ->will($this->returnValue($services));
+        $this->services = $services;
     }
 
     public function testInstantiatesHalViewHelper()
@@ -62,38 +64,8 @@ class HalViewHelperFactoryTest extends TestCase
         $this->setupPluginManager();
 
         $factory = new HalViewHelperFactory();
-        $plugin = $factory->createService($this->pluginManager);
+        $plugin = $factory($this->services, 'Hal');
 
         $this->assertInstanceOf('ZF\Hal\Plugin\Hal', $plugin);
-    }
-
-    /**
-     * @group fail
-     */
-    public function testOptionUseProxyIfPresentInConfig()
-    {
-        $options = [
-            'options' => [
-                'use_proxy' => true,
-            ],
-        ];
-
-        $this->setupPluginManager($options);
-
-        $factory = new HalViewHelperFactory();
-        $halPlugin = $factory->createService($this->pluginManager);
-
-        $r = new ReflectionObject($halPlugin);
-        $p = $r->getProperty('serverUrlHelper');
-        $p->setAccessible(true);
-        $serverUrlPlugin = $p->getValue($halPlugin);
-        $this->assertInstanceOf('Zend\View\Helper\ServerUrl', $serverUrlPlugin);
-
-        $r = new ReflectionObject($serverUrlPlugin);
-        $p = $r->getProperty('useProxy');
-        $p->setAccessible(true);
-        $useProxy = $p->getValue($serverUrlPlugin);
-        $this->assertInternalType('boolean', $useProxy);
-        $this->assertTrue($useProxy);
     }
 }
