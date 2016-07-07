@@ -2141,4 +2141,37 @@ class HalTest extends TestCase
         $this->plugin->setServerUrlHelper(function () {
         });
     }
+
+    /**
+     * @expectedException \Zend\Mvc\Router\Exception\RuntimeException
+     */
+    public function testNotExistingRouteInMetadataLinks()
+    {
+        $object = new TestAsset\Entity('foo', 'Foo');
+        $object->first_child  = new TestAsset\EmbeddedEntity('bar', 'Bar');
+        $entity = new Entity($object, 'foo');
+        $self = new Link('self');
+        $self->setRoute('hostname/resource', ['id' => 'foo']);
+        $entity->getLinks()->add($self);
+
+        $metadata = new MetadataMap([
+            'ZFTest\Hal\Plugin\TestAsset\EmbeddedEntity' => [
+                'hydrator' => 'Zend\Hydrator\ObjectProperty',
+                'route'    => 'hostname/embedded',
+                'route_identifier_name' => 'id',
+                'entity_identifier_name' => 'id',
+                'links' => [
+                    'link' => [
+                        'rel' => 'link',
+                        'route' => [
+                            'name' => 'non_existing_route',
+                        ]
+                    ]
+                ]
+            ],
+        ]);
+
+        $this->plugin->setMetadataMap($metadata);
+        $this->plugin->renderEntity($entity);
+    }
 }
