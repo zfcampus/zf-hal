@@ -7,6 +7,8 @@
 namespace ZFTest\Hal\Factory;
 
 use PHPUnit_Framework_TestCase as TestCase;
+use ReflectionObject;
+use Zend\ServiceManager\AbstractPluginManager;
 use Zend\ServiceManager\ServiceManager;
 use Zend\Hydrator\HydratorPluginManager;
 use ZF\Hal\Factory\HalViewHelperFactory;
@@ -14,28 +16,26 @@ use ZF\Hal\RendererOptions;
 
 class HalViewHelperFactoryTest extends TestCase
 {
-    public function testInstantiatesHalViewHelper()
-    {
-        $pluginManager = $this->getPluginManager();
+    private $pluginManager;
+    private $services;
 
-        $factory = new HalViewHelperFactory();
-        $plugin = $factory->createService($pluginManager);
-
-        $this->assertInstanceOf('ZF\Hal\Plugin\Hal', $plugin);
-    }
-
-    private function getPluginManager()
+    public function setupPluginManager($config = [])
     {
         $services = new ServiceManager();
 
-        $services->setService('ZF\Hal\HalConfig', []);
-        $services->setService('ZF\Hal\RendererOptions', new RendererOptions());
+        $services->setService('ZF\Hal\HalConfig', $config);
 
-        $metadataMap = $this->getMock('ZF\Hal\Metadata\MetadataMap');
+        if (isset($config['renderer']) && is_array($config['renderer'])) {
+            $rendererOptions = new RendererOptions($config['renderer']);
+        } else {
+            $rendererOptions = new RendererOptions();
+        }
+
+        $metadataMap = $this->createMock('ZF\Hal\Metadata\MetadataMap');
         $metadataMap
             ->expects($this->once())
             ->method('getHydratorManager')
-            ->will($this->returnValue(new HydratorPluginManager()));
+            ->will($this->returnValue(new HydratorPluginManager($services)));
 
         $services->setService('ZF\Hal\MetadataMap', $metadataMap);
 
@@ -53,6 +53,39 @@ class HalViewHelperFactoryTest extends TestCase
         $pluginManager
             ->method('getServiceLocator')
             ->will($this->returnValue($services));
+    }
+
+    public function testInstantiatesHalViewHelper()
+    {
+        $this->setupPluginManager();
+
+        $factory = new HalViewHelperFactory();
+        $plugin = $factory($this->services, 'Hal');
+
+        $this->assertInstanceOf('ZF\Hal\Plugin\Hal', $plugin);
+    }
+
+    /**
+     * @group fail
+     */
+    public function testOptionUseProxyIfPresentInConfig()
+    {
+        $options = [
+            'options' => [
+                'use_proxy' => true,
+            ],
+        ];
+
+        $this->setupPluginManager($options);
+
+        $factory = new HalViewHelperFactory();
+        $halPlugin = $factory($this->services, 'Hal');
+
+        $r = new ReflectionObject($halPlugin);
+        $p = $r->getProperty('serverUrlHelper');
+        $p->setAccessible(true);
+        $serverUrlPlugin = $p->getValue($halPlugin);
+        $this->assertInstanceOf('Zend\View\Helper\ServerUrl', $serverUrlPlugin);
 
         return $pluginManager;
     }

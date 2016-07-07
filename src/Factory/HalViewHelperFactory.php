@@ -6,6 +6,7 @@
 
 namespace ZF\Hal\Factory;
 
+use Interop\Container\ContainerInterface;
 use Zend\ServiceManager\AbstractPluginManager;
 use ZF\Hal\Exception;
 use ZF\Hal\Extractor\LinkCollectionExtractor;
@@ -15,10 +16,10 @@ use ZF\Hal\Plugin;
 class HalViewHelperFactory
 {
     /**
-     * @param  \Interop\Container\ContainerInterface|\Zend\ServiceManager\ServiceLocatorInterface $container
+     * @param  ContainerInterface|\Zend\ServiceManager\ServiceLocatorInterface $container
      * @return Plugin\Hal
      */
-    public function __invoke($container)
+    public function __invoke(ContainerInterface $container)
     {
         $container = ($container instanceof AbstractPluginManager)
             ? $container->getServiceLocator()

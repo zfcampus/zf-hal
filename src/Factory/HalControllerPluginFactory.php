@@ -6,20 +6,24 @@
 
 namespace ZF\Hal\Factory;
 
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Interop\Container\ContainerInterface;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
 class HalControllerPluginFactory implements FactoryInterface
 {
-    /**
-     * @param  ServiceLocatorInterface $serviceLocator
-     * @return \ZF\Hal\Plugin\Hal
-     */
-    public function createService(ServiceLocatorInterface $serviceLocator)
-    {
-        $services = $serviceLocator->getServiceLocator();
-        $helpers  = $services->get('ViewHelperManager');
 
+    /**
+     * @param \Interop\Container\ContainerInterface $container
+     * @param string                                $requestedName
+     * @param array|NULL                            $options
+     *
+     * @return mixed
+     */
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = NULL)
+    {
+        $helpers  = $container->get('ViewHelperManager');
         return $helpers->get('Hal');
     }
+
+
 }

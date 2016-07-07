@@ -143,7 +143,7 @@ class HalJsonRendererTest extends TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $halPlugin = $this->getMock('ZF\Hal\Plugin\Hal');
+        $halPlugin = $this->createMock('ZF\Hal\Plugin\Hal');
 
         $helperPluginManager
             ->method('get')

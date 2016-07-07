@@ -8,13 +8,18 @@ namespace ZFTest\Hal;
 
 use Zend\ServiceManager\ServiceManager;
 use Zend\View\View;
+use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Module;
 use ZF\Hal\View\HalJsonModel;
 use PHPUnit_Framework_TestCase as TestCase;
 use stdClass;
+use ZF\Hal\View\HalJsonRenderer;
+use ZF\Hal\View\HalJsonStrategy;
 
 class ModuleTest extends TestCase
 {
+    private $module;
+
     public function setUp()
     {
         $this->module = new Module;
@@ -22,7 +27,7 @@ class ModuleTest extends TestCase
 
     public function testOnRenderWhenMvcEventResultIsNotHalJsonModel()
     {
-        $mvcEvent = $this->getMock('Zend\Mvc\MvcEvent');
+        $mvcEvent = $this->createMock('Zend\Mvc\MvcEvent');
         $mvcEvent
             ->expects($this->once())
             ->method('getResult')
@@ -36,32 +41,28 @@ class ModuleTest extends TestCase
 
     public function testOnRenderAttachesJsonStrategy()
     {
-        $halJsonStrategy = $this->getMockBuilder('ZF\Hal\View\HalJsonStrategy')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $strategy = new HalJsonStrategy(new HalJsonRenderer(new ApiProblemRenderer()));
+        
         $view = new View();
 
-        $eventManager = $this->getMock('Zend\EventManager\EventManager');
+        $eventManager = $this->createMock('Zend\EventManager\EventManager');
         $eventManager
-            ->expects($this->once())
-            ->method('attach')
-            ->with($halJsonStrategy, 200);
+            ->expects($this->exactly(2))
+            ->method('attach');
 
         $view->setEventManager($eventManager);
 
         $serviceManager = new ServiceManager();
-        $serviceManager
-            ->setService('ZF\Hal\JsonStrategy', $halJsonStrategy)
-            ->setService('View', $view);
+        $serviceManager->setService('ZF\Hal\JsonStrategy', $strategy);
+        $serviceManager->setService('View', $view);
 
-        $application = $this->getMock('Zend\Mvc\ApplicationInterface');
+        $application = $this->createMock('Zend\Mvc\ApplicationInterface');
         $application
             ->expects($this->once())
             ->method('getServiceManager')
             ->will($this->returnValue($serviceManager));
 
-        $mvcEvent = $this->getMock('Zend\Mvc\MvcEvent');
+        $mvcEvent = $this->createMock('Zend\Mvc\MvcEvent');
         $mvcEvent
             ->expects($this->at(0))
             ->method('getResult')

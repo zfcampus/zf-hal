@@ -8,6 +8,7 @@ namespace ZF\Hal;
 
 use Zend\Loader\StandardAutoloader;
 use Zend\Mvc\MvcEvent;
+use ZF\Hal\View\HalJsonStrategy;
 
 /**
  * ZF2 module
@@ -72,6 +73,8 @@ class Module
 
         // register at high priority, to "beat" normal json strategy registered
         // via view manager
-        $events->attach($services->get('ZF\Hal\JsonStrategy'), 200);
+        /** @var HalJsonStrategy $halStrategy */
+        $halStrategy = $services->get('ZF\Hal\JsonStrategy');
+        $halStrategy->attach($events,200);
     }
 }
