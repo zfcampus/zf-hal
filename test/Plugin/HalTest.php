@@ -2131,14 +2131,14 @@ class HalTest extends TestCase
                 'route'    => 'hostname/embedded',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
-                'links' => array(
-                    'link' => array(
+                'links' => [
+                    'link' => [
                         'rel' => 'link',
-                        'route' => array(
+                        'route' => [
                             'name' => 'non_existing_route',
-                        )
-                    )
-                )
+                        ]
+                    ]
+                ]
             ],
         ]);
 
