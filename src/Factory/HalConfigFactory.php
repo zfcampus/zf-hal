@@ -6,20 +6,28 @@
 
 namespace ZF\Hal\Factory;
 
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Interop\Container\ContainerInterface;
+use Zend\ServiceManager\Factory\FactoryInterface;
 
+/**
+ * Class HalConfigFactory
+ *
+ * @package ZF\Hal\Factory
+ */
 class HalConfigFactory implements FactoryInterface
 {
     /**
-     * @param  ServiceLocatorInterface $serviceLocator
-     * @return array
+     * @param \Interop\Container\ContainerInterface $container
+     * @param string                                $requestedName
+     * @param array|NULL                            $options
+     *
+     * @return array|mixed
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = NULL)
     {
         $config = [];
-        if ($serviceLocator->has('config')) {
-            $config = $serviceLocator->get('config');
+        if ($container->has('config')) {
+            $config = $container->get('config');
         }
 
         $halConfig = [];
@@ -29,4 +37,6 @@ class HalConfigFactory implements FactoryInterface
 
         return $halConfig;
     }
+
+
 }

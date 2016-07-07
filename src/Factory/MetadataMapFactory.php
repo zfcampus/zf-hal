@@ -6,7 +6,11 @@
 
 namespace ZF\Hal\Factory;
 
-use Zend\ServiceManager\FactoryInterface;
+use Interop\Container\ContainerInterface;
+use Interop\Container\Exception\ContainerException;
+use Zend\ServiceManager\Exception\ServiceNotCreatedException;
+use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Zend\ServiceManager\Factory\FactoryInterface;
 use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\Hydrator\HydratorPluginManager;
 use ZF\Hal\Metadata;
@@ -14,17 +18,26 @@ use ZF\Hal\Metadata;
 class MetadataMapFactory implements FactoryInterface
 {
     /**
-     * @param  ServiceLocatorInterface $serviceLocator
-     * @return Metadata\MetadataMap
+     * Create an object
+     *
+     * @param  ContainerInterface $container
+     * @param  string             $requestedName
+     * @param  null|array         $options
+     *
+     * @return object
+     * @throws ServiceNotFoundException if unable to resolve the service.
+     * @throws ServiceNotCreatedException if an exception is raised when
+     *     creating a service.
+     * @throws ContainerException if any other error occurs
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = NULL)
     {
-        $config = $serviceLocator->get('ZF\Hal\HalConfig');
+        $config = $container->get('ZF\Hal\HalConfig');
 
-        if ($serviceLocator->has('HydratorManager')) {
-            $hydrators = $serviceLocator->get('HydratorManager');
+        if ($container->has('HydratorManager')) {
+            $hydrators = $container->get('HydratorManager');
         } else {
-            $hydrators = new HydratorPluginManager();
+            $hydrators = new HydratorPluginManager($container);
         }
 
         $map = [];
@@ -34,4 +47,5 @@ class MetadataMapFactory implements FactoryInterface
 
         return new Metadata\MetadataMap($map, $hydrators);
     }
+
 }

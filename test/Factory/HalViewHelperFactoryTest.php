@@ -8,6 +8,7 @@ namespace ZFTest\Hal\Factory;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use ReflectionObject;
+use Zend\ServiceManager\AbstractPluginManager;
 use Zend\ServiceManager\ServiceManager;
 use Zend\Hydrator\HydratorPluginManager;
 use Zend\View\Helper\ServerUrl;
@@ -17,6 +18,9 @@ use ZF\Hal\RendererOptions;
 
 class HalViewHelperFactoryTest extends TestCase
 {
+    private $pluginManager;
+    private $services;
+
     public function setupPluginManager($config = [])
     {
         $services = new ServiceManager();
@@ -30,24 +34,30 @@ class HalViewHelperFactoryTest extends TestCase
         }
         $services->setService('ZF\Hal\RendererOptions', $rendererOptions);
 
-        $metadataMap = $this->getMock('ZF\Hal\Metadata\MetadataMap');
+        $metadataMap = $this->createMock('ZF\Hal\Metadata\MetadataMap');
         $metadataMap
             ->expects($this->once())
             ->method('getHydratorManager')
-            ->will($this->returnValue(new HydratorPluginManager()));
+            ->will($this->returnValue(new HydratorPluginManager($services)));
 
         $services->setService('ZF\Hal\MetadataMap', $metadataMap);
 
-        $this->pluginManager = $this->getMock('Zend\ServiceManager\AbstractPluginManager');
+
+        $pluginManagerMockBuilder = $this->getMockBuilder(AbstractPluginManager::class);
+        $pluginManagerMockBuilder->setConstructorArgs([$services]);
+
+        $this->pluginManager = $pluginManagerMockBuilder->getMock();
+        $services->setService('ViewHelperManager', $this->pluginManager);
+        $this->services = $services;
 
         $this->pluginManager
-            ->expects($this->at(1))
+            ->expects($this->at(0))
             ->method('get')
             ->with('ServerUrl')
             ->will($this->returnValue(new ServerUrl()));
 
         $this->pluginManager
-            ->expects($this->at(2))
+            ->expects($this->at(1))
             ->method('get')
             ->with('Url')
             ->will($this->returnValue(new Url()));
@@ -62,7 +72,7 @@ class HalViewHelperFactoryTest extends TestCase
         $this->setupPluginManager();
 
         $factory = new HalViewHelperFactory();
-        $plugin = $factory->createService($this->pluginManager);
+        $plugin = $factory($this->services, 'Hal');
 
         $this->assertInstanceOf('ZF\Hal\Plugin\Hal', $plugin);
     }
@@ -81,7 +91,7 @@ class HalViewHelperFactoryTest extends TestCase
         $this->setupPluginManager($options);
 
         $factory = new HalViewHelperFactory();
-        $halPlugin = $factory->createService($this->pluginManager);
+        $halPlugin = $factory($this->services, 'Hal');
 
         $r = new ReflectionObject($halPlugin);
         $p = $r->getProperty('serverUrlHelper');

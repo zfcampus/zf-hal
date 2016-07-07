@@ -6,20 +6,24 @@
 
 namespace ZF\Hal\Factory;
 
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
+use Interop\Container\ContainerInterface;
+use Zend\ServiceManager\Factory\FactoryInterface;
 use ZF\Hal\View;
 
 class HalJsonStrategyFactory implements FactoryInterface
 {
-    /**
-     * @param  ServiceLocatorInterface $serviceLocator
-     * @return View\HalJsonStrategy
-     */
-    public function createService(ServiceLocatorInterface $serviceLocator)
-    {
-        $renderer = $serviceLocator->get('ZF\Hal\JsonRenderer');
 
+    /**
+     * @param \Interop\Container\ContainerInterface $container
+     * @param string                                $requestedName
+     * @param array|NULL                            $options
+     *
+     * @return \ZF\Hal\View\HalJsonStrategy
+     */
+    public function __invoke(ContainerInterface $container, $requestedName, array $options = NULL)
+    {
+
+        $renderer = $container->get('ZF\Hal\JsonRenderer');
         return new View\HalJsonStrategy($renderer);
     }
 }

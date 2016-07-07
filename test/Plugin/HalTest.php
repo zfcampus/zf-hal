@@ -8,11 +8,12 @@ namespace ZFTest\Hal\Plugin;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use ReflectionObject;
-use Zend\Mvc\Router\Http\TreeRouteStack;
-use Zend\Mvc\Router\Http\Segment;
+use Zend\Router\Http\TreeRouteStack;
+use Zend\Router\Http\Segment;
 use Zend\Mvc\MvcEvent;
 use Zend\Paginator\Adapter\ArrayAdapter as ArrayPaginator;
 use Zend\Paginator\Paginator;
+use Zend\ServiceManager\ServiceManager;
 use Zend\Uri\Http;
 use Zend\Hydrator;
 use Zend\View\Helper\Url as UrlHelper;
@@ -96,7 +97,7 @@ class HalTest extends TestCase
         $event->setRouter($router);
         $router->setRequestUri(new Http('http://localhost.localdomain/resource'));
 
-        $controller = $this->controller = $this->getMock('Zend\Mvc\Controller\AbstractRestfulController');
+        $controller = $this->controller = $this->createMock('Zend\Mvc\Controller\AbstractRestfulController');
         $controller->expects($this->any())
             ->method('getEvent')
             ->will($this->returnValue($event));
@@ -108,7 +109,7 @@ class HalTest extends TestCase
         $serverUrlHelper->setScheme('http');
         $serverUrlHelper->setHost('localhost.localdomain');
 
-        $this->plugin = $plugin = new HalHelper();
+        $this->plugin = $plugin = new HalHelper(new Hydrator\HydratorPluginManager(new ServiceManager()));
         $plugin->setController($controller);
         $plugin->setUrlHelper($urlHelper);
         $plugin->setServerUrlHelper($serverUrlHelper);
@@ -242,6 +243,8 @@ class HalTest extends TestCase
                 'entity_identifier_name' => 'custom_id',
             ],
         ]);
+        
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
 
         $this->plugin->setMetadataMap($metadata);
 
@@ -294,6 +297,8 @@ class HalTest extends TestCase
             ],
         ]);
 
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
+
         $this->plugin->setMetadataMap($metadata);
 
         $rendered = $this->plugin->renderEntity($entity);
@@ -344,6 +349,8 @@ class HalTest extends TestCase
                 'entity_identifier_name' => 'id',
             ],
         ]);
+
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
 
         $this->plugin->setMetadataMap($metadata);
 
@@ -400,6 +407,8 @@ class HalTest extends TestCase
                 'entity_identifier_name' => 'id',
             ],
         ]);
+
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
 
         $this->plugin->setMetadataMap($metadata);
 
@@ -462,6 +471,8 @@ class HalTest extends TestCase
                 'route_name' => 'hostname/resource',
             ],
         ]);
+
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
 
         $this->plugin->setMetadataMap($metadata);
         $this->plugin->setRenderEmbeddedEntities(false);
@@ -679,6 +690,8 @@ class HalTest extends TestCase
         $collection->setCollectionName('resource');
         $collection->setCollectionRoute('hostname/resource');
 
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
+
         $this->plugin->setMetadataMap($metadata);
 
         $test = $this->plugin->renderCollection($collection);
@@ -722,6 +735,8 @@ class HalTest extends TestCase
                 ],
             ],
         ]);
+
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
 
         $this->plugin->setMetadataMap($metadata);
         $entity = $this->plugin->createEntity($object, 'hostname/resource', 'id');
@@ -901,6 +916,8 @@ class HalTest extends TestCase
                 'entity_route_name'   => 'hostname/embedded',
             ],
         ]);
+        
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
 
         $this->plugin->setMetadataMap($metadata);
 
@@ -1007,6 +1024,8 @@ class HalTest extends TestCase
                 'entity_identifier_name' => 'id',
             ],
         ]);
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
+
         $this->plugin->setMetadataMap($metadata);
 
         $foo = new TestAsset\Entity('foo', 'Foo Bar');
@@ -1045,6 +1064,8 @@ class HalTest extends TestCase
     public function testRenderEntityMaxDepth($entity, $metadataMap, $expectedResult, $exception = null)
     {
         $this->plugin->setMetadataMap($metadataMap);
+
+        $metadataMap->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
 
         if ($exception) {
             $this->setExpectedException($exception['class'], $exception['message']);
@@ -1193,6 +1214,9 @@ class HalTest extends TestCase
         $metadataMap1 = $this->createNestedMetadataMap(0);
         $metadataMap2 = $this->createNestedMetadataMap(1);
 
+        $metadataMap1->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
+        $metadataMap2->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
+
         $this->plugin->setMetadataMap($metadataMap1);
         $result1 = $this->plugin->renderEntity($entity);
 
@@ -1212,6 +1236,7 @@ class HalTest extends TestCase
      */
     public function testRenderCollectionWithMaxDepth($collection, $metadataMap, $expectedResult, $exception = null)
     {
+        $metadataMap->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
         $this->plugin->setMetadataMap($metadataMap);
 
         if ($exception) {
@@ -1505,6 +1530,7 @@ class HalTest extends TestCase
             ],
         ]);
 
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
         $this->plugin->setMetadataMap($metadata);
         $entity = $this->plugin->createEntityFromMetadata(
             $object,
@@ -1526,6 +1552,8 @@ class HalTest extends TestCase
                 'force_self_link' => false,
             ],
         ]);
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
+
         $this->plugin->setMetadataMap($metadata);
         $entity = $this->plugin->createEntity($object, 'hostname/resource', 'id');
         $links = $entity->getLinks();
@@ -1550,6 +1578,8 @@ class HalTest extends TestCase
             ],
         ]);
 
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
+
         $this->plugin->setMetadataMap($metadata);
 
         $collection = $this->plugin->createCollectionFromMetadata(
@@ -1572,6 +1602,9 @@ class HalTest extends TestCase
                 'force_self_link'   => false,
             ],
         ]);
+
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
+
         $this->plugin->setMetadataMap($metadata);
 
         $result = $this->plugin->createCollection($collection);

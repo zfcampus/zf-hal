@@ -587,8 +587,8 @@ without listeners to do the actual work.&lt;/p&gt;</long-description>
         <docblock line="81">
           <description></description>
           <long-description></long-description>
-          <tag line="81" name="param" description="" type="\Zend\Mvc\Router\RouteMatch" variable="$matches">
-            <type by_reference="false">\Zend\Mvc\Router\RouteMatch</type>
+          <tag line="81" name="param" description="" type="\Zend\Router\RouteMatch" variable="$matches">
+            <type by_reference="false">\Zend\Router\RouteMatch</type>
           </tag>
           <tag line="81" name="return" description="" type="self">
             <type by_reference="false">self</type>
@@ -597,7 +597,7 @@ without listeners to do the actual work.&lt;/p&gt;</long-description>
         <argument line="85">
           <name>$matches</name>
           <default></default>
-          <type>\Zend\Mvc\Router\RouteMatch</type>
+          <type>\Zend\Router\RouteMatch</type>
         </argument>
       </method>
       <method final="false" abstract="false" static="false" visibility="public" namespace="PhlyRestfully" line="94" package="Default">
@@ -606,9 +606,9 @@ without listeners to do the actual work.&lt;/p&gt;</long-description>
         <docblock line="91">
           <description></description>
           <long-description></long-description>
-          <tag line="91" name="return" description="" type="null|\Zend\Mvc\Router\RouteMatch">
+          <tag line="91" name="return" description="" type="null|\Zend\Router\RouteMatch">
             <type by_reference="false">null</type>
-            <type by_reference="false">\Zend\Mvc\Router\RouteMatch</type>
+            <type by_reference="false">\Zend\Router\RouteMatch</type>
           </tag>
         </docblock>
       </method>
@@ -3483,8 +3483,8 @@ replaced with a RestfulJsonModel containing an API-Problem payload.&lt;/p&gt;</l
         <docblock line="64">
           <description></description>
           <long-description></long-description>
-          <tag line="64" name="param" description="" type="\Zend\Mvc\Router\RouteMatch" variable="$matches">
-            <type by_reference="false">\Zend\Mvc\Router\RouteMatch</type>
+          <tag line="64" name="param" description="" type="\Zend\Router\RouteMatch" variable="$matches">
+            <type by_reference="false">\Zend\Router\RouteMatch</type>
           </tag>
           <tag line="64" name="return" description="" type="self">
             <type by_reference="false">self</type>
@@ -3493,7 +3493,7 @@ replaced with a RestfulJsonModel containing an API-Problem payload.&lt;/p&gt;</l
         <argument line="68">
           <name>$matches</name>
           <default>null</default>
-          <type>\Zend\Mvc\Router\RouteMatch</type>
+          <type>\Zend\Router\RouteMatch</type>
         </argument>
       </method>
       <method final="false" abstract="false" static="false" visibility="public" namespace="PhlyRestfully" line="77" package="Default">
@@ -3502,9 +3502,9 @@ replaced with a RestfulJsonModel containing an API-Problem payload.&lt;/p&gt;</l
         <docblock line="74">
           <description></description>
           <long-description></long-description>
-          <tag line="74" name="return" description="" type="null|\Zend\Mvc\Router\RouteMatch">
+          <tag line="74" name="return" description="" type="null|\Zend\Router\RouteMatch">
             <type by_reference="false">null</type>
-            <type by_reference="false">\Zend\Mvc\Router\RouteMatch</type>
+            <type by_reference="false">\Zend\Router\RouteMatch</type>
           </tag>
         </docblock>
       </method>
