@@ -11,7 +11,8 @@ filtering, or other actions on collections.
 
 The available methods are:
 
-- ``getRouteMatch()``, which returns the ``Zend\Router\RouteMatch`` instance
+- ``getRouteMatch()``, which returns the ``Zend\Router\RouteMatch`` instance (or
+  ``Zend\Mvc\Router\RouteMatch`` if you are using a zend-mvc v2 release)
   that indicates the currently active route in the MVC, and contains any
   parameters matched during routing.
 - ``getRouteParam($name, $default = null)`` allows you to retrieve a single route
