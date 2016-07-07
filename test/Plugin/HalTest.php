@@ -8,11 +8,17 @@ namespace ZFTest\Hal\Plugin;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use ReflectionObject;
-use Zend\Mvc\Router\Http\TreeRouteStack;
-use Zend\Mvc\Router\Http\Segment;
+use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Mvc\MvcEvent;
+use Zend\Mvc\Router\Exception as V2RouterException;
+use Zend\Mvc\Router\Http\Segment as V2Segment;
+use Zend\Mvc\Router\Http\TreeRouteStack as V2TreeRouteStack;
 use Zend\Paginator\Adapter\ArrayAdapter as ArrayPaginator;
 use Zend\Paginator\Paginator;
+use Zend\Router\Exception as RouterException;
+use Zend\Router\Http\Segment;
+use Zend\Router\Http\TreeRouteStack;
+use Zend\ServiceManager\ServiceManager;
 use Zend\Uri\Http;
 use Zend\Hydrator;
 use Zend\View\Helper\Url as UrlHelper;
@@ -41,10 +47,13 @@ class HalTest extends TestCase
 
     public function setUp()
     {
-        $this->router = $router = new TreeRouteStack();
-        $route = new Segment('/resource[/[:id]]');
+        $routerClass  = class_exists(V2TreeRouteStack::class) ? V2TreeRouteStack::class : TreeRouteStack::class;
+        $routeClass   = class_exists(V2Segment::class) ? V2Segment::class : Segment::class;
+
+        $this->router = $router = new $routerClass();
+        $route = new $routeClass('/resource[/[:id]]');
         $router->addRoute('resource', $route);
-        $route2 = new Segment('/help');
+        $route2 = new $routeClass('/help');
         $router->addRoute('docs', $route2);
         $router->addRoute('hostname', [
             'type' => 'hostname',
@@ -98,10 +107,8 @@ class HalTest extends TestCase
         $event->setRouter($router);
         $router->setRequestUri(new Http('http://localhost.localdomain/resource'));
 
-        $controller = $this->controller = $this->getMock('Zend\Mvc\Controller\AbstractRestfulController');
-        $controller->expects($this->any())
-            ->method('getEvent')
-            ->will($this->returnValue($event));
+        $controller = $this->controller = $this->prophesize(AbstractRestfulController::class);
+        $controller->getEvent()->willReturn($event);
 
         $this->urlHelper = $urlHelper = new UrlHelper();
         $urlHelper->setRouter($router);
@@ -111,7 +118,7 @@ class HalTest extends TestCase
         $serverUrlHelper->setHost('localhost.localdomain');
 
         $this->plugin = $plugin = new HalHelper();
-        $plugin->setController($controller);
+        $plugin->setController($controller->reveal());
 
         $linkUrlBuilder = new LinkUrlBuilder($serverUrlHelper, $urlHelper);
         $plugin->setLinkUrlBuilder($linkUrlBuilder);
@@ -246,6 +253,8 @@ class HalTest extends TestCase
             ],
         ]);
 
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
+
         $this->plugin->setMetadataMap($metadata);
 
         $rendered = $this->plugin->renderEntity($entity);
@@ -297,6 +306,8 @@ class HalTest extends TestCase
             ],
         ]);
 
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
+
         $this->plugin->setMetadataMap($metadata);
 
         $rendered = $this->plugin->renderEntity($entity);
@@ -347,6 +358,8 @@ class HalTest extends TestCase
                 'entity_identifier_name' => 'id',
             ],
         ]);
+
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
 
         $this->plugin->setMetadataMap($metadata);
 
@@ -403,6 +416,8 @@ class HalTest extends TestCase
                 'entity_identifier_name' => 'id',
             ],
         ]);
+
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
 
         $this->plugin->setMetadataMap($metadata);
 
@@ -465,6 +480,8 @@ class HalTest extends TestCase
                 'route_name' => 'hostname/resource',
             ],
         ]);
+
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
 
         $this->plugin->setMetadataMap($metadata);
         $this->plugin->setRenderEmbeddedEntities(false);
@@ -682,6 +699,8 @@ class HalTest extends TestCase
         $collection->setCollectionName('resource');
         $collection->setCollectionRoute('hostname/resource');
 
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
+
         $this->plugin->setMetadataMap($metadata);
 
         $test = $this->plugin->renderCollection($collection);
@@ -725,6 +744,8 @@ class HalTest extends TestCase
                 ],
             ],
         ]);
+
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
 
         $this->plugin->setMetadataMap($metadata);
         $entity = $this->plugin->createEntity($object, 'hostname/resource', 'id');
@@ -811,27 +832,16 @@ class HalTest extends TestCase
 
     public function testFromLinkShouldUseLinkExtractor()
     {
+        $link = new Link('foo');
         $extraction = true;
 
-        $linkExtractor = $this->getMockBuilder('ZF\Hal\Extractor\LinkExtractor')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $linkExtractor
-            ->expects($this->once())
-            ->method('extract')
-            ->will($this->returnValue($extraction));
+        $linkExtractor = $this->prophesize(LinkExtractor::class);
+        $linkExtractor->extract($link)->willReturn($extraction);
 
-        $linkCollectionExtractor = $this->getMockBuilder('ZF\Hal\Extractor\LinkCollectionExtractor')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $linkCollectionExtractor
-            ->expects($this->once())
-            ->method('getLinkExtractor')
-            ->will($this->returnValue($linkExtractor));
+        $linkCollectionExtractor = $this->prophesize(LinkCollectionExtractor::class);
+        $linkCollectionExtractor->getLinkExtractor()->willReturn($linkExtractor->reveal());
 
-        $this->plugin->setLinkCollectionExtractor($linkCollectionExtractor);
-
-        $link = new Link('foo');
+        $this->plugin->setLinkCollectionExtractor($linkCollectionExtractor->reveal());
 
         $result = $this->plugin->fromLink($link);
 
@@ -840,19 +850,13 @@ class HalTest extends TestCase
 
     public function testFromLinkCollectionShouldUseLinkCollectionExtractor()
     {
+        $linkCollection = new LinkCollection();
         $extraction = true;
 
-        $linkCollectionExtractor = $this->getMockBuilder('ZF\Hal\Extractor\LinkCollectionExtractor')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $linkCollectionExtractor
-            ->expects($this->once())
-            ->method('extract')
-            ->will($this->returnValue($extraction));
+        $linkCollectionExtractor = $this->prophesize(LinkCollectionExtractor::class);
+        $linkCollectionExtractor->extract($linkCollection)->willReturn($extraction);
 
-        $this->plugin->setLinkCollectionExtractor($linkCollectionExtractor);
-
-        $linkCollection = new LinkCollection();
+        $this->plugin->setLinkCollectionExtractor($linkCollectionExtractor->reveal());
 
         $result = $this->plugin->fromLinkCollection($linkCollection);
 
@@ -904,6 +908,8 @@ class HalTest extends TestCase
                 'entity_route_name'   => 'hostname/embedded',
             ],
         ]);
+
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
 
         $this->plugin->setMetadataMap($metadata);
 
@@ -1010,6 +1016,8 @@ class HalTest extends TestCase
                 'entity_identifier_name' => 'id',
             ],
         ]);
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
+
         $this->plugin->setMetadataMap($metadata);
 
         $foo = new TestAsset\Entity('foo', 'Foo Bar');
@@ -1048,6 +1056,8 @@ class HalTest extends TestCase
     public function testRenderEntityMaxDepth($entity, $metadataMap, $expectedResult, $exception = null)
     {
         $this->plugin->setMetadataMap($metadataMap);
+
+        $metadataMap->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
 
         if ($exception) {
             $this->setExpectedException($exception['class'], $exception['message']);
@@ -1196,6 +1206,9 @@ class HalTest extends TestCase
         $metadataMap1 = $this->createNestedMetadataMap(0);
         $metadataMap2 = $this->createNestedMetadataMap(1);
 
+        $metadataMap1->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
+        $metadataMap2->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
+
         $this->plugin->setMetadataMap($metadataMap1);
         $result1 = $this->plugin->renderEntity($entity);
 
@@ -1215,6 +1228,7 @@ class HalTest extends TestCase
      */
     public function testRenderCollectionWithMaxDepth($collection, $metadataMap, $expectedResult, $exception = null)
     {
+        $metadataMap->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
         $this->plugin->setMetadataMap($metadataMap);
 
         if ($exception) {
@@ -1508,6 +1522,7 @@ class HalTest extends TestCase
             ],
         ]);
 
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
         $this->plugin->setMetadataMap($metadata);
         $entity = $this->plugin->createEntityFromMetadata(
             $object,
@@ -1529,6 +1544,8 @@ class HalTest extends TestCase
                 'force_self_link' => false,
             ],
         ]);
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
+
         $this->plugin->setMetadataMap($metadata);
         $entity = $this->plugin->createEntity($object, 'hostname/resource', 'id');
         $links = $entity->getLinks();
@@ -1553,6 +1570,8 @@ class HalTest extends TestCase
             ],
         ]);
 
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
+
         $this->plugin->setMetadataMap($metadata);
 
         $collection = $this->plugin->createCollectionFromMetadata(
@@ -1575,6 +1594,9 @@ class HalTest extends TestCase
                 'force_self_link'   => false,
             ],
         ]);
+
+        $metadata->setHydratorManager(new Hydrator\HydratorPluginManager(new ServiceManager()));
+
         $this->plugin->setMetadataMap($metadata);
 
         $result = $this->plugin->createCollection($collection);
@@ -1909,7 +1931,8 @@ class HalTest extends TestCase
 
     public function testCanRenderNestedEntitiesAsEmbeddedEntities()
     {
-        $this->router->addRoute('user', new Segment('/user[/:id]'));
+        $routeClass   = class_exists(V2Segment::class) ? V2Segment::class : Segment::class;
+        $this->router->addRoute('user', new $routeClass('/user[/:id]'));
 
         $child = new Entity([
             'id'     => 'matthew',
@@ -1946,7 +1969,8 @@ class HalTest extends TestCase
 
     public function testRendersEmbeddedEntitiesOfIndividualNonPaginatedCollections()
     {
-        $this->router->addRoute('user', new Segment('/user[/:id]'));
+        $routeClass   = class_exists(V2Segment::class) ? V2Segment::class : Segment::class;
+        $this->router->addRoute('user', new $routeClass('/user[/:id]'));
 
         $child = new Entity([
             'id'     => 'matthew',
@@ -1995,7 +2019,8 @@ class HalTest extends TestCase
 
     public function testRendersEmbeddedEntitiesOfIndividualPaginatedCollections()
     {
-        $this->router->addRoute('user', new Segment('/user[/:id]'));
+        $routeClass   = class_exists(V2Segment::class) ? V2Segment::class : Segment::class;
+        $this->router->addRoute('user', new $routeClass('/user[/:id]'));
 
         $child = new Entity([
             'id'     => 'matthew',
@@ -2143,7 +2168,7 @@ class HalTest extends TestCase
     }
 
     /**
-     * @expectedException \Zend\Mvc\Router\Exception\RuntimeException
+     * @group 101
      */
     public function testNotExistingRouteInMetadataLinks()
     {
@@ -2172,6 +2197,12 @@ class HalTest extends TestCase
         ]);
 
         $this->plugin->setMetadataMap($metadata);
+
+        $expectedExceptionClass = class_exists(V2RouterException\RuntimeException::class)
+            ? V2RouterException\RuntimeException::class
+            : RouterException\RuntimeException::class;
+
+        $this->setExpectedException($expectedExceptionClass);
         $this->plugin->renderEntity($entity);
     }
 }

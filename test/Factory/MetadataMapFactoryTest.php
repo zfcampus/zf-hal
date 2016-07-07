@@ -6,6 +6,7 @@
 
 namespace ZFTest\Hal\Factory;
 
+use Interop\Container\ContainerInterface;
 use PHPUnit_Framework_TestCase as TestCase;
 use ZF\Hal\Factory\MetadataMapFactory;
 
@@ -13,7 +14,7 @@ class MetadataMapFactoryTest extends TestCase
 {
     public function testInstantiatesMetadataMapWithEmptyConfig()
     {
-        $services = $this->getMock('Zend\ServiceManager\ServiceLocatorInterface');
+        $services = $this->getMockBuilder(ContainerInterface::class)->getMock();
 
         $services
             ->expects($this->at(0))
@@ -28,14 +29,14 @@ class MetadataMapFactoryTest extends TestCase
             ->will($this->returnValue(false));
 
         $factory = new MetadataMapFactory();
-        $renderer = $factory->createService($services);
+        $renderer = $factory($services, 'ZF\Hal\MetadataMap');
 
         $this->assertInstanceOf('ZF\Hal\Metadata\MetadataMap', $renderer);
     }
 
     public function testInstantiatesMetadataMapWithMetadataMapConfig()
     {
-        $services = $this->getMock('Zend\ServiceManager\ServiceLocatorInterface');
+        $services = $this->getMockBuilder(ContainerInterface::class)->getMock();
 
         $config = [
             'metadata_map' => [
@@ -73,7 +74,7 @@ class MetadataMapFactoryTest extends TestCase
             ->will($this->returnValue(false));
 
         $factory = new MetadataMapFactory();
-        $metadataMap = $factory->createService($services);
+        $metadataMap = $factory($services, 'ZF\Hal\MetadataMap');
 
         $this->assertInstanceOf('ZF\Hal\Metadata\MetadataMap', $metadataMap);
 

@@ -8,8 +8,10 @@ namespace ZFTest\Hal\Extractor;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use Zend\Http\Request;
-use Zend\Mvc\Router\Http\TreeRouteStack;
-use Zend\Mvc\Router\RouteMatch;
+use Zend\Mvc\Router\Http\TreeRouteStack as V2TreeRouteStack;
+use Zend\Mvc\Router\RouteMatch as V2RouteMatch;
+use Zend\Router\Http\TreeRouteStack;
+use Zend\Router\RouteMatch;
 use Zend\View\Helper\Url as UrlHelper;
 use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Link\Link;
@@ -88,7 +90,7 @@ class LinkExtractorTest extends TestCase
      */
     public function testPassingFalseReuseParamsOptionShouldOmitMatchedParametersInGeneratedLink()
     {
-        $serverUrlHelper = $this->getMock('Zend\View\Helper\ServerUrl');
+        $serverUrlHelper = $this->getMockBuilder('Zend\View\Helper\ServerUrl')->getMock();
         $urlHelper       = new UrlHelper;
 
         $linkUrlBuilder = new LinkUrlBuilder($serverUrlHelper, $urlHelper);
@@ -121,7 +123,8 @@ class LinkExtractorTest extends TestCase
         $request = new Request();
         $request->setUri($url);
 
-        $router = new TreeRouteStack();
+        $routerClass = class_exists(V2TreeRouteStack::class) ? V2TreeRouteStack::class : TreeRouteStack::class;
+        $router = new $routerClass();
 
         $router->addRoute('hostname', [
             'type' => 'hostname',
@@ -139,7 +142,7 @@ class LinkExtractorTest extends TestCase
         ]);
 
         $match = $router->match($request);
-        if ($match instanceof RouteMatch) {
+        if ($match instanceof RouteMatch || $match instanceof V2RouteMatch) {
             $urlHelper->setRouter($router);
             $urlHelper->setRouteMatch($match);
         }

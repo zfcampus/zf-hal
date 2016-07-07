@@ -1,25 +1,22 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Hal\Factory;
 
-use Zend\ServiceManager\FactoryInterface;
-use Zend\ServiceManager\ServiceLocatorInterface;
-use ZF\Hal\View;
+use Interop\Container\ContainerInterface;
+use ZF\Hal\View\HalJsonStrategy;
 
-class HalJsonStrategyFactory implements FactoryInterface
+class HalJsonStrategyFactory
 {
     /**
-     * @param  ServiceLocatorInterface $serviceLocator
-     * @return View\HalJsonStrategy
+     * @param ContainerInterface $container
+     * @return HalJsonStrategy
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function __invoke(ContainerInterface $container)
     {
-        $renderer = $serviceLocator->get('ZF\Hal\JsonRenderer');
-
-        return new View\HalJsonStrategy($renderer);
+        return new HalJsonStrategy($container->get('ZF\Hal\JsonRenderer'));
     }
 }

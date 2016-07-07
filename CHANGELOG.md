@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Added
 
+- [#142](https://github.com/zfcampus/zf-hal/pull/142) and
+  [#145](https://github.com/zfcampus/zf-hal/pull/145) add support for Zend
+  Framework v3 component releases, retaining support for v2 versions as well;
+  specifically, zend-eventmanager, zend-mvc, zend-stdlib, and
+  zend-servicemanager v3 may now be used with this module.
+- [#142](https://github.com/zfcampus/zf-hal/pull/142) and
+  [#145](https://github.com/zfcampus/zf-hal/pull/145) add support for PHP 7.
 - [#99](https://github.com/zfcampus/zf-hal/pull/99) adds accessors for the
   `$entity` and `$id` properties of `ZF\Hal\Entity`.
 - [#124](https://github.com/zfcampus/zf-hal/pull/124) adds a new interface
@@ -48,7 +55,7 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Removed
 
-- Nothing.
+- [#145](https://github.com/zfcampus/zf-hal/pull/145) removes support for PHP 5.5.
 
 ### Fixed
 

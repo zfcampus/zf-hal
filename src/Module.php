@@ -1,35 +1,16 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2016 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Hal;
 
-use Zend\Loader\StandardAutoloader;
 use Zend\Mvc\MvcEvent;
+use ZF\Hal\View\HalJsonStrategy;
 
-/**
- * ZF2 module
- */
 class Module
 {
-    /**
-     * Retrieve autoloader configuration
-     *
-     * @return array
-     */
-    public function getAutoloaderConfig()
-    {
-        return [
-            StandardAutoloader::class => [
-                'namespaces' => [
-                    __NAMESPACE__ => __DIR__ . '/src/',
-                ],
-            ],
-        ];
-    }
-
     /**
      * Retrieve module configuration
      *
@@ -37,7 +18,7 @@ class Module
      */
     public function getConfig()
     {
-        return include __DIR__ . '/config/module.config.php';
+        return include __DIR__ . '/../config/module.config.php';
     }
 
     /**
@@ -63,7 +44,7 @@ class Module
     public function onRender(MvcEvent $e)
     {
         $result = $e->getResult();
-        if (!$result instanceof View\HalJsonModel) {
+        if (! $result instanceof View\HalJsonModel) {
             return;
         }
 
@@ -72,6 +53,7 @@ class Module
 
         // register at high priority, to "beat" normal json strategy registered
         // via view manager
-        $events->attach($services->get('ZF\Hal\JsonStrategy'), 200);
+        $halStrategy = $services->get('ZF\Hal\JsonStrategy');
+        $halStrategy->attach($events, 200);
     }
 }

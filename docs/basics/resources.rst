@@ -38,7 +38,8 @@ also composes the route matches and query parameters from the request. You may
 retrieve them from the event instance using the following methods:
 
 - ``getQueryParams()`` (returns a ``Zend\Stdlib\Parameters`` instance)
-- ``getRouteMatch()`` (returns a ``Zend\Mvc\Router\RouteMatch`` instance)
+- ``getRouteMatch()`` (returns a ``Zend\Mvc\Router\RouteMatch`` or
+  ``Zend\Router\RouteMatch`` instance, based on zend-mvc major version used.)
 - ``getQueryParam($name, $default = null)``
 - ``getRouteParam($name, $default = null)``
 
