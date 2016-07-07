@@ -10,6 +10,7 @@ use PHPUnit_Framework_TestCase as TestCase;
 use Zend\Http\Request;
 use Zend\Hydrator\HydratorPluginManager;
 use Zend\Mvc\Controller\PluginManager as ControllerPluginManager;
+use Zend\Mvc\Router\Http\TreeRouteStack as V2TreeRouteStack;
 use Zend\Router\Http\TreeRouteStack;
 use Zend\ServiceManager\ServiceManager;
 use Zend\View\HelperPluginManager;
@@ -108,7 +109,10 @@ class ChildEntitiesIntegrationTest extends TestCase
                 ],
             ],
         ];
-        $this->router = $router = new TreeRouteStack();
+
+        $class = class_exists(V2TreeRouteStack::class) ? V2TreeRouteStack::class : TreeRouteStack::class;
+
+        $this->router = $router = new $class();
         $router->addRoutes($routes);
     }
 
@@ -285,7 +289,9 @@ class ChildEntitiesIntegrationTest extends TestCase
                 ],
             ],
         ];
-        $this->router = $router = new TreeRouteStack();
+
+        $class = class_exists(V2TreeRouteStack::class) ? V2TreeRouteStack::class : TreeRouteStack::class;
+        $this->router = $router = new $class();
         $router->addRoutes($routes);
         $this->helpers->get('url')->setRouter($router);
     }

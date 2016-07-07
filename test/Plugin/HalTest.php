@@ -8,11 +8,15 @@ namespace ZFTest\Hal\Plugin;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use ReflectionObject;
-use Zend\Router\Http\TreeRouteStack;
-use Zend\Router\Http\Segment;
 use Zend\Mvc\MvcEvent;
+use Zend\Mvc\Router\Exception as V2RouterException;
+use Zend\Mvc\Router\Http\Segment as V2Segment;
+use Zend\Mvc\Router\Http\TreeRouteStack as V2TreeRouteStack;
 use Zend\Paginator\Adapter\ArrayAdapter as ArrayPaginator;
 use Zend\Paginator\Paginator;
+use Zend\Router\Exception as RouterException;
+use Zend\Router\Http\Segment;
+use Zend\Router\Http\TreeRouteStack;
 use Zend\ServiceManager\ServiceManager;
 use Zend\Uri\Http;
 use Zend\Hydrator;
@@ -42,10 +46,13 @@ class HalTest extends TestCase
 
     public function setUp()
     {
-        $this->router = $router = new TreeRouteStack();
-        $route = new Segment('/resource[/[:id]]');
+        $routerClass  = class_exists(V2TreeRouteStack::class) ? V2TreeRouteStack::class : TreeRouteStack::class;
+        $routeClass   = class_exists(V2Segment::class) ? V2Segment::class : Segment::class;
+
+        $this->router = $router = new $routerClass();
+        $route = new $routeClass('/resource[/[:id]]');
         $router->addRoute('resource', $route);
-        $route2 = new Segment('/help');
+        $route2 = new $routeClass('/help');
         $router->addRoute('docs', $route2);
         $router->addRoute('hostname', [
             'type' => 'hostname',
@@ -1942,7 +1949,8 @@ class HalTest extends TestCase
 
     public function testCanRenderNestedEntitiesAsEmbeddedEntities()
     {
-        $this->router->addRoute('user', new Segment('/user[/:id]'));
+        $routeClass   = class_exists(V2Segment::class) ? V2Segment::class : Segment::class;
+        $this->router->addRoute('user', new $routeClass('/user[/:id]'));
 
         $child = new Entity([
             'id'     => 'matthew',
@@ -1979,7 +1987,8 @@ class HalTest extends TestCase
 
     public function testRendersEmbeddedEntitiesOfIndividualNonPaginatedCollections()
     {
-        $this->router->addRoute('user', new Segment('/user[/:id]'));
+        $routeClass   = class_exists(V2Segment::class) ? V2Segment::class : Segment::class;
+        $this->router->addRoute('user', new $routeClass('/user[/:id]'));
 
         $child = new Entity([
             'id'     => 'matthew',
@@ -2028,7 +2037,8 @@ class HalTest extends TestCase
 
     public function testRendersEmbeddedEntitiesOfIndividualPaginatedCollections()
     {
-        $this->router->addRoute('user', new Segment('/user[/:id]'));
+        $routeClass   = class_exists(V2Segment::class) ? V2Segment::class : Segment::class;
+        $this->router->addRoute('user', new $routeClass('/user[/:id]'));
 
         $child = new Entity([
             'id'     => 'matthew',
@@ -2176,7 +2186,7 @@ class HalTest extends TestCase
     }
 
     /**
-     * @expectedException \Zend\Mvc\Router\Exception\RuntimeException
+     * @group 101
      */
     public function testNotExistingRouteInMetadataLinks()
     {
@@ -2205,6 +2215,12 @@ class HalTest extends TestCase
         ]);
 
         $this->plugin->setMetadataMap($metadata);
+
+        $expectedExceptionClass = class_exists(V2RouterException\RuntimeException::class)
+            ? V2RouterException\RuntimeException::class
+            : RouterException\RuntimeException::class;
+
+        $this->setExpectedException($expectedExceptionClass);
         $this->plugin->renderEntity($entity);
     }
 }

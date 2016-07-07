@@ -11,6 +11,8 @@ use ReflectionObject;
 use Zend\ServiceManager\AbstractPluginManager;
 use Zend\ServiceManager\ServiceManager;
 use Zend\Hydrator\HydratorPluginManager;
+use ZF\Hal\Extractor\LinkCollectionExtractor;
+use ZF\Hal\Link;
 use ZF\Hal\Factory\HalViewHelperFactory;
 use ZF\Hal\RendererOptions;
 
@@ -30,29 +32,31 @@ class HalViewHelperFactoryTest extends TestCase
         } else {
             $rendererOptions = new RendererOptions();
         }
+        $services->setService(RendererOptions::class, $rendererOptions);
 
         $metadataMap = $this->createMock('ZF\Hal\Metadata\MetadataMap');
         $metadataMap
             ->expects($this->once())
             ->method('getHydratorManager')
             ->will($this->returnValue(new HydratorPluginManager($services)));
-
         $services->setService('ZF\Hal\MetadataMap', $metadataMap);
 
-        $linkUrlBuilder = $this->getMockBuilder('ZF\Hal\Link\LinkUrlBuilder')
+        $linkUrlBuilder = $this->getMockBuilder(Link\LinkUrlBuilder::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $services->setService('ZF\Hal\Link\LinkUrlBuilder', $linkUrlBuilder);
+        $services->setService(Link\LinkUrlBuilder::class, $linkUrlBuilder);
 
-        $linkCollectionExtractor = $this->getMockBuilder('ZF\Hal\Extractor\LinkCollectionExtractor')
+        $linkCollectionExtractor = $this->getMockBuilder(LinkCollectionExtractor::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $services->setService('ZF\Hal\Extractor\LinkCollectionExtractor', $linkCollectionExtractor);
+        $services->setService(LinkCollectionExtractor::class, $linkCollectionExtractor);
 
-        $pluginManager = $this->getMock('Zend\ServiceManager\AbstractPluginManager');
-        $pluginManager
-            ->method('getServiceLocator')
-            ->will($this->returnValue($services));
+        $pluginManagerMock = $this->getMockBuilder(AbstractPluginManager::class);
+        $pluginManagerMock->setConstructorArgs([$services]);
+        $this->pluginManager = $pluginManagerMock->getMock();
+        $services->setService('ViewHelperManager', $this->pluginManager);
+
+        $this->services = $services;
     }
 
     public function testInstantiatesHalViewHelper()
@@ -63,30 +67,5 @@ class HalViewHelperFactoryTest extends TestCase
         $plugin = $factory($this->services, 'Hal');
 
         $this->assertInstanceOf('ZF\Hal\Plugin\Hal', $plugin);
-    }
-
-    /**
-     * @group fail
-     */
-    public function testOptionUseProxyIfPresentInConfig()
-    {
-        $options = [
-            'options' => [
-                'use_proxy' => true,
-            ],
-        ];
-
-        $this->setupPluginManager($options);
-
-        $factory = new HalViewHelperFactory();
-        $halPlugin = $factory($this->services, 'Hal');
-
-        $r = new ReflectionObject($halPlugin);
-        $p = $r->getProperty('serverUrlHelper');
-        $p->setAccessible(true);
-        $serverUrlPlugin = $p->getValue($halPlugin);
-        $this->assertInstanceOf('Zend\View\Helper\ServerUrl', $serverUrlPlugin);
-
-        return $pluginManager;
     }
 }

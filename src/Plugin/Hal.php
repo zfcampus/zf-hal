@@ -17,6 +17,7 @@ use Zend\Hydrator\ExtractionInterface;
 use Zend\Hydrator\HydratorPluginManager;
 use Zend\Mvc\Controller\Plugin\PluginInterface as ControllerPluginInterface;
 use Zend\Paginator\Paginator;
+use Zend\ServiceManager\ServiceManager;
 use Zend\Stdlib\DispatchableInterface;
 use Zend\View\Helper\AbstractHelper;
 use ZF\ApiProblem\ApiProblem;
@@ -125,7 +126,7 @@ class Hal extends AbstractHelper implements
     public function __construct(HydratorPluginManager $hydrators = null)
     {
         if (null === $hydrators) {
-            $hydrators = new HydratorPluginManager();
+            $hydrators = new HydratorPluginManager(new ServiceManager());
         }
         $this->hydrators = $hydrators;
     }
