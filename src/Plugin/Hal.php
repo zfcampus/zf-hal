@@ -10,7 +10,6 @@ use ArrayObject;
 use Countable;
 use Zend\EventManager\Event;
 use Zend\EventManager\EventInterface;
-use Zend\EventManager\EventManager;
 use Zend\EventManager\EventManagerAwareInterface;
 use Zend\EventManager\EventManagerAwareTrait;
 use Zend\EventManager\EventManagerInterface;
