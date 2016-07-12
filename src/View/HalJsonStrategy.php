@@ -6,10 +6,10 @@
 
 namespace ZF\Hal\View;
 
+use Zend\Http\Response;
 use Zend\View\Strategy\JsonStrategy;
 use Zend\View\ViewEvent;
 use ZF\ApiProblem\View\ApiProblemModel;
-use Zend\Http\Response;
 
 /**
  * Extension of the JSON strategy to handle the HalJsonModel and provide
@@ -45,13 +45,14 @@ class HalJsonStrategy extends JsonStrategy
     {
         $model = $e->getModel();
 
-        if (!$model instanceof HalJsonModel) {
+        if (! $model instanceof HalJsonModel) {
             // unrecognized model; do nothing
             return;
         }
 
         // JsonModel found
         $this->renderer->setViewEvent($e);
+
         return $this->renderer;
     }
 
@@ -71,27 +72,41 @@ class HalJsonStrategy extends JsonStrategy
             return;
         }
 
-        $result   = $e->getResult();
-        if (!is_string($result)) {
+        $result = $e->getResult();
+        if (! is_string($result)) {
             // We don't have a string, and thus, no JSON
             return;
         }
 
-        $model       = $e->getModel();
-        $contentType = $this->contentType;
-        $response    = $e->getResponse();
+        $model    = $e->getModel();
+        $response = $e->getResponse();
+        $response->setContent($result);
 
+        $headers = $response->getHeaders();
+        $headers->addHeaderLine(
+            'content-type',
+            $this->getContentTypeFromModel($model)
+        );
+    }
+
+    /**
+     * Determine the response content-type to return based on the view model.
+     *
+     * @param ApiProblemModel|HalJsonModel|\Zend\View\Model\ModelInterface $model
+     * @return string The content-type to use.
+     */
+    private function getContentTypeFromModel($model)
+    {
         if ($model instanceof ApiProblemModel) {
-            $contentType = 'application/problem+json';
-        } elseif ($model instanceof HalJsonModel
-            && ($model->isCollection() || $model->isEntity())
-        ) {
-            $contentType = 'application/hal+json';
+            return 'application/problem+json';
         }
 
-        /** @var Response $response */
-        $response->setContent($result);
-        $headers = $response->getHeaders();
-        $headers->addHeaderLine('content-type', $contentType);
+        if ($model instanceof HalJsonModel
+            && ($model->isCollection() || $model->isEntity())
+        ) {
+            return 'application/hal+json';
+        }
+
+        return $this->contentType;
     }
 }
