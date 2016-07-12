@@ -6,10 +6,10 @@
 
 namespace ZF\Hal\View;
 
+use Zend\Http\Response;
 use Zend\View\Strategy\JsonStrategy;
 use Zend\View\ViewEvent;
 use ZF\ApiProblem\View\ApiProblemModel;
-use Zend\Http\Response;
 
 /**
  * Extension of the JSON strategy to handle the HalJsonModel and provide
@@ -32,7 +32,7 @@ class HalJsonStrategy extends JsonStrategy
      */
     public function __construct(HalJsonRenderer $renderer)
     {
-        $this->renderer = $renderer;
+        parent::__construct($renderer);
     }
 
     /**
@@ -52,6 +52,7 @@ class HalJsonStrategy extends JsonStrategy
 
         // JsonModel found
         $this->renderer->setViewEvent($e);
+
         return $this->renderer;
     }
 
@@ -71,27 +72,35 @@ class HalJsonStrategy extends JsonStrategy
             return;
         }
 
-        $result   = $e->getResult();
+        $result = $e->getResult();
         if (!is_string($result)) {
             // We don't have a string, and thus, no JSON
             return;
         }
 
-        $model       = $e->getModel();
-        $contentType = $this->contentType;
-        $response    = $e->getResponse();
-
-        if ($model instanceof ApiProblemModel) {
-            $contentType = 'application/problem+json';
-        } elseif ($model instanceof HalJsonModel
-            && ($model->isCollection() || $model->isEntity())
-        ) {
-            $contentType = 'application/hal+json';
-        }
+        $model    = $e->getModel();
+        $response = $e->getResponse();
 
         /** @var Response $response */
         $response->setContent($result);
+
         $headers = $response->getHeaders();
-        $headers->addHeaderLine('content-type', $contentType);
+        $headers->addHeaderLine(
+            'content-type',
+            $this->getContentTypeFromModel($model)
+        );
+    }
+
+    private function getContentTypeFromModel($model)
+    {
+        if ($model instanceof ApiProblemModel) {
+            return 'application/problem+json';
+        }
+
+        if ($model instanceof HalJsonModel && ($model->isCollection() || $model->isEntity())) {
+            return 'application/hal+json';
+        }
+
+        return $this->contentType;
     }
 }
