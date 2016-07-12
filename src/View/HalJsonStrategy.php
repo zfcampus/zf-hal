@@ -32,7 +32,7 @@ class HalJsonStrategy extends JsonStrategy
      */
     public function __construct(HalJsonRenderer $renderer)
     {
-        parent::__construct($renderer);
+        $this->renderer = $renderer;
     }
 
     /**
