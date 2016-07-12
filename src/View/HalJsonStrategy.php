@@ -45,7 +45,7 @@ class HalJsonStrategy extends JsonStrategy
     {
         $model = $e->getModel();
 
-        if (!$model instanceof HalJsonModel) {
+        if (! $model instanceof HalJsonModel) {
             // unrecognized model; do nothing
             return;
         }
@@ -73,15 +73,13 @@ class HalJsonStrategy extends JsonStrategy
         }
 
         $result = $e->getResult();
-        if (!is_string($result)) {
+        if (! is_string($result)) {
             // We don't have a string, and thus, no JSON
             return;
         }
 
         $model    = $e->getModel();
         $response = $e->getResponse();
-
-        /** @var Response $response */
         $response->setContent($result);
 
         $headers = $response->getHeaders();
@@ -91,13 +89,21 @@ class HalJsonStrategy extends JsonStrategy
         );
     }
 
+    /**
+     * Determine the response content-type to return based on the view model.
+     *
+     * @param ApiProblemModel|HalJsonModel|\Zend\View\Model\ModelInterface $model
+     * @return string The content-type to use.
+     */
     private function getContentTypeFromModel($model)
     {
         if ($model instanceof ApiProblemModel) {
             return 'application/problem+json';
         }
 
-        if ($model instanceof HalJsonModel && ($model->isCollection() || $model->isEntity())) {
+        if ($model instanceof HalJsonModel
+            && ($model->isCollection() || $model->isEntity())
+        ) {
             return 'application/hal+json';
         }
 
