@@ -7,6 +7,8 @@
 namespace ZF\Hal\Factory;
 
 use Interop\Container\ContainerInterface;
+use Zend\Hydrator\HydratorInterface;
+use Zend\Hydrator\HydratorPluginManager;
 use Zend\ServiceManager\AbstractPluginManager;
 use ZF\Hal\Exception;
 use ZF\Hal\Extractor\LinkCollectionExtractor;
@@ -28,6 +30,8 @@ class HalViewHelperFactory
         /* @var $rendererOptions \ZF\Hal\RendererOptions */
         $rendererOptions = $container->get('ZF\Hal\RendererOptions');
         $metadataMap     = $container->get('ZF\Hal\MetadataMap');
+
+        /** @var HydratorPluginManager $hydrators */
         $hydrators       = $metadataMap->getHydratorManager();
 
         $helper = new Plugin\Hal($hydrators);
@@ -48,6 +52,7 @@ class HalViewHelperFactory
                 ));
             }
 
+            /** @var HydratorInterface $hydrator */
             $hydrator = $hydrators->get($defaultHydrator);
             $helper->setDefaultHydrator($hydrator);
         }

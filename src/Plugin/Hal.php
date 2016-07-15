@@ -39,6 +39,7 @@ use ZF\Hal\Metadata\Metadata;
 use ZF\Hal\Metadata\MetadataMap;
 use ZF\Hal\Resource;
 use ZF\Hal\ResourceFactory;
+use Traversable;
 
 /**
  * Generate links for use with HAL payloads
@@ -941,7 +942,7 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * @param  object $object
+     * @param  array|Traversable|Paginator $object
      * @param  Metadata $metadata
      * @return Collection
      */

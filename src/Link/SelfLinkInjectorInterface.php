@@ -6,8 +6,6 @@
 
 namespace ZF\Hal\Link;
 
-use ZF\Hal\Link\LinkCollectionAwareInterface;
-
 interface SelfLinkInjectorInterface
 {
     /**

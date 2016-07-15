@@ -8,6 +8,7 @@ namespace ZF\Hal;
 
 use Traversable;
 use Zend\Stdlib\ArrayUtils;
+use Zend\Paginator\Paginator;
 
 /**
  * Model a collection for use with HAL payloads
@@ -24,7 +25,7 @@ class Collection implements Link\LinkCollectionAwareInterface
     protected $attributes = [];
 
     /**
-     * @var array|Traversable|\Zend\Paginator\Paginator
+     * @var array|Traversable|Paginator
      */
     protected $collection;
 
@@ -99,7 +100,7 @@ class Collection implements Link\LinkCollectionAwareInterface
     protected $entityRouteParams = [];
 
     /**
-     * @param  array|Traversable|\Zend\Paginator\Paginator $collection
+     * @param  array|Traversable|Paginator $collection
      * @param  string $entityRoute
      * @param  array|Traversable $entityRouteParams
      * @param  array|Traversable $entityRouteOptions
@@ -491,7 +492,7 @@ class Collection implements Link\LinkCollectionAwareInterface
     /**
      * Collection
      *
-     * @return array|Traversable|\Zend\Paginator\Paginator
+     * @return array|Traversable|Paginator
      */
     public function getCollection()
     {
