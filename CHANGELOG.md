@@ -20,7 +20,7 @@ All notable changes to this project will be documented in this file, in reverse 
 
 - Nothing.
 
-## 1.4.1 - TBD
+## 1.4.1 - 2016-07-27
 
 ### Added
 
@@ -36,7 +36,9 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Fixed
 
-- Nothing.
+- [#149](https://github.com/zfcampus/zf-hal/pull/149) updates the zend-hydrator
+  dependency to allow either the 1.1 or 2.2 series, allowing usage with
+  zend-stdlib v2 releases.
 
 ## 1.4.0 - 2016-07-07
 
