@@ -15,28 +15,28 @@ use ZF\Hal\Plugin\Hal;
 class HalControllerPluginFactory implements FactoryInterface
 {
     /**
-     * @param  ContainerInterface $container
-     * @param  string             $requestedName
-     * @param  null|array         $options
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param null|array $options
      * @return Hal
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $helpers  = $container->get('ViewHelperManager');
+        $helpers = $container->get('ViewHelperManager');
         return $helpers->get('Hal');
     }
 
     /**
      * Create service
      *
-     * @param ServiceLocatorInterface $serviceLocator
+     * @param ServiceLocatorInterface $container
      * @return Hal
      */
-    public function createService(ServiceLocatorInterface $serviceLocator)
+    public function createService(ServiceLocatorInterface $container)
     {
-        if ($serviceLocator instanceof AbstractPluginManager) {
-            $serviceLocator = $serviceLocator->getServiceLocator();
+        if ($container instanceof AbstractPluginManager) {
+            $container = $container->getServiceLocator() ?: $container;
         }
-        return $this($serviceLocator, Hal::class);
+        return $this($container, Hal::class);
     }
 }
