@@ -18,7 +18,9 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Fixed
 
-- Nothing.
+- [#151](https://github.com/zfcampus/zf-hal/pull/151) updates the
+  `HalControllerPluginFactory` to work correctly under v2 releases of
+  zend-servicemanager.
 
 ## 1.4.1 - 2016-07-27
 
