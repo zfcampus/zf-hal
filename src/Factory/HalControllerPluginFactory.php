@@ -7,6 +7,7 @@
 namespace ZF\Hal\Factory;
 
 use Interop\Container\ContainerInterface;
+use Zend\ServiceManager\AbstractPluginManager;
 use ZF\Hal\Plugin\Hal;
 
 class HalControllerPluginFactory
@@ -17,6 +18,10 @@ class HalControllerPluginFactory
      */
     public function __invoke(ContainerInterface $container)
     {
+        $container = ($container instanceof AbstractPluginManager)
+            ? $container->getServiceLocator()
+            : $container;
+
         $helpers  = $container->get('ViewHelperManager');
         return $helpers->get('Hal');
     }
