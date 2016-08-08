@@ -7,13 +7,13 @@
 namespace ZF\Hal;
 
 use Closure;
+use Traversable;
+use Zend\Paginator\Paginator;
 use ZF\Hal\Extractor\EntityExtractor;
 use ZF\Hal\Exception;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Metadata\Metadata;
-use Traversable;
-use Zend\Paginator\Paginator;
 
 class ResourceFactory
 {

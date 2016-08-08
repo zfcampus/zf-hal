@@ -6,8 +6,8 @@
 
 namespace ZF\Hal\Link;
 
-use ZF\Hal\Collection;
 use ZF\ApiProblem\ApiProblem;
+use ZF\Hal\Collection;
 
 interface PaginationInjectorInterface
 {

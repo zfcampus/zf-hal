@@ -8,6 +8,7 @@ namespace ZF\Hal\Plugin;
 
 use ArrayObject;
 use Countable;
+use Traversable;
 use Zend\EventManager\Event;
 use Zend\EventManager\EventInterface;
 use Zend\EventManager\EventManagerAwareInterface;
@@ -39,7 +40,6 @@ use ZF\Hal\Metadata\Metadata;
 use ZF\Hal\Metadata\MetadataMap;
 use ZF\Hal\Resource;
 use ZF\Hal\ResourceFactory;
-use Traversable;
 
 /**
  * Generate links for use with HAL payloads

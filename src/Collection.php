@@ -7,8 +7,8 @@
 namespace ZF\Hal;
 
 use Traversable;
-use Zend\Stdlib\ArrayUtils;
 use Zend\Paginator\Paginator;
+use Zend\Stdlib\ArrayUtils;
 
 /**
  * Model a collection for use with HAL payloads
