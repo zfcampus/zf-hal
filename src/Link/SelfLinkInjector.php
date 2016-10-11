@@ -6,7 +6,6 @@
 
 namespace ZF\Hal\Link;
 
-use ZF\Hal\Link\LinkCollectionAwareInterface;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
 
