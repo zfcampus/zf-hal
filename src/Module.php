@@ -6,6 +6,7 @@
 
 namespace ZF\Hal;
 
+use Zend\Mvc\ApplicationInterface;
 use Zend\Mvc\MvcEvent;
 use ZF\Hal\View\HalJsonStrategy;
 
@@ -30,7 +31,9 @@ class Module
      */
     public function onBootstrap(MvcEvent $e)
     {
-        $events = $e->getTarget()->getEventManager();
+        /** @var ApplicationInterface $application */
+        $application = $e->getTarget();
+        $events = $application->getEventManager();
         $events->attach(MvcEvent::EVENT_RENDER, [$this, 'onRender'], 100);
     }
 
@@ -48,11 +51,14 @@ class Module
             return;
         }
 
-        $services = $e->getTarget()->getServiceManager();
+        /** @var Application $application */
+        $application = $e->getTarget();
+        $services = $application->getServiceManager();
         $events   = $services->get('View')->getEventManager();
 
         // register at high priority, to "beat" normal json strategy registered
         // via view manager
+        /** @var HalJsonStrategy $halStrategy */
         $halStrategy = $services->get('ZF\Hal\JsonStrategy');
         $halStrategy->attach($events, 200);
     }
