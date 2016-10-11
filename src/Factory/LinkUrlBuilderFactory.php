@@ -6,6 +6,7 @@
 
 namespace ZF\Hal\Factory;
 
+use Zend\View\Helper\ServerUrl;
 use ZF\Hal\Link\LinkUrlBuilder;
 
 class LinkUrlBuilderFactory
@@ -20,6 +21,7 @@ class LinkUrlBuilderFactory
 
         $viewHelperManager = $container->get('ViewHelperManager');
 
+        /** @var ServerUrl $serverUrlHelper */
         $serverUrlHelper = $viewHelperManager->get('ServerUrl');
         if (isset($halConfig['options']['use_proxy'])) {
             $serverUrlHelper->setUseProxy($halConfig['options']['use_proxy']);

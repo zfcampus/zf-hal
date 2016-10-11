@@ -8,6 +8,7 @@ namespace ZF\Hal\Plugin;
 
 use ArrayObject;
 use Countable;
+use Traversable;
 use Zend\EventManager\Event;
 use Zend\EventManager\EventInterface;
 use Zend\EventManager\EventManagerAwareInterface;
@@ -941,7 +942,7 @@ class Hal extends AbstractHelper implements
     }
 
     /**
-     * @param  object $object
+     * @param  array|Traversable|Paginator $object
      * @param  Metadata $metadata
      * @return Collection
      */
