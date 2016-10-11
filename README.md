@@ -126,7 +126,7 @@ For now we have only one option available who contains the following configurati
 
 - `use_proxy` - boolean; set to `true` when you are using a proxy (for using
   `HTTP_X_FORWARDED_PROTO`, `HTTP_X_FORWARDED_HOST`, and
-  `HTTP_X_FORWARDED_PROTO` instead of `SSL HTTPS`, `HTTP_HOST, SERVER_PORT`)
+  `HTTP_X_FORWARDED_PORT` instead of `SSL_HTTPS`, `HTTP_HOST, SERVER_PORT`)
 
 ### System Configuration
 
