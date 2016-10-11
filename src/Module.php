@@ -6,7 +6,7 @@
 
 namespace ZF\Hal;
 
-use Zend\Mvc\Application;
+use Zend\Mvc\ApplicationInterface;
 use Zend\Mvc\MvcEvent;
 use ZF\Hal\View\HalJsonStrategy;
 
@@ -31,7 +31,7 @@ class Module
      */
     public function onBootstrap(MvcEvent $e)
     {
-        /** @var Application $application */
+        /** @var ApplicationInterface $application */
         $application = $e->getTarget();
         $events = $application->getEventManager();
         $events->attach(MvcEvent::EVENT_RENDER, [$this, 'onRender'], 100);
