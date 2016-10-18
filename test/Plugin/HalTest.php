@@ -64,7 +64,7 @@ class HalTest extends TestCase
                 'resource' => [
                     'type' => 'segment',
                     'options' => [
-                        'route' => '/resource[/:id]'
+                        'route' => '/resource[/:id]',
                     ],
                     'may_terminate' => true,
                     'child_routes' => [
@@ -79,28 +79,28 @@ class HalTest extends TestCase
                 'users' => [
                     'type' => 'segment',
                     'options' => [
-                        'route' => '/users[/:id]'
-                    ]
+                        'route' => '/users[/:id]',
+                    ],
                 ],
                 'contacts' => [
                     'type' => 'segment',
                     'options' => [
-                        'route' => '/contacts[/:id]'
-                    ]
+                        'route' => '/contacts[/:id]',
+                    ],
                 ],
                 'embedded' => [
                     'type' => 'segment',
                     'options' => [
-                        'route' => '/embedded[/:id]'
-                    ]
+                        'route' => '/embedded[/:id]',
+                    ],
                 ],
                 'embedded_custom' => [
                     'type' => 'segment',
                     'options' => [
-                        'route' => '/embedded_custom[/:custom_id]'
-                    ]
+                        'route' => '/embedded_custom[/:custom_id]',
+                    ],
                 ],
-            ]
+            ],
         ]);
 
         $this->event = $event = new MvcEvent();
@@ -529,12 +529,12 @@ class HalTest extends TestCase
 
         $this->assertTrue($links->has('self'));
         $link = $links->get('self');
-        $this->assertInstanceof('ZF\Hal\Link\Link', $link);
+        $this->assertInstanceOf('ZF\Hal\Link\Link', $link);
 
         $this->plugin->injectSelfLink($entity, 'hostname/resource');
         $this->assertTrue($links->has('self'));
         $link = $links->get('self');
-        $this->assertInstanceof('ZF\Hal\Link\Link', $link);
+        $this->assertInstanceOf('ZF\Hal\Link\Link', $link);
     }
 
     public function testEntityPropertiesCanBeLinks()
@@ -749,7 +749,7 @@ class HalTest extends TestCase
 
         $this->plugin->setMetadataMap($metadata);
         $entity = $this->plugin->createEntity($object, 'hostname/resource', 'id');
-        $this->assertInstanceof('ZF\Hal\Entity', $entity);
+        $this->assertInstanceOf('ZF\Hal\Entity', $entity);
         $links = $entity->getLinks();
         $this->assertTrue($links->has('describedby'), 'Missing describedby link');
         $this->assertTrue($links->has('children'), 'Missing children link');
@@ -1086,7 +1086,7 @@ class HalTest extends TestCase
                 [
                     'class'   => 'ZF\Hal\Exception\CircularReferenceException',
                     'message' => 'Circular reference detected in \'ZFTest\Hal\Plugin\TestAsset\Entity\'',
-                ]
+                ],
             ],
             [
                 $this->createNestedEntity(),
@@ -1102,24 +1102,24 @@ class HalTest extends TestCase
                                 'parent' => [
                                     '_links' => [
                                         'self' => [
-                                            'href' => 'http://localhost.localdomain/resource/foo'
+                                            'href' => 'http://localhost.localdomain/resource/foo',
                                         ],
                                     ],
-                                ]
+                                ],
                             ],
                             '_links' => [
                                 'self' => [
-                                    'href' => 'http://localhost.localdomain/embedded/bar'
+                                    'href' => 'http://localhost.localdomain/embedded/bar',
                                 ],
                             ],
                         ],
                     ],
                     '_links' => [
                         'self' => [
-                            'href' => 'http://localhost.localdomain/resource/foo'
+                            'href' => 'http://localhost.localdomain/resource/foo',
                         ],
                     ],
-                ]
+                ],
             ],
             [
                 $this->createNestedEntity(),
@@ -1140,32 +1140,32 @@ class HalTest extends TestCase
                                         'first_child' => [
                                             '_links' => [
                                                 'self' => [
-                                                    'href' => 'http://localhost.localdomain/embedded/bar'
+                                                    'href' => 'http://localhost.localdomain/embedded/bar',
                                                 ],
                                             ],
                                         ],
                                     ],
                                     '_links' => [
                                         'self' => [
-                                            'href' => 'http://localhost.localdomain/resource/foo'
+                                            'href' => 'http://localhost.localdomain/resource/foo',
                                         ],
                                     ],
-                                ]
+                                ],
                             ],
                             '_links' => [
                                 'self' => [
-                                    'href' => 'http://localhost.localdomain/embedded/bar'
+                                    'href' => 'http://localhost.localdomain/embedded/bar',
                                 ],
                             ],
                         ],
                     ],
                     '_links' => [
                         'self' => [
-                            'href' => 'http://localhost.localdomain/resource/foo'
+                            'href' => 'http://localhost.localdomain/resource/foo',
                         ],
                     ],
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
@@ -1258,7 +1258,7 @@ class HalTest extends TestCase
                     $collection = new TestAsset\Collection([
                         $object1,
                         $object2,
-                        $object3
+                        $object3,
                     ]);
 
                     return $collection;
@@ -1268,7 +1268,7 @@ class HalTest extends TestCase
                 [
                     'class'   => 'ZF\Hal\Exception\CircularReferenceException',
                     'message' => 'Circular reference detected in \'ZFTest\Hal\Plugin\TestAsset\Entity\'',
-                ]
+                ],
             ],
             [
                 function () {
@@ -1280,7 +1280,7 @@ class HalTest extends TestCase
                     $collection = new TestAsset\Collection([
                         $object1,
                         $object2,
-                        $object3
+                        $object3,
                     ]);
 
                     return $collection;
@@ -1368,7 +1368,7 @@ class HalTest extends TestCase
                 [
                     'class'   => 'ZF\Hal\Exception\CircularReferenceException',
                     'message' => 'Circular reference detected in \'ZFTest\Hal\Plugin\TestAsset\Entity\'',
-                ]
+                ],
             ],
             [
                 function () {
@@ -1411,7 +1411,7 @@ class HalTest extends TestCase
                                                     'href' => 'http://localhost.localdomain/resource/bar',
                                                 ],
                                             ],
-                                        ]
+                                        ],
                                     ],
                                 ],
                                 '_links'       => [
@@ -1435,7 +1435,7 @@ class HalTest extends TestCase
                     ],
                     'total_items' => 2,
                 ],
-            ]
+            ],
         ];
     }
 
@@ -2075,7 +2075,7 @@ class HalTest extends TestCase
         $this->plugin->getEventManager()->attach('getIdFromEntity', function ($e) {
             $entity = $e->getParam('entity');
 
-            if (!is_array($entity)) {
+            if (! is_array($entity)) {
                 return false;
             }
 
@@ -2190,9 +2190,9 @@ class HalTest extends TestCase
                         'rel' => 'link',
                         'route' => [
                             'name' => 'non_existing_route',
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ],
         ]);
 
