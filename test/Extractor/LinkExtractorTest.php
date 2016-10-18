@@ -135,10 +135,10 @@ class LinkExtractorTest extends TestCase
                 'resource' => [
                     'type' => 'segment',
                     'options' => [
-                        'route' => '/resource[/:id]'
+                        'route' => '/resource[/:id]',
                     ],
                 ],
-            ]
+            ],
         ]);
 
         $match = $router->match($request);

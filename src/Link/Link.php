@@ -79,7 +79,7 @@ class Link implements LinkInterface
      */
     public static function factory(array $spec)
     {
-        if (!isset($spec['rel'])) {
+        if (! isset($spec['rel'])) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s requires that the specification array contain a "rel" element; none found',
                 __METHOD__
@@ -111,7 +111,7 @@ class Link implements LinkInterface
                 return $link;
             }
 
-            if (!is_array($routeInfo)) {
+            if (! is_array($routeInfo)) {
                 throw new Exception\InvalidArgumentException(sprintf(
                     '%s requires that the specification array\'s "route" element be a string or array; received "%s"',
                     __METHOD__,
@@ -119,7 +119,7 @@ class Link implements LinkInterface
                 ));
             }
 
-            if (!isset($routeInfo['name'])) {
+            if (! isset($routeInfo['name'])) {
                 throw new Exception\InvalidArgumentException(sprintf(
                     '%s requires that the specification array\'s "route" array contain a "name" element; none found',
                     __METHOD__
@@ -199,7 +199,7 @@ class Link implements LinkInterface
             $options = ArrayUtils::iteratorToArray($options);
         }
 
-        if (!is_array($options)) {
+        if (! is_array($options)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects an array or Traversable; received "%s"',
                 __METHOD__,
@@ -224,7 +224,7 @@ class Link implements LinkInterface
             $params = ArrayUtils::iteratorToArray($params);
         }
 
-        if (!is_array($params)) {
+        if (! is_array($params)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects an array or Traversable; received "%s"',
                 __METHOD__,
@@ -262,7 +262,7 @@ class Link implements LinkInterface
             ), $e->getCode(), $e);
         }
 
-        if (!$uri->isValid()) {
+        if (! $uri->isValid()) {
             throw new Exception\InvalidArgumentException(
                 'Received invalid URL'
             );
@@ -347,7 +347,7 @@ class Link implements LinkInterface
      */
     public function isComplete()
     {
-        return (!empty($this->href) || !empty($this->route));
+        return (! empty($this->href) || ! empty($this->route));
     }
 
     /**
@@ -357,7 +357,7 @@ class Link implements LinkInterface
      */
     public function hasRoute()
     {
-        return !empty($this->route);
+        return ! empty($this->route);
     }
 
     /**
@@ -368,7 +368,7 @@ class Link implements LinkInterface
      */
     public function hasUrl()
     {
-        return !empty($this->href);
+        return ! empty($this->href);
     }
 
     /**

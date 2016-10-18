@@ -63,7 +63,7 @@ class ResourceFactory
             ));
         }
 
-        $id = ($entityIdentifierName) ? $data[$entityIdentifierName]: null;
+        $id = $entityIdentifierName ? $data[$entityIdentifierName] : null;
 
         if (! $renderEmbeddedEntities) {
             $object = [];

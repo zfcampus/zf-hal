@@ -30,7 +30,7 @@ class LinkExtractor implements LinkExtractorInterface
      */
     public function extract(Link $object)
     {
-        if (!$object->isComplete()) {
+        if (! $object->isComplete()) {
             throw new DomainException(sprintf(
                 'Link from resource provided to %s was incomplete; must contain a URL or a route',
                 __METHOD__

@@ -48,7 +48,7 @@ class ChildEntitiesIntegrationTest extends TestCase
 
     public function setupHelpers()
     {
-        if (!$this->router) {
+        if (! $this->router) {
             $this->setupRouter();
         }
 
@@ -79,7 +79,7 @@ class ChildEntitiesIntegrationTest extends TestCase
 
     public function setupRenderer()
     {
-        if (!$this->helpers) {
+        if (! $this->helpers) {
             $this->setupHelpers();
         }
         $this->renderer = $renderer = new HalJsonRenderer(new ApiProblemRenderer());
@@ -128,7 +128,7 @@ class ChildEntitiesIntegrationTest extends TestCase
 
         $link = new Link('self');
         $link->setRoute('parent');
-        $link->setRouteParams(['parent'=> 'anakin']);
+        $link->setRouteParams(['parent' => 'anakin']);
         $entity->getLinks()->add($link);
 
         return $entity;
@@ -144,7 +144,7 @@ class ChildEntitiesIntegrationTest extends TestCase
 
         $link = new Link('self');
         $link->setRoute('parent/child');
-        $link->setRouteParams(['child'=> $id]);
+        $link->setRouteParams(['child' => $id]);
         $entity->getLinks()->add($link);
 
         return $entity;

@@ -28,7 +28,7 @@ trait LinkCollectionAwareTrait
      */
     public function getLinks()
     {
-        if (!$this->links instanceof LinkCollection) {
+        if (! $this->links instanceof LinkCollection) {
             $this->setLinks(new LinkCollection());
         }
         return $this->links;

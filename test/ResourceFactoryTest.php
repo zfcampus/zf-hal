@@ -54,7 +54,7 @@ class ResourceFactoryTest extends TestCase
             $metadata->get(HalPluginTestAsset\Entity::class)
         );
 
-        $this->assertInstanceof('ZF\Hal\Entity', $entity);
+        $this->assertInstanceOf('ZF\Hal\Entity', $entity);
         $links = $entity->getLinks();
         $this->assertTrue($links->has('describedby'));
         $this->assertTrue($links->has('children'));
@@ -109,7 +109,7 @@ class ResourceFactoryTest extends TestCase
             $metadata->get(HalPluginTestAsset\Entity::class)
         );
 
-        $this->assertInstanceof('ZF\Hal\Entity', $entity);
+        $this->assertInstanceOf('ZF\Hal\Entity', $entity);
 
         $links = $entity->getLinks();
         $this->assertTrue($links->has('self'));
@@ -157,7 +157,7 @@ class ResourceFactoryTest extends TestCase
             $metadata->get(HalPluginTestAsset\Collection::class)
         );
 
-        $this->assertInstanceof('ZF\Hal\Collection', $collection);
+        $this->assertInstanceOf('ZF\Hal\Collection', $collection);
         $links = $collection->getLinks();
         $this->assertTrue($links->has('describedby'));
         $link = $links->get('describedby');

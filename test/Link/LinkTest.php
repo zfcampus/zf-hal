@@ -190,7 +190,7 @@ class LinkTest extends TestCase
             'props' => [
                 'version' => 2,
                 'latest'  => true,
-            ]
+            ],
         ]);
 
         $this->assertInstanceOf('ZF\Hal\Link\Link', $link);
