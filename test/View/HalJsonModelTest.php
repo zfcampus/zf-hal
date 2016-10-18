@@ -17,6 +17,11 @@ use ZF\Hal\View\HalJsonModel;
  */
 class HalJsonModelTest extends TestCase
 {
+    /**
+     * @var HalJsonModel
+     */
+    protected $model;
+
     public function setUp()
     {
         $this->model = new HalJsonModel;
@@ -60,6 +65,8 @@ class HalJsonModelTest extends TestCase
 
     /**
      * @dataProvider invalidCollectionPayloads
+     *
+     * @param mixed $payload
      */
     public function testIsCollectionReturnsFalseForInvalidValues($payload)
     {
@@ -85,6 +92,8 @@ class HalJsonModelTest extends TestCase
 
     /**
      * @dataProvider invalidEntityPayloads
+     *
+     * @param mixed $payload
      */
     public function testIsEntityReturnsFalseForInvalidValues($payload)
     {

@@ -12,7 +12,9 @@ use Zend\Mvc\Router\Http\TreeRouteStack as V2TreeRouteStack;
 use Zend\Mvc\Router\RouteMatch as V2RouteMatch;
 use Zend\Router\Http\TreeRouteStack;
 use Zend\Router\RouteMatch;
+use Zend\View\Helper\ServerUrl;
 use Zend\View\Helper\Url as UrlHelper;
+use ZF\ApiProblem\Exception\DomainException;
 use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkUrlBuilder;
@@ -21,31 +23,19 @@ class LinkExtractorTest extends TestCase
 {
     public function testExtractGivenIncompleteLinkShouldThrowException()
     {
-        $linkUrlBuilder = $this->getMockBuilder('ZF\Hal\Link\LinkUrlBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $linkUrlBuilder = $this->createMock(LinkUrlBuilder::class);
         $linkExtractor = new LinkExtractor($linkUrlBuilder);
 
-        $link = $this->getMockBuilder('ZF\Hal\Link\Link')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $link = $this->prophesize(Link::class);
+        $link->isComplete()->willReturn(false)->shouldBeCalledTimes(1);
 
-        $link
-            ->expects($this->once())
-            ->method('isComplete')
-            ->will($this->returnValue(false));
-
-        $this->setExpectedException('ZF\ApiProblem\Exception\DomainException');
-        $linkExtractor->extract($link);
+        $this->expectException(DomainException::class);
+        $linkExtractor->extract($link->reveal());
     }
 
     public function testExtractGivenLinkWithUrlShouldReturnThisOne()
     {
-        $linkUrlBuilder = $this->getMockBuilder('ZF\Hal\Link\LinkUrlBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $linkUrlBuilder = $this->createMock(LinkUrlBuilder::class);
         $linkExtractor = new LinkExtractor($linkUrlBuilder);
 
         $params = [
@@ -61,10 +51,7 @@ class LinkExtractorTest extends TestCase
 
     public function testExtractShouldComposeAnyPropertiesInLink()
     {
-        $linkUrlBuilder = $this->getMockBuilder('ZF\Hal\Link\LinkUrlBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+        $linkUrlBuilder = $this->createMock(LinkUrlBuilder::class);
         $linkExtractor = new LinkExtractor($linkUrlBuilder);
 
         $link = Link::factory([
@@ -90,8 +77,8 @@ class LinkExtractorTest extends TestCase
      */
     public function testPassingFalseReuseParamsOptionShouldOmitMatchedParametersInGeneratedLink()
     {
-        $serverUrlHelper = $this->getMockBuilder('Zend\View\Helper\ServerUrl')->getMock();
-        $urlHelper       = new UrlHelper;
+        $serverUrlHelper = $this->createMock(ServerUrl::class);
+        $urlHelper       = new UrlHelper();
 
         $linkUrlBuilder = new LinkUrlBuilder($serverUrlHelper, $urlHelper);
 

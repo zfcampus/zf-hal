@@ -8,16 +8,15 @@ namespace ZFTest\Hal;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use Zend\Http\Request;
-use Zend\Hydrator\HydratorPluginManager;
 use Zend\Mvc\Controller\PluginManager as ControllerPluginManager;
 use Zend\Mvc\Router\Http\TreeRouteStack as V2TreeRouteStack;
 use Zend\Mvc\Router\RouteMatch as V2RouteMatch;
 use Zend\Router\Http\TreeRouteStack;
 use Zend\Router\RouteMatch;
 use Zend\ServiceManager\ServiceManager;
-use Zend\View\HelperPluginManager;
 use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use Zend\View\Helper\Url as UrlHelper;
+use Zend\View\HelperPluginManager;
 use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
@@ -34,10 +33,25 @@ use ZF\Hal\View\HalJsonRenderer;
  */
 class ChildEntitiesIntegrationTest extends TestCase
 {
-
+    /**
+     * @var V2TreeRouteStack|TreeRouteStack
+     */
     protected $router;
+
+    /**
+     * @var HelperPluginManager
+     */
     protected $helpers;
+
+    /**
+     * @var HalJsonRenderer
+     */
     protected $renderer;
+
+    /**
+     * @var ControllerPluginManager
+     */
+    protected $plugins;
 
     public function setUp()
     {

@@ -6,8 +6,9 @@
 
 namespace ZFTest\Hal\Link;
 
-use ZF\Hal\Link\Link;
 use PHPUnit_Framework_TestCase as TestCase;
+use ZF\ApiProblem\Exception\DomainException;
+use ZF\Hal\Link\Link;
 
 class LinkTest extends TestCase
 {
@@ -80,7 +81,7 @@ class LinkTest extends TestCase
         $link = new Link('describedby');
         $link->setRoute('api/docs');
 
-        $this->setExpectedException('ZF\ApiProblem\Exception\DomainException');
+        $this->expectException(DomainException::class);
         $link->setUrl('http://example.com/api/docs.html');
     }
 
@@ -89,7 +90,7 @@ class LinkTest extends TestCase
         $link = new Link('describedby');
         $link->setUrl('http://example.com/api/docs.html');
 
-        $this->setExpectedException('ZF\ApiProblem\Exception\DomainException');
+        $this->expectException(DomainException::class);
         $link->setRoute('api/docs');
     }
 
@@ -150,7 +151,7 @@ class LinkTest extends TestCase
             'rel' => $rel,
             'url' => $url,
         ]);
-        $this->assertInstanceOf('ZF\Hal\Link\Link', $link);
+        $this->assertInstanceOf(Link::class, $link);
         $this->assertEquals($rel, $link->getRelation());
         $this->assertEquals($url, $link->getUrl());
     }
@@ -173,7 +174,7 @@ class LinkTest extends TestCase
             ],
         ]);
 
-        $this->assertInstanceOf('ZF\Hal\Link\Link', $link);
+        $this->assertInstanceOf(Link::class, $link);
         $this->assertEquals('describedby', $link->getRelation());
         $this->assertEquals($route, $link->getRoute());
         $this->assertEquals($params, $link->getRouteParams());
@@ -193,7 +194,7 @@ class LinkTest extends TestCase
             ],
         ]);
 
-        $this->assertInstanceOf('ZF\Hal\Link\Link', $link);
+        $this->assertInstanceOf(Link::class, $link);
         $this->assertEquals('describedby', $link->getRelation());
         $props = $link->getProps();
         $this->assertEquals([

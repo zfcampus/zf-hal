@@ -10,5 +10,4 @@ use Zend\Hydrator\ArraySerializable;
 
 class DummyHydrator extends ArraySerializable
 {
-
 }

@@ -10,6 +10,7 @@ use Interop\Container\ContainerInterface;
 use Zend\Hydrator\HydratorInterface;
 use Zend\Hydrator\HydratorPluginManager;
 use Zend\ServiceManager\AbstractPluginManager;
+use Zend\ServiceManager\ServiceLocatorInterface;
 use ZF\Hal\Exception;
 use ZF\Hal\Extractor\LinkCollectionExtractor;
 use ZF\Hal\Link;
@@ -18,7 +19,7 @@ use ZF\Hal\Plugin;
 class HalViewHelperFactory
 {
     /**
-     * @param  ContainerInterface|\Zend\ServiceManager\ServiceLocatorInterface $container
+     * @param  ContainerInterface|ServiceLocatorInterface $container
      * @return Plugin\Hal
      */
     public function __invoke(ContainerInterface $container)
@@ -72,7 +73,7 @@ class HalViewHelperFactory
      * Proxies to __invoke() to provide backwards compatibility.
      *
      * @deprecated since 1.4.0; use __invoke instead.
-     * @param  \Zend\ServiceManager\ServiceLocatorInterface $container
+     * @param  ServiceLocatorInterface $container
      * @return Plugin\Hal
      */
     public function createService($container)

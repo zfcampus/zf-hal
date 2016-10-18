@@ -7,13 +7,14 @@
 namespace ZFTest\Hal\Factory;
 
 use PHPUnit_Framework_TestCase as TestCase;
-use ReflectionObject;
+use Zend\Hydrator\HydratorPluginManager;
 use Zend\ServiceManager\AbstractPluginManager;
 use Zend\ServiceManager\ServiceManager;
-use Zend\Hydrator\HydratorPluginManager;
 use ZF\Hal\Extractor\LinkCollectionExtractor;
-use ZF\Hal\Link;
 use ZF\Hal\Factory\HalViewHelperFactory;
+use ZF\Hal\Link;
+use ZF\Hal\Metadata\MetadataMap;
+use ZF\Hal\Plugin\Hal as HalPlugin;
 use ZF\Hal\RendererOptions;
 
 class HalViewHelperFactoryTest extends TestCase
@@ -34,21 +35,14 @@ class HalViewHelperFactoryTest extends TestCase
         }
         $services->setService(RendererOptions::class, $rendererOptions);
 
-        $metadataMap = $this->getMockBuilder('ZF\Hal\Metadata\MetadataMap')->getMock();
-        $metadataMap
-            ->expects($this->once())
-            ->method('getHydratorManager')
-            ->will($this->returnValue(new HydratorPluginManager($services)));
-        $services->setService('ZF\Hal\MetadataMap', $metadataMap);
+        $metadataMap = $this->prophesize(MetadataMap::class);
+        $metadataMap->getHydratorManager()->willReturn(new HydratorPluginManager($services))->shouldBeCalledTimes(1);
+        $services->setService('ZF\Hal\MetadataMap', $metadataMap->reveal());
 
-        $linkUrlBuilder = $this->getMockBuilder(Link\LinkUrlBuilder::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $linkUrlBuilder = $this->createMock(Link\LinkUrlBuilder::class);
         $services->setService(Link\LinkUrlBuilder::class, $linkUrlBuilder);
 
-        $linkCollectionExtractor = $this->getMockBuilder(LinkCollectionExtractor::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $linkCollectionExtractor = $this->createMock(LinkCollectionExtractor::class);
         $services->setService(LinkCollectionExtractor::class, $linkCollectionExtractor);
 
         $pluginManagerMock = $this->getMockBuilder(AbstractPluginManager::class);
@@ -64,8 +58,8 @@ class HalViewHelperFactoryTest extends TestCase
         $this->setupPluginManager();
 
         $factory = new HalViewHelperFactory();
-        $plugin = $factory($this->services, 'Hal');
+        $plugin = $factory($this->services);
 
-        $this->assertInstanceOf('ZF\Hal\Plugin\Hal', $plugin);
+        $this->assertInstanceOf(HalPlugin::class, $plugin);
     }
 }
