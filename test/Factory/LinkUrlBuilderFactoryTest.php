@@ -14,6 +14,16 @@ use ZF\Hal\Link\LinkUrlBuilder;
 
 class LinkUrlBuilderFactoryTest extends TestCase
 {
+    /**
+     * @var Helper\ServerUrl
+     */
+    private $serverUrlHelper;
+
+    /**
+     * @var Helper\Url
+     */
+    private $urlHelper;
+
     public function testInstantiatesLinkUrlBuilder()
     {
         $serviceManager = $this->getServiceManager();
@@ -44,7 +54,6 @@ class LinkUrlBuilderFactoryTest extends TestCase
     private function getServiceManager($config = [])
     {
         $serviceManager = new ServiceManager();
-
         $serviceManager->setService('ZF\Hal\HalConfig', $config);
 
         $viewHelperManager = new ServiceManager();

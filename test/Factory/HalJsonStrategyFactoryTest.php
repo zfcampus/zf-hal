@@ -9,22 +9,21 @@ namespace ZFTest\Hal\Factory;
 use PHPUnit_Framework_TestCase as TestCase;
 use Zend\ServiceManager\ServiceManager;
 use ZF\Hal\Factory\HalJsonStrategyFactory;
+use ZF\Hal\View\HalJsonRenderer;
+use ZF\Hal\View\HalJsonStrategy;
 
 class HalJsonStrategyFactoryTest extends TestCase
 {
     public function testInstantiatesHalJsonStrategy()
     {
+        $halJsonRenderer = $this->createMock(HalJsonRenderer::class);
+
         $services = new ServiceManager();
-
-        $halJsonRenderer = $this->getMockBuilder('ZF\Hal\View\HalJsonRenderer')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $services->setService('ZF\Hal\JsonRenderer', $halJsonRenderer);
 
         $factory = new HalJsonStrategyFactory();
-        $strategy = $factory($services, 'ZF\Hal\JsonStrategy');
+        $strategy = $factory($services);
 
-        $this->assertInstanceOf('ZF\Hal\View\HalJsonStrategy', $strategy);
+        $this->assertInstanceOf(HalJsonStrategy::class, $strategy);
     }
 }

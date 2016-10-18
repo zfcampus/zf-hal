@@ -19,8 +19,6 @@ class MetadataMapFactory
      * Create an object
      *
      * @param  ContainerInterface $container
-     * @param  string             $requestedName
-     * @param  null|array         $options
      * @return Metadata\MetadataMap
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when

@@ -7,16 +7,14 @@
 namespace ZFTest\Hal\View;
 
 use PHPUnit_Framework_TestCase as TestCase;
+use Zend\View\HelperPluginManager;
 use Zend\View\Model\JsonModel;
 use Zend\View\Model\ViewModel;
 use ZF\ApiProblem\ApiProblem;
 use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
-use ZF\Hal\Extractor\LinkCollectionExtractor;
-use ZF\Hal\Extractor\LinkExtractor;
-use ZF\Hal\Link\Link;
-use ZF\Hal\Plugin\Hal as HalHelper;
+use ZF\Hal\Plugin\Hal as HalPlugin;
 use ZF\Hal\View\HalJsonModel;
 use ZF\Hal\View\HalJsonRenderer;
 
@@ -45,11 +43,12 @@ class HalJsonRendererTest extends TestCase
 
     /**
      * @dataProvider nonHalJsonModels
+     *
+     * @param ViewModel $model
      */
     public function testRenderGivenNonHalJsonModelShouldReturnDataInJsonFormat($model)
     {
         $payload = $this->renderer->render($model);
-        $expected = json_encode(['foo' => 'bar']);
 
         $this->assertEquals(
             $model->getVariables(),
@@ -139,11 +138,8 @@ class HalJsonRendererTest extends TestCase
 
     private function getHelperPluginManager()
     {
-        $helperPluginManager = $this->getMockBuilder('Zend\View\HelperPluginManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $halPlugin = $this->getMockBuilder('ZF\Hal\Plugin\Hal')->getMock();
+        $helperPluginManager = $this->createMock(HelperPluginManager::class);
+        $halPlugin = $this->createMock(HalPlugin::class);
 
         $helperPluginManager
             ->method('get')

@@ -8,7 +8,7 @@ namespace ZFTest\Hal\Factory;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use Zend\ServiceManager\ServiceManager;
-use ZF\ApiProblem\Factory\ApiProblemRendererFactory;
+use Zend\View\HelperPluginManager;
 use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Factory\HalJsonRendererFactory;
 use ZF\Hal\View\HalJsonRenderer;
@@ -17,19 +17,15 @@ class HalJsonRendererFactoryTest extends TestCase
 {
     public function testInstantiatesHalJsonRenderer()
     {
+        $viewHelperManager = $this->createMock(HelperPluginManager::class);
+
         $services = new ServiceManager();
-
-        $viewHelperManager = $this->getMockBuilder('Zend\View\HelperPluginManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $services->setService('ViewHelperManager', $viewHelperManager);
-
         $services->setInvokableClass(ApiProblemRenderer::class, ApiProblemRenderer::class);
 
         $factory = new HalJsonRendererFactory();
         $renderer = $factory($services, 'ZF\Hal\JsonRenderer');
 
-        $this->assertInstanceOf('ZF\Hal\View\HalJsonRenderer', $renderer);
+        $this->assertInstanceOf(HalJsonRenderer::class, $renderer);
     }
 }

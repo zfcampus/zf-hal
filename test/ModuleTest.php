@@ -6,37 +6,39 @@
 
 namespace ZFTest\Hal;
 
+use PHPUnit_Framework_TestCase as TestCase;
+use Prophecy\Argument;
+use stdClass;
+use Zend\EventManager\EventManager;
+use Zend\Mvc\ApplicationInterface;
+use Zend\Mvc\MvcEvent;
 use Zend\ServiceManager\ServiceManager;
 use Zend\View\View;
 use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Module;
 use ZF\Hal\View\HalJsonModel;
-use PHPUnit_Framework_TestCase as TestCase;
-use stdClass;
 use ZF\Hal\View\HalJsonRenderer;
 use ZF\Hal\View\HalJsonStrategy;
 
 class ModuleTest extends TestCase
 {
+    /**
+     * @var Module
+     */
     private $module;
 
     public function setUp()
     {
-        $this->module = new Module;
+        $this->module = new Module();
     }
 
     public function testOnRenderWhenMvcEventResultIsNotHalJsonModel()
     {
-        $mvcEvent = $this->getMockBuilder('Zend\Mvc\MvcEvent')->getMock();
-        $mvcEvent
-            ->expects($this->once())
-            ->method('getResult')
-            ->will($this->returnValue(new stdClass()));
-        $mvcEvent
-            ->expects($this->never())
-            ->method('getTarget');
+        $mvcEvent = $this->prophesize(MvcEvent::class);
+        $mvcEvent->getResult()->willReturn(new stdClass())->shouldBeCalledTimes(1);
+        $mvcEvent->getTarget()->shouldNotBeCalled();
 
-        $this->module->onRender($mvcEvent);
+        $this->module->onRender($mvcEvent->reveal());
     }
 
     public function testOnRenderAttachesJsonStrategy()
@@ -45,7 +47,7 @@ class ModuleTest extends TestCase
 
         $view = new View();
 
-        $eventManager = $this->getMockBuilder('Zend\EventManager\EventManager')->getMock();
+        $eventManager = $this->createMock(EventManager::class);
         $eventManager
             ->expects($this->exactly(2))
             ->method('attach');
@@ -56,22 +58,13 @@ class ModuleTest extends TestCase
         $serviceManager->setService('ZF\Hal\JsonStrategy', $strategy);
         $serviceManager->setService('View', $view);
 
-        $application = $this->getMockBuilder('Zend\Mvc\ApplicationInterface')->getMock();
-        $application
-            ->expects($this->once())
-            ->method('getServiceManager')
-            ->will($this->returnValue($serviceManager));
+        $application = $this->prophesize(ApplicationInterface::class);
+        $application->getServiceManager()->willReturn($serviceManager);
 
-        $mvcEvent = $this->getMockBuilder('Zend\Mvc\MvcEvent')->getMock();
-        $mvcEvent
-            ->expects($this->at(0))
-            ->method('getResult')
-            ->will($this->returnValue(new HalJsonModel()));
-        $mvcEvent
-            ->expects($this->at(1))
-            ->method('getTarget')
-            ->will($this->returnValue($application));
+        $mvcEvent = $this->prophesize(MvcEvent::class);
+        $mvcEvent->getResult()->willReturn(new HalJsonModel());
+        $mvcEvent->getTarget()->willReturn($application->reveal());
 
-        $this->module->onRender($mvcEvent);
+        $this->module->onRender($mvcEvent->reveal());
     }
 }

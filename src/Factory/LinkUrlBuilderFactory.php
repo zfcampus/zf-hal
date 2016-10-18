@@ -6,13 +6,15 @@
 
 namespace ZF\Hal\Factory;
 
+use Interop\Container\ContainerInterface;
+use Zend\ServiceManager\ServiceLocatorInterface;
 use Zend\View\Helper\ServerUrl;
 use ZF\Hal\Link\LinkUrlBuilder;
 
 class LinkUrlBuilderFactory
 {
     /**
-     * @param  \Interop\Container\ContainerInterface|\Zend\ServiceManager\ServiceLocatorInterface $container
+     * @param  ContainerInterface|ServiceLocatorInterface $container
      * @return LinkUrlBuilder
      */
     public function __invoke($container)

@@ -129,9 +129,6 @@ class HalJsonStrategyTest extends TestCase
         $this->assertEquals('application/hal+json', $header->getFieldValue());
     }
 
-    /**
-     *
-     */
     public function testInjectResponseSetsContentTypeHeaderToApiProblemForApiProblemModel()
     {
         $problem = new ApiProblem(500, "Error message");

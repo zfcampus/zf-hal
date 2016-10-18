@@ -8,18 +8,20 @@ namespace ZFTest\Hal\Extractor;
 
 use PHPUnit_Framework_TestCase as TestCase;
 use ZF\Hal\Extractor\LinkCollectionExtractor;
+use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
 
 class LinkCollectionExtractorTest extends TestCase
 {
+    /**
+     * @var LinkCollectionExtractor
+     */
     protected $linkCollectionExtractor;
 
     public function setUp()
     {
-        $linkExtractor = $this->getMockBuilder('ZF\Hal\Extractor\LinkExtractor')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $linkExtractor = $this->createMock(LinkExtractor::class);
 
         $this->linkCollectionExtractor = new LinkCollectionExtractor($linkExtractor);
     }

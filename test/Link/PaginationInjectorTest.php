@@ -6,11 +6,12 @@
 
 namespace ZFTest\Hal\Link;
 
+use PHPUnit_Framework_TestCase as TestCase;
 use Zend\Paginator\Adapter\ArrayAdapter;
 use Zend\Paginator\Paginator;
+use ZF\ApiProblem\ApiProblem;
 use ZF\Hal\Collection;
 use ZF\Hal\Link\PaginationInjector;
-use PHPUnit_Framework_TestCase as TestCase;
 
 class PaginationInjectorTest extends TestCase
 {
@@ -104,7 +105,7 @@ class PaginationInjectorTest extends TestCase
         $injector = new PaginationInjector();
         $result = $injector->injectPaginationLinks($halCollection);
 
-        $this->assertInstanceOf('ZF\ApiProblem\ApiProblem', $result);
+        $this->assertInstanceOf(ApiProblem::class, $result);
         $this->assertEquals(409, $result->status);
     }
 
