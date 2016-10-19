@@ -8,9 +8,9 @@ namespace ZF\Hal\Factory;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
+use Zend\Hydrator\HydratorPluginManager;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
-use Zend\Hydrator\HydratorPluginManager;
 use ZF\Hal\Metadata;
 
 class MetadataMapFactory

@@ -6,9 +6,9 @@
 
 namespace ZF\Hal\View;
 
+use Zend\View\Model\JsonModel;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
-use Zend\View\Model\JsonModel;
 
 /**
  * Simple extension to facilitate the specialized JsonStrategy and JsonRenderer
