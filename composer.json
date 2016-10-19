@@ -59,8 +59,10 @@
             "@cs-check",
             "@test"
         ],
+        "upload-coverage": "coveralls -v",
         "cs-check": "phpcs",
         "cs-fix": "phpcbf",
-        "test": "phpunit"
+        "test": "phpunit",
+        "test-coverage": "phpunit --coverage-clover clover.xml"
     }
 }
