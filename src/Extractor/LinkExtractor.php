@@ -40,7 +40,7 @@ class LinkExtractor implements LinkExtractorInterface
         $representation = $object->getProps();
 
         if ($object->hasUrl()) {
-            $representation['href'] = $object->getUrl();
+            $representation['href'] = $object->getUrl() . $object->getFormattedUriTemplate();
 
             return $representation;
         }
@@ -57,7 +57,7 @@ class LinkExtractor implements LinkExtractorInterface
             $object->getRouteParams(),
             $options,
             $reuseMatchedParams
-        );
+        ) . $object->getFormattedUriTemplate();
 
         return $representation;
     }
