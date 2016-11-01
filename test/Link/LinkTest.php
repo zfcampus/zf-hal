@@ -8,6 +8,7 @@ namespace ZFTest\Hal\Link;
 
 use ZF\Hal\Link\Link;
 use PHPUnit_Framework_TestCase as TestCase;
+use ZF\Hal\Link\UriTemplate;
 
 class LinkTest extends TestCase
 {
@@ -132,6 +133,23 @@ class LinkTest extends TestCase
         $this->assertTrue($link->hasRoute());
     }
 
+    public function testReturnsEmptyStringWhenAskingForFormattedUriTemplateWithoutHavingSetAny()
+    {
+        $link = new Link('describedby');
+        $this->assertEmpty($link->getFormattedUriTemplate());
+    }
+
+    public function testReturnsFormattedStringWhenAskingForFormattedUriTemplateWithSetUriTemplate()
+    {
+        $link = new Link('describedby');
+
+        /** @var UriTemplate | \PHPUnit_Framework_MockObject_MockObject $uriTemplateStub */
+        $uriTemplateStub = $this->getMockBuilder(UriTemplate::class)->disableOriginalConstructor()->getMock();
+        $uriTemplateStub->method('getFormattedString')->willReturn('string');
+        $link->setUriTemplate($uriTemplateStub);
+        $this->assertSame('string', $link->getFormattedUriTemplate());
+    }
+
     public function testIsCompleteReturnsTrueWhenRouteIsSet()
     {
         $link = new Link('describedby');
@@ -200,5 +218,41 @@ class LinkTest extends TestCase
             'version' => 2,
             'latest'  => true,
         ], $props);
+    }
+
+    public function testFactoryCanGenerateLinkWithUriTemplateWithQueryParameters()
+    {
+        $rel = 'describedby';
+        $url = 'http://example.org/api/foo?version=2';
+        $link = Link::factory([
+            'rel'   => $rel,
+            'url'   => $url,
+            'uriTemplate' => [
+                'query' => ['id'],
+            ]
+        ]);
+
+        $this->assertInstanceOf('ZF\Hal\Link\Link', $link);
+        $this->assertEquals('describedby', $link->getRelation());
+        $uriTemplate = $link->getFormattedUriTemplate();
+        $this->assertSame('{?id}', $uriTemplate);
+    }
+
+    public function testFactoryCanGenerateLinkWithUriTemplateWithPathSegmentParameters()
+    {
+        $rel = 'describedby';
+        $url = 'http://example.org/api/foo?version=2';
+        $link = Link::factory([
+            'rel'   => $rel,
+            'url'   => $url,
+            'uriTemplate' => [
+                'pathSegment' => ['id'],
+            ]
+        ]);
+
+        $this->assertInstanceOf('ZF\Hal\Link\Link', $link);
+        $this->assertEquals('describedby', $link->getRelation());
+        $uriTemplate = $link->getFormattedUriTemplate();
+        $this->assertSame('/{id}', $uriTemplate);
     }
 }
