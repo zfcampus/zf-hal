@@ -11,18 +11,17 @@ use PHPUnit_Framework_TestCase as TestCase;
 
 class UriTemplateTest extends TestCase
 {
-    public function testReturnsFormattedQueryStringWhenGettingFormattedStringForUriTemplateWithQueryParameters()
+    public function testReturnsFormattedQueryStringWhenGettingUriTemplateStringWithQueryParameters()
     {
         $uriTemplate = UriTemplate::withQueryParameters(['id', 'tmp']);
 
         $this->assertSame('{?id,tmp}', $uriTemplate->getFormattedString());
     }
 
-    public function testReturnsFormattedPathSegmentStringWhenGettingFormattedStringForUriTemplateWithPathSegmentParameters()
+    public function testReturnsFormattedPathSegmentStringWhenGettingUriTemplateStringWithPathSegmentParameters()
     {
         $uriTemplate = UriTemplate::withPathSegmentParameters(['id', 'tmp']);
 
         $this->assertSame('/{id}/{tmp}', $uriTemplate->getFormattedString());
     }
-
 }

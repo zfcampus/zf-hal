@@ -6,7 +6,6 @@
 
 namespace ZF\Hal\Link;
 
-
 class UriTemplate
 {
     /** @var array */
@@ -56,5 +55,4 @@ class UriTemplate
         }
         return '';
     }
-
 }
