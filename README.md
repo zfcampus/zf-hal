@@ -1,7 +1,8 @@
 ZF HAL
 ======
 
-[![Build Status](https://travis-ci.org/zfcampus/zf-hal.png)](https://travis-ci.org/zfcampus/zf-hal)
+[![Build Status](https://travis-ci.org/zfcampus/zf-hal.svg?branch=master)](https://travis-ci.org/zfcampus/zf-hal)
+[![Coverage Status](https://coveralls.io/repos/github/zfcampus/zf-hal/badge.svg?branch=master)](https://coveralls.io/github/zfcampus/zf-hal?branch=master)
 
 Introduction
 ------------
