@@ -28,7 +28,7 @@ class HalJsonRendererFactoryTest extends TestCase
         $services->setInvokableClass(ApiProblemRenderer::class, ApiProblemRenderer::class);
 
         $factory = new HalJsonRendererFactory();
-        $renderer = $factory($services,'ZF\Hal\JsonRenderer');
+        $renderer = $factory($services, 'ZF\Hal\JsonRenderer');
 
         $this->assertInstanceOf('ZF\Hal\View\HalJsonRenderer', $renderer);
     }
