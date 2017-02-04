@@ -1266,19 +1266,7 @@ class Hal extends AbstractHelper implements
             );
         }
 
-        $rel = $link->getRelation();
-        if (! $links->has($rel)) {
-            $links->add($link);
-            return $links;
-        }
-
-        $relLink = $links->get($rel);
-        if ($relLink !== $link
-            || (is_array($relLink) && ! in_array($link, $relLink, true))
-        ) {
-            $links->add($link);
-            return $links;
-        }
+        $links->idempotentAdd($link);
 
         return $links;
     }

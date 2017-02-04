@@ -49,6 +49,7 @@ class LinkCollection implements Countable, IteratorAggregate
      * @param  bool $overwrite
      * @return self
      * @throws Exception\DomainException
+     * @deprecated Use idempotentAdd() for PSR-13 and RFC 5988 compliance
      */
     public function add(Link $link, $overwrite = false)
     {
@@ -80,6 +81,40 @@ class LinkCollection implements Countable, IteratorAggregate
     }
 
     /**
+     * Add a link to the collection and update the collection's relations according to RFC 5988.
+     *
+     * @todo Rename to "add" after deprecating the current "add" implementation
+     *
+     * @param LinkInterface $link
+     * @return void
+     */
+    public function idempotentAdd(LinkInterface $link)
+    {
+        $existingRels = \array_keys($this->links);
+        $linkRels = $link->getRels();
+
+        // update existing rels
+        $intersection = \array_intersect($linkRels, $existingRels);
+        foreach ($intersection as $relation) {
+            $relationLinks = $this->links[$relation];
+            if (!\is_array($relationLinks)) {
+                $relationLinks = [$relationLinks];
+            }
+
+            if (!\in_array($link, $relationLinks, true)) {
+                $relationLinks[] = $link;
+                $this->links[$relation] = $relationLinks; // inside the if, otherwise it's not really idempotent
+            }
+        }
+
+        // add missing rels
+        $diff = \array_diff($linkRels, $existingRels);
+        foreach ($diff as $relation) {
+            $this->links[$relation] = $link;
+        }
+    }
+
+    /**
      * Retrieve a link relation
      *
      * @param  string $relation
@@ -102,6 +137,18 @@ class LinkCollection implements Countable, IteratorAggregate
     public function has($relation)
     {
         return array_key_exists($relation, $this->links);
+    }
+
+    /**
+     * Do all of these relations exist?
+     * @param array $relations
+     * @return bool
+     */
+    public function hasAllTheseRels(array $relations)
+    {
+        $diff = array_diff($relations, array_keys($this->links));
+
+        return !count($diff);
     }
 
     /**
