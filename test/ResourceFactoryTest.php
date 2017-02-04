@@ -34,7 +34,7 @@ class ResourceFactoryTest extends TestCase
                 'links'      => [
                     [
                         'rel' => 'describedby',
-                        'url' => 'http://example.com/api/help/resource',
+                        'href' => 'http://example.com/api/help/resource',
                     ],
                     [
                         'rel' => 'children',
@@ -143,7 +143,7 @@ class ResourceFactoryTest extends TestCase
                 'links'               => [
                     [
                         'rel' => 'describedby',
-                        'url' => 'http://example.com/api/help/collection',
+                        'href' => 'http://example.com/api/help/collection',
                     ],
                 ],
             ],

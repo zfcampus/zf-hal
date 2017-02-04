@@ -38,7 +38,8 @@
         "zendframework/zend-paginator": "^2.7",
         "zendframework/zend-uri": "^2.5.2",
         "zendframework/zend-view": "^2.8.1",
-        "zendframework/zend-stdlib": "^2.7.7 || ^3.0.1"
+        "zendframework/zend-stdlib": "^2.7.7 || ^3.0.1",
+        "psr/link": "^1.0"
     },
     "require-dev": {
         "phpunit/PHPUnit": "^4.8 || ^5.4",
