@@ -67,7 +67,13 @@ class Link implements LinkInterface
     /**
      * Factory for creating links
      *
-     * @param  array $spec
+     * @param  array $spec {
+     *      @var string $rel Required.
+     *      @var array $props Optional.
+     *      @var string $url {@deprecated 1.4.3 use 'href' instead} Optional.
+     *      @var string $href Optional.
+     *      @var string|array $route Optional.
+     * }
      * @return self
      * @throws Exception\InvalidArgumentException if missing a "rel" or invalid route specifications
      */
@@ -87,6 +93,7 @@ class Link implements LinkInterface
             $link->setProps($spec['props']);
         }
 
+        // deprecated since 1.4.3, use 'href' instead
         if (isset($spec['url'])) {
             $link->setUrl($spec['url']);
             return $link;
