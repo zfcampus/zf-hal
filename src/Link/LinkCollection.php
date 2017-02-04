@@ -9,6 +9,7 @@ namespace ZF\Hal\Link;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use Psr\Link\LinkInterface;
 use ZF\ApiProblem\Exception;
 
 /**
@@ -57,7 +58,7 @@ class LinkCollection implements Countable, IteratorAggregate
             return $this;
         }
 
-        if ($this->links[$relation] instanceof Link) {
+        if ($this->links[$relation] instanceof LinkInterface) {
             $this->links[$relation] = [$this->links[$relation]];
         }
 
@@ -82,7 +83,7 @@ class LinkCollection implements Countable, IteratorAggregate
      * Retrieve a link relation
      *
      * @param  string $relation
-     * @return Link|array|null
+     * @return LinkInterface|Link|array|null
      */
     public function get($relation)
     {
