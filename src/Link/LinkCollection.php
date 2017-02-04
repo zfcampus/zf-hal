@@ -140,18 +140,6 @@ class LinkCollection implements Countable, IteratorAggregate
     }
 
     /**
-     * Do all of these relations exist?
-     * @param array $relations
-     * @return bool
-     */
-    public function hasAllTheseRels(array $relations)
-    {
-        $diff = array_diff($relations, array_keys($this->links));
-
-        return !count($diff);
-    }
-
-    /**
      * Remove a given link relation
      *
      * @param  string $relation
