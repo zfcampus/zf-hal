@@ -10,11 +10,6 @@ use JsonSerializable;
 
 class JsonSerializableEntity extends Entity implements JsonSerializable
 {
-    public function __construct($id, $name)
-    {
-        parent::__construct($id, $name);
-    }
-
     public function jsonSerialize()
     {
         return [
