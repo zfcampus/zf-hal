@@ -6,14 +6,13 @@
 
 namespace ZFTest\Hal\Plugin\TestAsset;
 
-use Zend\Stdlib\JsonSerializable;
+use JsonSerializable;
 
 class JsonSerializableEntity extends Entity implements JsonSerializable
 {
     public function __construct($id, $name)
     {
-        $this->id   = $id;
-        $this->name = $name;
+        parent::__construct($id, $name);
     }
 
     public function jsonSerialize()
