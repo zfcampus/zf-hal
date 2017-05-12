@@ -791,6 +791,8 @@ class Hal extends AbstractHelper implements
      */
     public function fromLink(Link $linkDefinition)
     {
+        $this->getEventManager()->trigger(__FUNCTION__ . '.pre', $this, ['linkDefinition' => $linkDefinition]);
+
         $linkExtractor = $this->linkCollectionExtractor->getLinkExtractor();
 
         return $linkExtractor->extract($linkDefinition);
