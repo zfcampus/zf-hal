@@ -575,6 +575,9 @@ class Hal extends AbstractHelper implements
         $collectionName = $halCollection->getCollectionName();
 
         if ($collection instanceof Paginator) {
+            $halCollection->setPage($collection->getCurrentPageNumber());
+            $halCollection->setPageSize($collection->getItemCountPerPage());
+
             $status = $this->injectPaginationLinks($halCollection);
             if ($status instanceof ApiProblem) {
                 return $status;
