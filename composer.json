@@ -35,7 +35,7 @@
         "zendframework/zend-filter": "^2.7.1",
         "zendframework/zend-http": "^2.5.4",
         "zendframework/zend-hydrator": "^1.1 || ^2.2.1",
-        "zendframework/zend-mvc": "^2.7.9 || ^3.0.2",
+        "zendframework/zend-mvc": "^2.7.15 || ^3.0.2",
         "zendframework/zend-paginator": "^2.7",
         "zendframework/zend-uri": "^2.5.2",
         "zendframework/zend-view": "^2.8.1",
@@ -61,7 +61,6 @@
             "@cs-check",
             "@test"
         ],
-        "upload-coverage": "coveralls -v",
         "cs-check": "phpcs",
         "cs-fix": "phpcbf",
         "test": "phpunit",
