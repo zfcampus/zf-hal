@@ -28,7 +28,9 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Changed
 
-- Nothing.
+- [#165](https://github.com/zfcampus/zf-hal/pull/165) modifies the `JsonSerializableEntity` to implement the native PHP `JsonSerializable`
+  interface instead of the polyfill from zend-stdlib, as all versions of PHP we support
+  provide that interface in default installs now.
 
 ### Deprecated
 
