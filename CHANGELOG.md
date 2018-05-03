@@ -6,6 +6,12 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Added
 
+- [#167](https://github.com/zfcampus/zf-hal/pull/167) adds a new event, `fromLink.pre`, triggered from the `ZF\Hal\Plugin\Hal::fromLink` method.
+  This event can be used in conjunction with `ZF\Rest\RestController::create()` to manipulate the generated
+  link for purpose of modifying it for the `Link` HTTP response header.
+
+### Changed
+
 - Nothing.
 
 ### Deprecated
