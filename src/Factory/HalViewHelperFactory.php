@@ -35,6 +35,11 @@ class HalViewHelperFactory
         $hydrators       = $metadataMap->getHydratorManager();
 
         $helper = new Plugin\Hal($hydrators);
+
+        if ($container->has('EventManager')) {
+            $helper->setEventManager($container->get('EventManager'));
+        }
+
         $helper->setMetadataMap($metadataMap);
 
         $linkUrlBuilder = $container->get(Link\LinkUrlBuilder::class);

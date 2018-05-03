@@ -8,6 +8,10 @@ All notable changes to this project will be documented in this file, in reverse 
 
 - Nothing.
 
+### Changed
+
+- Nothing.
+
 ### Deprecated
 
 - Nothing.
@@ -18,7 +22,9 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Fixed
 
-- Nothing.
+- [#161](https://github.com/zfcampus/zf-hal/pull/161) fixes initialization of the `hal` view helper, ensuring it receives an
+  event manager instance within its factory. Previously, listeners attached within delegator
+  factories could be overwritten.
 
 ## 1.4.2 - 2016-07-28
 
