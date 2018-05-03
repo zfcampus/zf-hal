@@ -1,7 +1,7 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2018 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Hal\Link;
@@ -57,7 +57,7 @@ class Link implements LinkInterface
      */
     public function __construct($relation)
     {
-        if (!\is_array($relation)) {
+        if (!is_array($relation)) {
             $relation = [(string) $relation];
         }
 
@@ -67,12 +67,12 @@ class Link implements LinkInterface
     /**
      * Factory for creating links
      *
-     * @param  array $spec {
+     * @param array $spec {
      *      @var string $rel Required.
      *      @var array $props Optional.
-     *      @var string $url {@deprecated 1.4.3 use 'href' instead} Optional.
      *      @var string $href Optional.
      *      @var string|array $route Optional.
+     *      @var string $url {@deprecated since 1.5.0; use 'href' instead} Optional.
      * }
      * @return self
      * @throws Exception\InvalidArgumentException if missing a "rel" or invalid route specifications
@@ -93,7 +93,7 @@ class Link implements LinkInterface
             $link->setProps($spec['props']);
         }
 
-        // deprecated since 1.4.3, use 'href' instead
+        // deprecated since 1.5.0; use 'href' instead
         if (isset($spec['url'])) {
             $link->setUrl($spec['url']);
             return $link;
@@ -144,8 +144,7 @@ class Link implements LinkInterface
      *
      * "href" will be ignored.
      *
-     * @param  array $props
-     *
+     * @param array $props
      * @return self
      */
     public function setProps(array $props)
@@ -364,8 +363,7 @@ class Link implements LinkInterface
     /**
      * Does the link have a URL set?
      *
-     * @deprecated 1.4.3 No empty URLs will be allowed in the future
-     *
+     * @deprecated since 1.5.0; no empty URLs will be allowed in the future.
      * @return bool
      */
     public function hasUrl()
@@ -379,7 +377,7 @@ class Link implements LinkInterface
      * The target link must be one of:
      * - An absolute URI, as defined by RFC 5988.
      * - A relative URI, as defined by RFC 5988. The base of the relative link
-     *     is assumed to be known based on context by the client.
+     *   is assumed to be known based on context by the client.
      * - A URI template as defined by RFC 6570.
      *
      * If a URI template is returned, isTemplated() MUST return True.
@@ -394,8 +392,9 @@ class Link implements LinkInterface
     /**
      * Returns whether or not this is a templated link.
      *
-     * @return bool
-     *   True if this link object is templated, False otherwise.
+     * @return bool True if this link object is templated, False otherwise.
+     *     Currently, templated links are not yet supported, so this will
+     *     always return false.
      */
     public function isTemplated()
     {
@@ -419,9 +418,9 @@ class Link implements LinkInterface
      * Returns a list of attributes that describe the target URI.
      *
      * @return array<string,mixed>
-     *   A key-value list of attributes, where the key is a string and the value
-     *  is either a PHP primitive or an array of PHP strings. If no values are
-     *  found an empty array MUST be returned.
+     *    A key-value list of attributes, where the key is a string and the value
+     *    is either a PHP primitive or an array of PHP strings. If no values are
+     *    found an empty array MUST be returned.
      */
     public function getAttributes()
     {

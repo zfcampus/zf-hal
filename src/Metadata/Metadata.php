@@ -474,7 +474,7 @@ class Metadata
      * Each element in the array should be an array with the elements:
      *
      * - rel - the link relation
-     * - url - the URL to use for the link (deprecated since 1.4.3, use "href" instead) OR
+     * - url - the URL to use for the link (deprecated since 1.5.0; use "href" instead) OR
      * - href - the href to use for the link OR
      * - route - an array of route information for generating the link; this
      *   should include the elements "name" (required; the route name),
