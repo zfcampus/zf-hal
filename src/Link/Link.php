@@ -1,11 +1,12 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2018 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZF\Hal\Link;
 
+use Psr\Link\LinkInterface;
 use Traversable;
 use Zend\Stdlib\ArrayUtils;
 use Zend\Uri\Exception as UriException;
@@ -16,17 +17,17 @@ use ZF\Hal\Exception;
 /**
  * Object describing a link relation
  */
-class Link
+class Link implements LinkInterface
 {
     /**
-     * @var array
+     * @var array<string,mixed>
      */
-    protected $props = [];
+    protected $attributes = [];
 
     /**
-     * @var string
+     * @var string[]
      */
-    protected $relation;
+    protected $rels;
 
     /**
      * @var string
@@ -46,7 +47,7 @@ class Link
     /**
      * @var string
      */
-    protected $url;
+    protected $href;
 
     /**
      * Create a link relation
@@ -56,13 +57,23 @@ class Link
      */
     public function __construct($relation)
     {
-        $this->relation = (string) $relation;
+        if (!is_array($relation)) {
+            $relation = [(string) $relation];
+        }
+
+        $this->rels = $relation;
     }
 
     /**
      * Factory for creating links
      *
-     * @param  array $spec
+     * @param array $spec {
+     *      @var string $rel Required.
+     *      @var array $props Optional.
+     *      @var string $href Optional.
+     *      @var string|array $route Optional.
+     *      @var string $url {@deprecated since 1.5.0; use 'href' instead} Optional.
+     * }
      * @return self
      * @throws Exception\InvalidArgumentException if missing a "rel" or invalid route specifications
      */
@@ -82,8 +93,14 @@ class Link
             $link->setProps($spec['props']);
         }
 
+        // deprecated since 1.5.0; use 'href' instead
         if (isset($spec['url'])) {
             $link->setUrl($spec['url']);
+            return $link;
+        }
+
+        if (isset($spec['href'])) {
+            $link->href = (string) $spec['href'];
             return $link;
         }
 
@@ -127,7 +144,7 @@ class Link
      *
      * "href" will be ignored.
      *
-     * @param  array $props
+     * @param array $props
      * @return self
      */
     public function setProps(array $props)
@@ -135,7 +152,7 @@ class Link
         if (isset($props['href'])) {
             unset($props['href']);
         }
-        $this->props = $props;
+        $this->attributes = $props;
         return $this;
     }
 
@@ -222,12 +239,12 @@ class Link
     /**
      * Set an explicit URL for the link relation
      *
-     * @param  string $url
+     * @param  string $href
      * @return self
      * @throws DomainException
      * @throws Exception\InvalidArgumentException
      */
-    public function setUrl($url)
+    public function setUrl($href)
     {
         if ($this->hasRoute()) {
             throw new DomainException(sprintf(
@@ -237,7 +254,7 @@ class Link
         }
 
         try {
-            $uri = UriFactory::factory($url);
+            $uri = UriFactory::factory($href);
         } catch (UriException\ExceptionInterface $e) {
             throw new Exception\InvalidArgumentException(sprintf(
                 'Received invalid URL: %s',
@@ -251,28 +268,34 @@ class Link
             );
         }
 
-        $this->url = $url;
+        $this->href = $href;
         return $this;
     }
 
     /**
      * Get additional properties to include in Link representation
      *
+     * @deprecated 1.4.3 Use getAttributes() instead
+     *
      * @return array
      */
     public function getProps()
     {
-        return $this->props;
+        return $this->getAttributes();
     }
 
     /**
      * Retrieve the link relation
      *
+     * @deprecated 1.4.3 Use getRels() and update your code to handle an array of strings
+     *
      * @return string
      */
     public function getRelation()
     {
-        return $this->relation;
+        $rels = $this->getRels();
+
+        return (string) reset($rels);
     }
 
     /**
@@ -308,11 +331,13 @@ class Link
     /**
      * Retrieve the link URL, if set
      *
+     * @deprecated 1.4.3 Use getHref() instead
+     *
      * @return null|string
      */
     public function getUrl()
     {
-        return $this->url;
+        return $this->getHref();
     }
 
     /**
@@ -322,7 +347,7 @@ class Link
      */
     public function isComplete()
     {
-        return (!empty($this->url) || !empty($this->route));
+        return (!empty($this->href) || !empty($this->route));
     }
 
     /**
@@ -338,10 +363,67 @@ class Link
     /**
      * Does the link have a URL set?
      *
+     * @deprecated since 1.5.0; no empty URLs will be allowed in the future.
      * @return bool
      */
     public function hasUrl()
     {
-        return !empty($this->url);
+        return !empty($this->href);
+    }
+
+    /**
+     * Returns the target of the link.
+     *
+     * The target link must be one of:
+     * - An absolute URI, as defined by RFC 5988.
+     * - A relative URI, as defined by RFC 5988. The base of the relative link
+     *   is assumed to be known based on context by the client.
+     * - A URI template as defined by RFC 6570.
+     *
+     * If a URI template is returned, isTemplated() MUST return True.
+     *
+     * @return string
+     */
+    public function getHref()
+    {
+        return (string) $this->href;
+    }
+
+    /**
+     * Returns whether or not this is a templated link.
+     *
+     * @return bool True if this link object is templated, False otherwise.
+     *     Currently, templated links are not yet supported, so this will
+     *     always return false.
+     */
+    public function isTemplated()
+    {
+        return false; // zf-hal doesn't support this currently
+    }
+
+    /**
+     * Returns the relationship type(s) of the link.
+     *
+     * This method returns 0 or more relationship types for a link, expressed
+     * as an array of strings.
+     *
+     * @return string[]
+     */
+    public function getRels()
+    {
+        return $this->rels;
+    }
+
+    /**
+     * Returns a list of attributes that describe the target URI.
+     *
+     * @return array<string,mixed>
+     *    A key-value list of attributes, where the key is a string and the value
+     *    is either a PHP primitive or an array of PHP strings. If no values are
+     *    found an empty array MUST be returned.
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
     }
 }

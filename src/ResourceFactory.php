@@ -142,7 +142,7 @@ class ResourceFactory
 
         if (! $metadata->hasRoute()) {
             throw new Exception\RuntimeException(sprintf(
-                'Unable to create a self link for resource of type "%s"; metadata does not contain a route or a url',
+                'Unable to create a self link for resource of type "%s"; metadata does not contain a route or a href',
                 get_class($object)
             ));
         }
