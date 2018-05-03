@@ -68,7 +68,7 @@ consists of the following keys:
   hydrator by the `Hal` plugin when no hydrator is configured for an entity class.
 - `render_embedded_entities` - boolean, default `true`, to render full embedded entities in HAL
   responses; if `false`, embedded entities will contain only their relational links.
-- `render_collections` - boolean, default is `true`, to render collections in HAL responses; if
+- `render_embedded_collections` - boolean, default is `true`, to render collections in HAL responses; if
   `false`, only a collection's relational links will be rendered.
 - `hydrators` - a map of entity class names to hydrator service names that the `Hal` plugin can use
   when hydrating entities.
