@@ -2,9 +2,11 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
-## 1.5.0 - TBD
+## 1.5.0 - 2018-05-03
 
 ### Added
+
+- [#158](https://github.com/zfcampus/zf-hal/pull/158) adds support for PHP 7.1 and 7.2.
 
 - [#167](https://github.com/zfcampus/zf-hal/pull/167) adds a new event, `fromLink.pre`, triggered from the `ZF\Hal\Plugin\Hal::fromLink` method.
   This event can be used in conjunction with `ZF\Rest\RestController::create()` to manipulate the generated
@@ -26,7 +28,7 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Removed
 
-- Nothing.
+- [#158](https://github.com/zfcampus/zf-hal/pull/158) removes support for HHVM.
 
 ### Fixed
 
