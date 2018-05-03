@@ -7,18 +7,26 @@
 namespace ZFTest\Hal\Factory;
 
 use PHPUnit_Framework_TestCase as TestCase;
-use ReflectionObject;
+use Zend\EventManager\EventManagerInterface;
+use Zend\EventManager\SharedEventManagerInterface;
 use Zend\ServiceManager\AbstractPluginManager;
 use Zend\ServiceManager\ServiceManager;
 use Zend\Hydrator\HydratorPluginManager;
 use ZF\Hal\Extractor\LinkCollectionExtractor;
 use ZF\Hal\Link;
 use ZF\Hal\Factory\HalViewHelperFactory;
+use ZF\Hal\Plugin\Hal;
 use ZF\Hal\RendererOptions;
 
 class HalViewHelperFactoryTest extends TestCase
 {
+    /**
+     * @var AbstractPluginManager
+     */
     private $pluginManager;
+    /**
+     * @var ServiceManager
+     */
     private $services;
 
     public function setupPluginManager($config = [])
@@ -63,9 +71,19 @@ class HalViewHelperFactoryTest extends TestCase
     {
         $this->setupPluginManager();
 
+        $sharedEventManager = $this->getMockBuilder(SharedEventManagerInterface::class)
+            ->getMock();
+        $eventManagerMock = $this->getMockBuilder(EventManagerInterface::class)
+            ->getMock();
+        $eventManagerMock->method('getSharedManager')->willReturn($sharedEventManager);
+
+        $this->services->setService('EventManager', $eventManagerMock);
+
         $factory = new HalViewHelperFactory();
+        /** @var Hal $plugin */
         $plugin = $factory($this->services, 'Hal');
 
         $this->assertInstanceOf('ZF\Hal\Plugin\Hal', $plugin);
+        $this->assertInstanceOf(SharedEventManagerInterface::class, $plugin->getEventManager()->getSharedManager());
     }
 }
