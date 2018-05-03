@@ -17,6 +17,10 @@ All notable changes to this project will be documented in this file, in reverse 
 - [#163](https://github.com/zfcampus/zf-hal/pull/163) updates `ZF\Hal\Link\Link` to implement the PSR-13 `LinkInterface`, and modifies
   some internals to make use of its idempotency.
 
+- [#165](https://github.com/zfcampus/zf-hal/pull/165) modifies the `JsonSerializableEntity` to implement the native PHP `JsonSerializable`
+  interface instead of the polyfill from zend-stdlib, as all versions of PHP we support
+  provide that interface in default installs now.
+
 ### Deprecated
 
 - [#163](https://github.com/zfcampus/zf-hal/pull/163) both adds and deprecates the method `ZF\Hal\Link\LinkCollection::idempotentAdd()`;
@@ -29,30 +33,6 @@ All notable changes to this project will be documented in this file, in reverse 
 ### Removed
 
 - [#158](https://github.com/zfcampus/zf-hal/pull/158) removes support for HHVM.
-
-### Fixed
-
-- Nothing.
-
-## 1.4.3 - TBD
-
-### Added
-
-- Nothing.
-
-### Changed
-
-- [#165](https://github.com/zfcampus/zf-hal/pull/165) modifies the `JsonSerializableEntity` to implement the native PHP `JsonSerializable`
-  interface instead of the polyfill from zend-stdlib, as all versions of PHP we support
-  provide that interface in default installs now.
-
-### Deprecated
-
-- Nothing.
-
-### Removed
-
-- Nothing.
 
 ### Fixed
 
