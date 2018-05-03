@@ -8,6 +8,7 @@
         "zf2",
         "zend",
         "module",
+        "psr-13",
         "rest",
         "hal"
     ],
