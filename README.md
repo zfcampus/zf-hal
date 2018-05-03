@@ -231,6 +231,10 @@ Notes on individual events:
     entity.
 - `getIdFromEntity` defines one parameter, `entity`, which is an array or object
   from which an identifier needs to be extracted.
+- `fromLink.pre` (since 1.5.0) defines one parameter, `linkDefinition`, which is a
+  `ZF\Hal\Link\Link` instance. This is generally useful from
+  `ZF\Rest\RestController::create()`, when you may want to manipulate the self
+  relational link for purposes of generating the `Link` header.
 
 ### Listeners
 
