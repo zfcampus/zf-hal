@@ -29,7 +29,7 @@ class SelfLinkInjector implements SelfLinkInjectorInterface
     private function createSelfLink($resource, $route, $routeIdentifier)
     {
         // build route
-        if (!is_array($route)) {
+        if (! is_array($route)) {
             $route = ['name' => (string) $route];
         }
         $routeParams = $this->getRouteParams($resource, $routeIdentifier);

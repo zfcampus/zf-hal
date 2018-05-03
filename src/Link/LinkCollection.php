@@ -96,11 +96,11 @@ class LinkCollection implements Countable, IteratorAggregate
         $intersection = array_intersect($linkRels, $existingRels);
         foreach ($intersection as $relation) {
             $relationLinks = $this->links[$relation];
-            if (!is_array($relationLinks)) {
+            if (! is_array($relationLinks)) {
                 $relationLinks = [$relationLinks];
             }
 
-            if (!in_array($link, $relationLinks, true)) {
+            if (! in_array($link, $relationLinks, true)) {
                 $relationLinks[] = $link;
                 $this->links[$relation] = $relationLinks; // inside the if, otherwise it's not really idempotent
             }

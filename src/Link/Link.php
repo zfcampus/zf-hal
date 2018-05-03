@@ -57,7 +57,7 @@ class Link implements LinkInterface
      */
     public function __construct($relation)
     {
-        if (!is_array($relation)) {
+        if (! is_array($relation)) {
             $relation = [(string) $relation];
         }
 
