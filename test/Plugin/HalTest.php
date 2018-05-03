@@ -848,6 +848,35 @@ class HalTest extends TestCase
         $this->assertEquals($extraction, $result);
     }
 
+    public function testFromLinkShouldTriggerPreEvent()
+    {
+        $link = new Link('foo');
+        $extraction = true;
+
+        $linkExtractor = $this->prophesize(LinkExtractor::class);
+        $linkExtractor->extract($link)->willReturn($extraction);
+
+        $linkCollectionExtractor = $this->prophesize(LinkCollectionExtractor::class);
+        $linkCollectionExtractor->getLinkExtractor()->willReturn($linkExtractor->reveal());
+
+        $this->plugin->setLinkCollectionExtractor($linkCollectionExtractor->reveal());
+
+        $preEventTriggered = false;
+
+        $this->plugin->getEventManager()->attach(
+            'fromLink.pre',
+            function (\Zend\EventManager\Event $e) use (&$preEventTriggered, $link) {
+                $preEventTriggered = true;
+                $this->assertSame($link, $e->getParam('linkDefinition'));
+            }
+        );
+
+        $result = $this->plugin->fromLink($link);
+
+        $this->assertEquals($extraction, $result);
+        $this->assertTrue($preEventTriggered);
+    }
+
     public function testFromLinkCollectionShouldUseLinkCollectionExtractor()
     {
         $linkCollection = new LinkCollection();
