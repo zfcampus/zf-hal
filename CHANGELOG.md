@@ -12,11 +12,17 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Changed
 
-- Nothing.
+- [#163](https://github.com/zfcampus/zf-hal/pull/163) updates `ZF\Hal\Link\Link` to implement the PSR-13 `LinkInterface`, and modifies
+  some internals to make use of its idempotency.
 
 ### Deprecated
 
-- Nothing.
+- [#163](https://github.com/zfcampus/zf-hal/pull/163) both adds and deprecates the method `ZF\Hal\Link\LinkCollection::idempotentAdd()`;
+  in version 3, if released, that method will replace the `add()` method. Its
+  internals largely replace functionality in `ZF\Hal\Plugin\Hal::injectPropertyAsLink()`.
+
+- [#163](https://github.com/zfcampus/zf-hal/pull/163) deprecates the "url" key when creating a new link from an array, in
+  favor of an "href" key.
 
 ### Removed
 
