@@ -37,7 +37,7 @@ class MetadataMap
             $this->setHydratorManager($hydrators);
         }
 
-        if (!empty($map)) {
+        if (! empty($map)) {
             $this->setMap($map);
         }
     }

@@ -1,25 +1,27 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2015 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2015-2017 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZFTest\Hal\Extractor;
 
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use ZF\Hal\Extractor\LinkCollectionExtractor;
+use ZF\Hal\Extractor\LinkExtractor;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
 
 class LinkCollectionExtractorTest extends TestCase
 {
+    /**
+     * @var LinkCollectionExtractor
+     */
     protected $linkCollectionExtractor;
 
     public function setUp()
     {
-        $linkExtractor = $this->getMockBuilder('ZF\Hal\Extractor\LinkExtractor')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $linkExtractor = $this->createMock(LinkExtractor::class);
 
         $this->linkCollectionExtractor = new LinkCollectionExtractor($linkExtractor);
     }

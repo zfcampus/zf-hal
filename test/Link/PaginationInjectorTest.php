@@ -1,16 +1,17 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2017 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZFTest\Hal\Link;
 
+use PHPUnit\Framework\TestCase;
 use Zend\Paginator\Adapter\ArrayAdapter;
 use Zend\Paginator\Paginator;
+use ZF\ApiProblem\ApiProblem;
 use ZF\Hal\Collection;
 use ZF\Hal\Link\PaginationInjector;
-use PHPUnit_Framework_TestCase as TestCase;
 
 class PaginationInjectorTest extends TestCase
 {
@@ -104,7 +105,7 @@ class PaginationInjectorTest extends TestCase
         $injector = new PaginationInjector();
         $result = $injector->injectPaginationLinks($halCollection);
 
-        $this->assertInstanceOf('ZF\ApiProblem\ApiProblem', $result);
+        $this->assertInstanceOf(ApiProblem::class, $result);
         $this->assertEquals(409, $result->status);
     }
 

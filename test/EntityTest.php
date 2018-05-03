@@ -1,15 +1,16 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2017 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZFTest\Hal;
 
-use ZF\Hal\Entity;
-use ZF\Hal\Link\LinkCollection;
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use stdClass;
+use ZF\Hal\Entity;
+use ZF\Hal\Exception\InvalidEntityException;
+use ZF\Hal\Link\LinkCollection;
 
 class EntityTest extends TestCase
 {
@@ -29,17 +30,21 @@ class EntityTest extends TestCase
 
     /**
      * @dataProvider invalidEntities
+     *
+     * @param mixed $entity
      */
     public function testConstructorRaisesExceptionForNonObjectNonArrayEntity($entity)
     {
-        $this->setExpectedException('ZF\Hal\Exception\InvalidEntityException');
-        $hal = new Entity($entity, 'id');
+        $this->expectException(InvalidEntityException::class);
+
+        new Entity($entity, 'id');
     }
 
     public function testPropertiesAreAccessibleAfterConstruction()
     {
         $entity = new stdClass;
         $hal    = new Entity($entity, 'id');
+
         $this->assertSame($entity, $hal->getEntity());
         $this->assertEquals('id', $hal->getId());
     }
@@ -48,7 +53,8 @@ class EntityTest extends TestCase
     {
         $entity = new stdClass;
         $hal    = new Entity($entity, 'id', 'route', ['foo' => 'bar']);
-        $this->assertInstanceOf('ZF\Hal\Link\LinkCollection', $hal->getLinks());
+
+        $this->assertInstanceOf(LinkCollection::class, $hal->getLinks());
     }
 
     public function testLinkCollectionMayBeInjected()
@@ -57,6 +63,7 @@ class EntityTest extends TestCase
         $hal    = new Entity($entity, 'id', 'route', ['foo' => 'bar']);
         $links  = new LinkCollection();
         $hal->setLinks($links);
+
         $this->assertSame($links, $hal->getLinks());
     }
 

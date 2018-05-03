@@ -52,7 +52,7 @@ class LinkCollection implements Countable, IteratorAggregate
     public function add(Link $link, $overwrite = false)
     {
         $relation = $link->getRelation();
-        if (!isset($this->links[$relation]) || $overwrite || 'self' == $relation) {
+        if (! isset($this->links[$relation]) || $overwrite || 'self' == $relation) {
             $this->links[$relation] = $link;
             return $this;
         }
@@ -61,7 +61,7 @@ class LinkCollection implements Countable, IteratorAggregate
             $this->links[$relation] = [$this->links[$relation]];
         }
 
-        if (!is_array($this->links[$relation])) {
+        if (! is_array($this->links[$relation])) {
             $type = (is_object($this->links[$relation])
                 ? get_class($this->links[$relation])
                 : gettype($this->links[$relation]));
@@ -86,7 +86,7 @@ class LinkCollection implements Countable, IteratorAggregate
      */
     public function get($relation)
     {
-        if (!$this->has($relation)) {
+        if (! $this->has($relation)) {
             return null;
         }
         return $this->links[$relation];
@@ -111,7 +111,7 @@ class LinkCollection implements Countable, IteratorAggregate
      */
     public function remove($relation)
     {
-        if (!$this->has($relation)) {
+        if (! $this->has($relation)) {
             return false;
         }
         unset($this->links[$relation]);

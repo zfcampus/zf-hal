@@ -1,24 +1,23 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2017 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZFTest\Hal\Link;
 
+use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
 use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Link\SelfLinkInjector;
-use PHPUnit_Framework_TestCase as TestCase;
 
 class SelfLinkInjectorTest extends TestCase
 {
     public function testInjectSelfLinkAlreadyAddedShouldBePrevented()
     {
         $linkCollection = $this->prophesize(LinkCollection::class);
-
         $linkCollection->has('self')->willReturn(true);
         $linkCollection->add(Argument::any())->shouldNotBeCalled();
 

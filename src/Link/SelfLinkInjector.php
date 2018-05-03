@@ -32,12 +32,12 @@ class SelfLinkInjector implements SelfLinkInjectorInterface
         $link->setRoute($route);
 
         $routeParams = $this->getRouteParams($resource, $routeIdentifier);
-        if (!empty($routeParams)) {
+        if (! empty($routeParams)) {
             $link->setRouteParams($routeParams);
         }
 
         $routeOptions = $this->getRouteOptions($resource);
-        if (!empty($routeOptions)) {
+        if (! empty($routeOptions)) {
             $link->setRouteOptions($routeOptions);
         }
 

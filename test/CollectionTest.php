@@ -1,16 +1,17 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2017 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZFTest\Hal;
 
+use PHPUnit\Framework\TestCase;
+use stdClass;
 use ZF\Hal\Collection;
+use ZF\Hal\Exception\InvalidCollectionException;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
-use PHPUnit_Framework_TestCase as TestCase;
-use stdClass;
 
 class CollectionTest extends TestCase
 {
@@ -31,16 +32,20 @@ class CollectionTest extends TestCase
 
     /**
      * @dataProvider invalidCollections
+     *
+     * @param mixed $collection
      */
     public function testConstructorRaisesExceptionForNonTraversableCollection($collection)
     {
-        $this->setExpectedException('ZF\Hal\Exception\InvalidCollectionException');
-        $hal = new Collection($collection, 'collection/route', 'item/route');
+        $this->expectException(InvalidCollectionException::class);
+
+        new Collection($collection, 'collection/route', 'item/route');
     }
 
     public function testPropertiesAreAccessibleFollowingConstruction()
     {
         $hal = new Collection([], 'item/route', ['version' => 1], ['query' => 'format=json']);
+
         $this->assertEquals([], $hal->getCollection());
         $this->assertEquals('item/route', $hal->getEntityRoute());
         $this->assertEquals(['version' => 1], $hal->getEntityRouteParams());
@@ -50,6 +55,7 @@ class CollectionTest extends TestCase
     public function testDefaultPageIsOne()
     {
         $hal = new Collection([], 'item/route');
+
         $this->assertEquals(1, $hal->getPage());
     }
 
@@ -57,12 +63,14 @@ class CollectionTest extends TestCase
     {
         $hal = new Collection([], 'item/route');
         $hal->setPage(5);
+
         $this->assertEquals(5, $hal->getPage());
     }
 
     public function testDefaultPageSizeIsThirty()
     {
         $hal = new Collection([], 'item/route');
+
         $this->assertEquals(30, $hal->getPageSize());
     }
 
@@ -70,6 +78,7 @@ class CollectionTest extends TestCase
     {
         $hal = new Collection([], 'item/route');
         $hal->setPageSize(3);
+
         $this->assertEquals(3, $hal->getPageSize());
     }
 
@@ -77,12 +86,14 @@ class CollectionTest extends TestCase
     {
         $hal = new Collection([], 'item/route');
         $hal->setPageSize(-1);
+
         $this->assertEquals(-1, $hal->getPageSize());
     }
 
     public function testDefaultCollectionNameIsItems()
     {
         $hal = new Collection([], 'item/route');
+
         $this->assertEquals('items', $hal->getCollectionName());
     }
 
@@ -90,12 +101,14 @@ class CollectionTest extends TestCase
     {
         $hal = new Collection([], 'item/route');
         $hal->setCollectionName('records');
+
         $this->assertEquals('records', $hal->getCollectionName());
     }
 
     public function testDefaultAttributesAreEmpty()
     {
         $hal = new Collection([], 'item/route');
+
         $this->assertEquals([], $hal->getAttributes());
     }
 
@@ -107,13 +120,15 @@ class CollectionTest extends TestCase
             'order' => 'desc',
         ];
         $hal->setAttributes($attributes);
+
         $this->assertEquals($attributes, $hal->getAttributes());
     }
 
     public function testComposesLinkCollectionByDefault()
     {
         $hal = new Collection([], 'item/route');
-        $this->assertInstanceOf('ZF\Hal\Link\LinkCollection', $hal->getLinks());
+
+        $this->assertInstanceOf(LinkCollection::class, $hal->getLinks());
     }
 
     public function testLinkCollectionMayBeInjected()
@@ -121,6 +136,7 @@ class CollectionTest extends TestCase
         $hal   = new Collection([], 'item/route');
         $links = new LinkCollection();
         $hal->setLinks($links);
+
         $this->assertSame($links, $hal->getLinks());
     }
 
@@ -131,6 +147,7 @@ class CollectionTest extends TestCase
         $links->add(new Link('orders'));
         $hal   = new Collection([], 'item/route');
         $hal->setEntityLinks($links);
+
         $this->assertSame($links, $hal->getEntityLinks());
     }
 }

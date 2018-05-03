@@ -1,17 +1,22 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2017 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZFTest\Hal\Link;
 
+use PHPUnit\Framework\TestCase;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
-use PHPUnit_Framework_TestCase as TestCase;
 
 class LinkCollectionTest extends TestCase
 {
+    /**
+     * @var LinkCollection
+     */
+    protected $links;
+
     public function setUp()
     {
         $this->links = new LinkCollection();
@@ -77,8 +82,8 @@ class LinkCollectionTest extends TestCase
         $this->assertEquals(2, $this->links->count());
         $i = 0;
         foreach ($this->links as $link) {
-            $this->assertInstanceOf('ZF\Hal\Link\Link', $link);
-            $i += 1;
+            $this->assertInstanceOf(Link::class, $link);
+            ++$i;
         }
         $this->assertEquals(2, $i);
     }
@@ -92,7 +97,7 @@ class LinkCollectionTest extends TestCase
                     ->add($second);
 
         $this->assertTrue($this->links->has('self'));
-        $this->assertInstanceOf('ZF\Hal\Link\Link', $this->links->get('self'));
+        $this->assertInstanceOf(Link::class, $this->links->get('self'));
         $this->assertSame($second, $this->links->get('self'));
     }
 }
