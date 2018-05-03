@@ -111,9 +111,10 @@ The `links` property is an array of arrays, each with the following structure:
     'rel'   => 'link relation',
     'url'   => 'string absolute URI to use', // OR
     'route' => [
-        'name'    => 'route name for this link',
-        'params'  => [ /* any route params to use for link generation */ .,
-        'options' => [ /* any options to pass to the router */ .,
+        'name'        => 'route name for this link',
+        'params'      => [ /* any route params to use for link generation */ .,
+        'options'     => [ /* any options to pass to the router */ .,
+        'uriTemplate' => [ /* see below */ .,
     .,
 .,
 // repeat as needed for any additional relational links
@@ -127,6 +128,16 @@ For now we have only one option available who contains the following configurati
 - `use_proxy` - boolean; set to `true` when you are using a proxy (for using
   `HTTP_X_FORWARDED_PROTO`, `HTTP_X_FORWARDED_HOST`, and
   `HTTP_X_FORWARDED_PORT` instead of `SSL_HTTPS`, `HTTP_HOST, SERVER_PORT`)
+
+#### Key: `uriTemplate`
+
+The uriTemplate key is used to configure some basic URI templates to be attached to the URL.
+For now we have two options available:
+
+- `query` - array; an array of values that will be attached as comma-separated list to the end of the URL
+            (e.g. `'uriTemplate' => ['query' => ['id', 'uid']],` leads to `{?id,uid}` being attached to the URL.)
+- `pathSegment` - array; an array of values that will be attached as in order as path segments to the end of the URL
+            (e.g. `'uriTemplate' => ['pathSegment' => ['id', 'uid']],` leads to `/{id}/{uid}` being attached to the URL.)
 
 ### System Configuration
 

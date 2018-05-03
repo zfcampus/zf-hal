@@ -59,6 +59,26 @@ class LinkExtractorTest extends TestCase
         $this->assertEquals($params['url'], $result['href']);
     }
 
+    public function testExtractGivenLinkWithUrlAndUriTemplateShouldReturnUrlWithTemplate()
+    {
+        $linkUrlBuilder = $this->getMockBuilder('ZF\Hal\Link\LinkUrlBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $linkExtractor = new LinkExtractor($linkUrlBuilder);
+
+        $params = [
+            'rel' => 'resource',
+            'url' => 'http://api.example.com',
+            'uriTemplate' => ['query' => ['id']],
+        ];
+        $link = Link::factory($params);
+
+        $result = $linkExtractor->extract($link);
+
+        $this->assertEquals('http://api.example.com{?id}', $result['href']);
+    }
+
     public function testExtractShouldComposeAnyPropertiesInLink()
     {
         $linkUrlBuilder = $this->getMockBuilder('ZF\Hal\Link\LinkUrlBuilder')

@@ -49,6 +49,11 @@ class Link
     protected $url;
 
     /**
+     * @var UriTemplate
+     */
+    protected $uriTemplate;
+
+    /**
      * Create a link relation
      *
      * @todo  filtering and/or validation of relation string
@@ -80,6 +85,22 @@ class Link
             && is_array($spec['props'])
         ) {
             $link->setProps($spec['props']);
+        }
+
+        if (isset($spec['uriTemplate'])) {
+            $uriTemplateSpec = $spec['uriTemplate'];
+            if (count($uriTemplateSpec) > 1) {
+                throw new Exception\InvalidArgumentException(sprintf(
+                    '%s requires that the specification array\'s "uriTemplate" array contains at most one parameter',
+                    __METHOD__
+                ));
+            }
+
+            if (isset($uriTemplateSpec['query']) && is_array($uriTemplateSpec['query'])) {
+                $link->setUriTemplate(UriTemplate::withQueryParameters($uriTemplateSpec['query']));
+            } elseif (isset($uriTemplateSpec['pathSegment']) && is_array($uriTemplateSpec['pathSegment'])) {
+                $link->setUriTemplate(UriTemplate::withPathSegmentParameters($uriTemplateSpec['pathSegment']));
+            }
         }
 
         if (isset($spec['url'])) {
@@ -256,6 +277,14 @@ class Link
     }
 
     /**
+     * @param UriTemplate $uriTemplate
+     */
+    public function setUriTemplate($uriTemplate)
+    {
+        $this->uriTemplate = $uriTemplate;
+    }
+
+    /**
      * Get additional properties to include in Link representation
      *
      * @return array
@@ -313,6 +342,17 @@ class Link
     public function getUrl()
     {
         return $this->url;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFormattedUriTemplate()
+    {
+        if ($this->uriTemplate !== null) {
+            return $this->uriTemplate->getFormattedString();
+        }
+        return '';
     }
 
     /**
