@@ -1,7 +1,8 @@
 ZF HAL
 ======
 
-[![Build Status](https://travis-ci.org/zfcampus/zf-hal.png)](https://travis-ci.org/zfcampus/zf-hal)
+[![Build Status](https://travis-ci.org/zfcampus/zf-hal.svg?branch=master)](https://travis-ci.org/zfcampus/zf-hal)
+[![Coverage Status](https://coveralls.io/repos/github/zfcampus/zf-hal/badge.svg?branch=master)](https://coveralls.io/github/zfcampus/zf-hal?branch=master)
 
 Introduction
 ------------
@@ -231,6 +232,10 @@ Notes on individual events:
     entity.
 - `getIdFromEntity` defines one parameter, `entity`, which is an array or object
   from which an identifier needs to be extracted.
+- `fromLink.pre` (since 1.5.0) defines one parameter, `linkDefinition`, which is a
+  `ZF\Hal\Link\Link` instance. This is generally useful from
+  `ZF\Rest\RestController::create()`, when you may want to manipulate the self
+  relational link for purposes of generating the `Link` header.
 
 ### Listeners
 

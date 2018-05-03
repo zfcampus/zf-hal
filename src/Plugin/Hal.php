@@ -73,14 +73,14 @@ class Hal extends AbstractHelper implements
     /**
      * Boolean to render embedded entities or just include _embedded data
      *
-     * @var boolean
+     * @var bool
      */
     protected $renderEmbeddedEntities = true;
 
     /**
      * Boolean to render collections or just return their _embedded data
      *
-     * @var boolean
+     * @var bool
      */
     protected $renderCollections = true;
 
@@ -171,7 +171,7 @@ class Hal extends AbstractHelper implements
             }
 
             // No id in array, or not an object; return false
-            if (is_array($entity) || !is_object($entity)) {
+            if (is_array($entity) || ! is_object($entity)) {
                 return false;
             }
 
@@ -428,7 +428,7 @@ class Hal extends AbstractHelper implements
      * Set boolean to render embedded entities or just include _embedded data
      *
      * @deprecated
-     * @param  boolean $value
+     * @param  bool $value
      * @return self
      */
     public function setRenderEmbeddedResources($value)
@@ -445,7 +445,7 @@ class Hal extends AbstractHelper implements
     /**
      * Set boolean to render embedded entities or just include _embedded data
      *
-     * @param  boolean $value
+     * @param  bool $value
      * @return self
      */
     public function setRenderEmbeddedEntities($value)
@@ -458,7 +458,7 @@ class Hal extends AbstractHelper implements
      * Get boolean to render embedded resources or just include _embedded data
      *
      * @deprecated
-     * @return boolean
+     * @return bool
      */
     public function getRenderEmbeddedResources()
     {
@@ -473,7 +473,7 @@ class Hal extends AbstractHelper implements
     /**
      * Get boolean to render embedded entities or just include _embedded data
      *
-     * @return boolean
+     * @return bool
      */
     public function getRenderEmbeddedEntities()
     {
@@ -483,7 +483,7 @@ class Hal extends AbstractHelper implements
     /**
      * Set boolean to render embedded collections or just include _embedded data
      *
-     * @param  boolean $value
+     * @param  bool $value
      * @return self
      */
     public function setRenderCollections($value)
@@ -495,7 +495,7 @@ class Hal extends AbstractHelper implements
     /**
      * Get boolean to render embedded collections or just include _embedded data
      *
-     * @return boolean
+     * @return bool
      */
     public function getRenderCollections()
     {
@@ -692,7 +692,7 @@ class Hal extends AbstractHelper implements
             $entity = [];
         }
 
-        if (!is_array($entity)) {
+        if (! is_array($entity)) {
             $entity = $this->getEntityExtractor()->extract($entity);
         }
 
@@ -791,6 +791,8 @@ class Hal extends AbstractHelper implements
      */
     public function fromLink(Link $linkDefinition)
     {
+        $this->getEventManager()->trigger(__FUNCTION__ . '.pre', $this, ['linkDefinition' => $linkDefinition]);
+
         $linkExtractor = $this->linkCollectionExtractor->getLinkExtractor();
 
         return $linkExtractor->extract($linkDefinition);
@@ -967,7 +969,7 @@ class Hal extends AbstractHelper implements
      * Generate HAL links for a paginated collection
      *
      * @param  Collection $halCollection
-     * @return boolean|ApiProblem
+     * @return bool|ApiProblem
      */
     protected function injectPaginationLinks(Collection $halCollection)
     {
@@ -992,7 +994,7 @@ class Hal extends AbstractHelper implements
         // No need to increment depth for this call
         $rendered = $this->renderEntity($entity, true, $depth, $maxDepth);
 
-        if (!isset($parent['_embedded'])) {
+        if (! isset($parent['_embedded'])) {
             $parent['_embedded'] = [];
         }
 
@@ -1022,7 +1024,7 @@ class Hal extends AbstractHelper implements
     ) {
         $rendered = $this->extractCollection($collection, $depth + 1, $maxDepth);
 
-        if (!isset($parent['_embedded'])) {
+        if (! isset($parent['_embedded'])) {
             $parent['_embedded'] = [];
         }
 
@@ -1075,7 +1077,7 @@ class Hal extends AbstractHelper implements
                 continue;
             }
 
-            if (!is_array($entity)) {
+            if (! is_array($entity)) {
                 $entity = $this->getEntityExtractor()->extract($entity);
             }
 
@@ -1149,7 +1151,7 @@ class Hal extends AbstractHelper implements
     {
         $params  = [
             'entity'   => $entity,
-            'resource' => $entity
+            'resource' => $entity,
         ];
 
         $callback = function ($r) {
@@ -1266,19 +1268,7 @@ class Hal extends AbstractHelper implements
             );
         }
 
-        $rel = $link->getRelation();
-        if (! $links->has($rel)) {
-            $links->add($link);
-            return $links;
-        }
-
-        $relLink = $links->get($rel);
-        if ($relLink !== $link
-            || (is_array($relLink) && ! in_array($link, $relLink, true))
-        ) {
-            $links->add($link);
-            return $links;
-        }
+        $links->idempotentAdd($link);
 
         return $links;
     }

@@ -2,13 +2,20 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
-## 1.4.3 - TBD
+## 1.5.0 - 2018-05-03
 
 ### Added
 
-- Nothing.
+- [#158](https://github.com/zfcampus/zf-hal/pull/158) adds support for PHP 7.1 and 7.2.
+
+- [#167](https://github.com/zfcampus/zf-hal/pull/167) adds a new event, `fromLink.pre`, triggered from the `ZF\Hal\Plugin\Hal::fromLink` method.
+  This event can be used in conjunction with `ZF\Rest\RestController::create()` to manipulate the generated
+  link for purpose of modifying it for the `Link` HTTP response header.
 
 ### Changed
+
+- [#163](https://github.com/zfcampus/zf-hal/pull/163) updates `ZF\Hal\Link\Link` to implement the PSR-13 `LinkInterface`, and modifies
+  some internals to make use of its idempotency.
 
 - [#165](https://github.com/zfcampus/zf-hal/pull/165) modifies the `JsonSerializableEntity` to implement the native PHP `JsonSerializable`
   interface instead of the polyfill from zend-stdlib, as all versions of PHP we support
@@ -16,11 +23,16 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Deprecated
 
-- Nothing.
+- [#163](https://github.com/zfcampus/zf-hal/pull/163) both adds and deprecates the method `ZF\Hal\Link\LinkCollection::idempotentAdd()`;
+  in version 3, if released, that method will replace the `add()` method. Its
+  internals largely replace functionality in `ZF\Hal\Plugin\Hal::injectPropertyAsLink()`.
+
+- [#163](https://github.com/zfcampus/zf-hal/pull/163) deprecates the "url" key when creating a new link from an array, in
+  favor of an "href" key.
 
 ### Removed
 
-- Nothing.
+- [#158](https://github.com/zfcampus/zf-hal/pull/158) removes support for HHVM.
 
 ### Fixed
 

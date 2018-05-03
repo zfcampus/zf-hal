@@ -1,12 +1,12 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2017 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZFTest\Hal\Factory;
 
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use Zend\ServiceManager\ServiceManager;
 use Zend\View\Helper;
 use ZF\Hal\Factory\LinkUrlBuilderFactory;
@@ -14,6 +14,16 @@ use ZF\Hal\Link\LinkUrlBuilder;
 
 class LinkUrlBuilderFactoryTest extends TestCase
 {
+    /**
+     * @var Helper\ServerUrl
+     */
+    private $serverUrlHelper;
+
+    /**
+     * @var Helper\Url
+     */
+    private $urlHelper;
+
     public function testInstantiatesLinkUrlBuilder()
     {
         $serviceManager = $this->getServiceManager();
@@ -44,7 +54,6 @@ class LinkUrlBuilderFactoryTest extends TestCase
     private function getServiceManager($config = [])
     {
         $serviceManager = new ServiceManager();
-
         $serviceManager->setService('ZF\Hal\HalConfig', $config);
 
         $viewHelperManager = new ServiceManager();

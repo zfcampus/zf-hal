@@ -1,12 +1,12 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2017 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZFTest\Hal\View;
 
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use Zend\Http\Response;
 use Zend\View\ViewEvent;
 use ZF\ApiProblem\ApiProblem;
@@ -129,9 +129,6 @@ class HalJsonStrategyTest extends TestCase
         $this->assertEquals('application/hal+json', $header->getFieldValue());
     }
 
-    /**
-     *
-     */
     public function testInjectResponseSetsContentTypeHeaderToApiProblemForApiProblemModel()
     {
         $problem = new ApiProblem(500, "Error message");

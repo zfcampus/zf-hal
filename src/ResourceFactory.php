@@ -9,8 +9,8 @@ namespace ZF\Hal;
 use Closure;
 use Traversable;
 use Zend\Paginator\Paginator;
-use ZF\Hal\Extractor\EntityExtractor;
 use ZF\Hal\Exception;
+use ZF\Hal\Extractor\EntityExtractor;
 use ZF\Hal\Link\Link;
 use ZF\Hal\Link\LinkCollection;
 use ZF\Hal\Metadata\Metadata;
@@ -63,7 +63,7 @@ class ResourceFactory
             ));
         }
 
-        $id = ($entityIdentifierName) ? $data[$entityIdentifierName]: null;
+        $id = $entityIdentifierName ? $data[$entityIdentifierName] : null;
 
         if (! $renderEmbeddedEntities) {
             $object = [];
@@ -142,7 +142,7 @@ class ResourceFactory
 
         if (! $metadata->hasRoute()) {
             throw new Exception\RuntimeException(sprintf(
-                'Unable to create a self link for resource of type "%s"; metadata does not contain a route or a url',
+                'Unable to create a self link for resource of type "%s"; metadata does not contain a route or a href',
                 get_class($object)
             ));
         }

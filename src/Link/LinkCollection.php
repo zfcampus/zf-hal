@@ -9,6 +9,7 @@ namespace ZF\Hal\Link;
 use ArrayIterator;
 use Countable;
 use IteratorAggregate;
+use Psr\Link\LinkInterface;
 use ZF\ApiProblem\Exception;
 
 /**
@@ -44,6 +45,7 @@ class LinkCollection implements Countable, IteratorAggregate
     /**
      * Add a link
      *
+     * @deprecated Since 1.5.0; use idempotentAdd() for PSR-13 and RFC 5988 compliance.
      * @param  Link $link
      * @param  bool $overwrite
      * @return self
@@ -52,16 +54,16 @@ class LinkCollection implements Countable, IteratorAggregate
     public function add(Link $link, $overwrite = false)
     {
         $relation = $link->getRelation();
-        if (!isset($this->links[$relation]) || $overwrite || 'self' == $relation) {
+        if (! isset($this->links[$relation]) || $overwrite || 'self' == $relation) {
             $this->links[$relation] = $link;
             return $this;
         }
 
-        if ($this->links[$relation] instanceof Link) {
+        if ($this->links[$relation] instanceof LinkInterface) {
             $this->links[$relation] = [$this->links[$relation]];
         }
 
-        if (!is_array($this->links[$relation])) {
+        if (! is_array($this->links[$relation])) {
             $type = (is_object($this->links[$relation])
                 ? get_class($this->links[$relation])
                 : gettype($this->links[$relation]));
@@ -79,14 +81,47 @@ class LinkCollection implements Countable, IteratorAggregate
     }
 
     /**
+     * Add a link to the collection and update the collection's relations according to RFC 5988.
+     *
+     * @todo Rename to "add" after deprecating the current "add" implementation
+     * @param LinkInterface $link
+     * @return void
+     */
+    public function idempotentAdd(LinkInterface $link)
+    {
+        $existingRels = array_keys($this->links);
+        $linkRels = $link->getRels();
+
+        // update existing rels
+        $intersection = array_intersect($linkRels, $existingRels);
+        foreach ($intersection as $relation) {
+            $relationLinks = $this->links[$relation];
+            if (! is_array($relationLinks)) {
+                $relationLinks = [$relationLinks];
+            }
+
+            if (! in_array($link, $relationLinks, true)) {
+                $relationLinks[] = $link;
+                $this->links[$relation] = $relationLinks; // inside the if, otherwise it's not really idempotent
+            }
+        }
+
+        // add missing rels
+        $diff = array_diff($linkRels, $existingRels);
+        foreach ($diff as $relation) {
+            $this->links[$relation] = $link;
+        }
+    }
+
+    /**
      * Retrieve a link relation
      *
      * @param  string $relation
-     * @return Link|array|null
+     * @return LinkInterface|Link|array|null
      */
     public function get($relation)
     {
-        if (!$this->has($relation)) {
+        if (! $this->has($relation)) {
             return null;
         }
         return $this->links[$relation];
@@ -111,7 +146,7 @@ class LinkCollection implements Countable, IteratorAggregate
      */
     public function remove($relation)
     {
-        if (!$this->has($relation)) {
+        if (! $this->has($relation)) {
             return false;
         }
         unset($this->links[$relation]);

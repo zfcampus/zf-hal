@@ -108,7 +108,7 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function __construct($collection, $entityRoute = null, $entityRouteParams = null, $entityRouteOptions = null)
     {
-        if (!is_array($collection) && !$collection instanceof Traversable) {
+        if (! is_array($collection) && ! $collection instanceof Traversable) {
             throw new Exception\InvalidCollectionException(sprintf(
                 '%s expects an array or Traversable; received "%s"',
                 __METHOD__,
@@ -189,7 +189,7 @@ class Collection implements Link\LinkCollectionAwareInterface
         if ($options instanceof Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
         }
-        if (!is_array($options)) {
+        if (! is_array($options)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects an array or Traversable; received "%s"',
                 __METHOD__,
@@ -212,7 +212,7 @@ class Collection implements Link\LinkCollectionAwareInterface
         if ($params instanceof Traversable) {
             $params = ArrayUtils::iteratorToArray($params);
         }
-        if (!is_array($params)) {
+        if (! is_array($params)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects an array or Traversable; received "%s"',
                 __METHOD__,
@@ -256,7 +256,7 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function setPage($page)
     {
-        if (!is_int($page) && !is_numeric($page)) {
+        if (! is_int($page) && ! is_numeric($page)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 'Page must be an integer; received "%s"',
                 gettype($page)
@@ -284,7 +284,7 @@ class Collection implements Link\LinkCollectionAwareInterface
      */
     public function setPageSize($size)
     {
-        if (!is_int($size) && !is_numeric($size)) {
+        if (! is_int($size) && ! is_numeric($size)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 'Page size must be an integer; received "%s"',
                 gettype($size)
@@ -377,7 +377,7 @@ class Collection implements Link\LinkCollectionAwareInterface
         if ($options instanceof Traversable) {
             $options = ArrayUtils::iteratorToArray($options);
         }
-        if (!is_array($options)) {
+        if (! is_array($options)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects an array or Traversable; received "%s"',
                 __METHOD__,
@@ -420,7 +420,7 @@ class Collection implements Link\LinkCollectionAwareInterface
         if ($params instanceof Traversable) {
             $params = ArrayUtils::iteratorToArray($params);
         }
-        if (!is_array($params)) {
+        if (! is_array($params)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 '%s expects an array or Traversable; received "%s"',
                 __METHOD__,

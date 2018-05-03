@@ -113,7 +113,7 @@ class Metadata
     /**
      * Maximum number of nesting levels
      *
-     * @var integer
+     * @var int
      */
     protected $maxDepth;
 
@@ -137,7 +137,7 @@ class Metadata
         $filter->attachByName('WordUnderscoreToCamelCase')
                ->attachByName('StringToLower');
 
-        if (!class_exists($class)) {
+        if (! class_exists($class)) {
             throw new Exception\InvalidArgumentException(sprintf(
                 'Class provided to %s must exist; received "%s"',
                 __CLASS__,
@@ -415,7 +415,7 @@ class Metadata
                 $hydrator = new $hydrator();
             }
         }
-        if (!$hydrator instanceof ExtractionInterface) {
+        if (! $hydrator instanceof ExtractionInterface) {
             if (is_object($hydrator)) {
                 $type = get_class($hydrator);
             } elseif (is_string($hydrator)) {
@@ -474,7 +474,8 @@ class Metadata
      * Each element in the array should be an array with the elements:
      *
      * - rel - the link relation
-     * - url - the URL to use for the link OR
+     * - url - the URL to use for the link (deprecated since 1.5.0; use "href" instead) OR
+     * - href - the href to use for the link OR
      * - route - an array of route information for generating the link; this
      *   should include the elements "name" (required; the route name),
      *   "params" (optional; additional parameters to inject), and "options"
@@ -583,7 +584,7 @@ class Metadata
     /**
      * Returns true if this entity should be forced to have a "self" link.
      *
-     * @return boolean
+     * @return bool
      */
     public function getForceSelfLink()
     {
@@ -593,7 +594,7 @@ class Metadata
     /**
      * Set whether to force the existance of "self" links.
      *
-     * @param boolean $forceSelfLink A truthy value
+     * @param bool $forceSelfLink A truthy value
      * @return $this
      */
     public function setForceSelfLink($forceSelfLink)
