@@ -6,7 +6,6 @@
 
 namespace ZF\Hal\View;
 
-use Zend\Http\Response;
 use Zend\View\Strategy\JsonStrategy;
 use Zend\View\ViewEvent;
 use ZF\ApiProblem\View\ApiProblemModel;

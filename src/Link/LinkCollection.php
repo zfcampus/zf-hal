@@ -54,7 +54,7 @@ class LinkCollection implements Countable, IteratorAggregate
     public function add(Link $link, $overwrite = false)
     {
         $relation = $link->getRelation();
-        if (!isset($this->links[$relation]) || $overwrite || 'self' == $relation) {
+        if (! isset($this->links[$relation]) || $overwrite || 'self' == $relation) {
             $this->links[$relation] = $link;
             return $this;
         }
@@ -63,7 +63,7 @@ class LinkCollection implements Countable, IteratorAggregate
             $this->links[$relation] = [$this->links[$relation]];
         }
 
-        if (!is_array($this->links[$relation])) {
+        if (! is_array($this->links[$relation])) {
             $type = (is_object($this->links[$relation])
                 ? get_class($this->links[$relation])
                 : gettype($this->links[$relation]));
@@ -96,11 +96,11 @@ class LinkCollection implements Countable, IteratorAggregate
         $intersection = array_intersect($linkRels, $existingRels);
         foreach ($intersection as $relation) {
             $relationLinks = $this->links[$relation];
-            if (!is_array($relationLinks)) {
+            if (! is_array($relationLinks)) {
                 $relationLinks = [$relationLinks];
             }
 
-            if (!in_array($link, $relationLinks, true)) {
+            if (! in_array($link, $relationLinks, true)) {
                 $relationLinks[] = $link;
                 $this->links[$relation] = $relationLinks; // inside the if, otherwise it's not really idempotent
             }
@@ -121,7 +121,7 @@ class LinkCollection implements Countable, IteratorAggregate
      */
     public function get($relation)
     {
-        if (!$this->has($relation)) {
+        if (! $this->has($relation)) {
             return null;
         }
         return $this->links[$relation];
@@ -146,7 +146,7 @@ class LinkCollection implements Countable, IteratorAggregate
      */
     public function remove($relation)
     {
-        if (!$this->has($relation)) {
+        if (! $this->has($relation)) {
             return false;
         }
         unset($this->links[$relation]);

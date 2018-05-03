@@ -1,14 +1,17 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2017 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZFTest\Hal;
 
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use Zend\Hydrator\HydratorPluginManager;
+use Zend\Hydrator\ObjectProperty;
 use Zend\ServiceManager\ServiceManager;
+use ZF\Hal\Collection;
+use ZF\Hal\Entity;
 use ZF\Hal\EntityHydratorManager;
 use ZF\Hal\Extractor\EntityExtractor;
 use ZF\Hal\Metadata\MetadataMap;
@@ -54,7 +57,7 @@ class ResourceFactoryTest extends TestCase
             $metadata->get(HalPluginTestAsset\Entity::class)
         );
 
-        $this->assertInstanceof('ZF\Hal\Entity', $entity);
+        $this->assertInstanceOf(Entity::class, $entity);
         $links = $entity->getLinks();
         $this->assertTrue($links->has('describedby'));
         $this->assertTrue($links->has('children'));
@@ -88,7 +91,7 @@ class ResourceFactoryTest extends TestCase
 
         $metadata = new MetadataMap([
             HalPluginTestAsset\Entity::class => [
-                'hydrator'     => 'Zend\Hydrator\ObjectProperty',
+                'hydrator'     => ObjectProperty::class,
                 'route_name'   => 'hostname/resource',
                 'route_params' => [
                     'test-1' => [$entityDefiningCallback, 'callback'],
@@ -109,7 +112,7 @@ class ResourceFactoryTest extends TestCase
             $metadata->get(HalPluginTestAsset\Entity::class)
         );
 
-        $this->assertInstanceof('ZF\Hal\Entity', $entity);
+        $this->assertInstanceOf(Entity::class, $entity);
 
         $links = $entity->getLinks();
         $this->assertTrue($links->has('self'));
@@ -157,7 +160,7 @@ class ResourceFactoryTest extends TestCase
             $metadata->get(HalPluginTestAsset\Collection::class)
         );
 
-        $this->assertInstanceof('ZF\Hal\Collection', $collection);
+        $this->assertInstanceOf(Collection::class, $collection);
         $links = $collection->getLinks();
         $this->assertTrue($links->has('describedby'));
         $link = $links->get('describedby');

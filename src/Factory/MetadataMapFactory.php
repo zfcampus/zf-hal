@@ -8,9 +8,9 @@ namespace ZF\Hal\Factory;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
+use Zend\Hydrator\HydratorPluginManager;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
-use Zend\Hydrator\HydratorPluginManager;
 use ZF\Hal\Metadata;
 
 class MetadataMapFactory
@@ -19,8 +19,6 @@ class MetadataMapFactory
      * Create an object
      *
      * @param  ContainerInterface $container
-     * @param  string             $requestedName
-     * @param  null|array         $options
      * @return Metadata\MetadataMap
      * @throws ServiceNotFoundException if unable to resolve the service.
      * @throws ServiceNotCreatedException if an exception is raised when

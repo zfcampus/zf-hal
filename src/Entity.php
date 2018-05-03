@@ -27,7 +27,7 @@ class Entity implements Link\LinkCollectionAwareInterface
      */
     public function __construct($entity, $id = null)
     {
-        if (!is_object($entity) && !is_array($entity)) {
+        if (! is_object($entity) && ! is_array($entity)) {
             throw new Exception\InvalidEntityException();
         }
 
@@ -58,7 +58,7 @@ class Entity implements Link\LinkCollectionAwareInterface
             'id'     => 'id',
         ];
         $name = strtolower($name);
-        if (!in_array($name, array_keys($names))) {
+        if (! in_array($name, array_keys($names))) {
             throw new Exception\InvalidArgumentException(sprintf(
                 'Invalid property name "%s"',
                 $name

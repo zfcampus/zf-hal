@@ -1,12 +1,12 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2017 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZFTest\Hal\View;
 
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use stdClass;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
@@ -17,6 +17,11 @@ use ZF\Hal\View\HalJsonModel;
  */
 class HalJsonModelTest extends TestCase
 {
+    /**
+     * @var HalJsonModel
+     */
+    protected $model;
+
     public function setUp()
     {
         $this->model = new HalJsonModel;
@@ -60,6 +65,8 @@ class HalJsonModelTest extends TestCase
 
     /**
      * @dataProvider invalidCollectionPayloads
+     *
+     * @param mixed $payload
      */
     public function testIsCollectionReturnsFalseForInvalidValues($payload)
     {
@@ -85,6 +92,8 @@ class HalJsonModelTest extends TestCase
 
     /**
      * @dataProvider invalidEntityPayloads
+     *
+     * @param mixed $payload
      */
     public function testIsEntityReturnsFalseForInvalidValues($payload)
     {

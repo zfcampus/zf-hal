@@ -74,7 +74,7 @@ class HalJsonRenderer extends JsonRenderer
      */
     public function getHelperPluginManager()
     {
-        if (!$this->helpers instanceof HelperPluginManager) {
+        if (! $this->helpers instanceof HelperPluginManager) {
             $this->setHelperPluginManager(new HelperPluginManager());
         }
 
@@ -104,7 +104,7 @@ class HalJsonRenderer extends JsonRenderer
      */
     public function render($nameOrModel, $values = null)
     {
-        if (!$nameOrModel instanceof HalJsonModel) {
+        if (! $nameOrModel instanceof HalJsonModel) {
             return parent::render($nameOrModel, $values);
         }
 

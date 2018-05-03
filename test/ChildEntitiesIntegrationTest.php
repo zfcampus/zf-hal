@@ -1,23 +1,22 @@
 <?php
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) 2014 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright Copyright (c) 2014-2017 Zend Technologies USA Inc. (http://www.zend.com)
  */
 
 namespace ZFTest\Hal;
 
-use PHPUnit_Framework_TestCase as TestCase;
+use PHPUnit\Framework\TestCase;
 use Zend\Http\Request;
-use Zend\Hydrator\HydratorPluginManager;
 use Zend\Mvc\Controller\PluginManager as ControllerPluginManager;
 use Zend\Mvc\Router\Http\TreeRouteStack as V2TreeRouteStack;
 use Zend\Mvc\Router\RouteMatch as V2RouteMatch;
 use Zend\Router\Http\TreeRouteStack;
 use Zend\Router\RouteMatch;
 use Zend\ServiceManager\ServiceManager;
-use Zend\View\HelperPluginManager;
 use Zend\View\Helper\ServerUrl as ServerUrlHelper;
 use Zend\View\Helper\Url as UrlHelper;
+use Zend\View\HelperPluginManager;
 use ZF\ApiProblem\View\ApiProblemRenderer;
 use ZF\Hal\Collection;
 use ZF\Hal\Entity;
@@ -34,10 +33,25 @@ use ZF\Hal\View\HalJsonRenderer;
  */
 class ChildEntitiesIntegrationTest extends TestCase
 {
-
+    /**
+     * @var V2TreeRouteStack|TreeRouteStack
+     */
     protected $router;
+
+    /**
+     * @var HelperPluginManager
+     */
     protected $helpers;
+
+    /**
+     * @var HalJsonRenderer
+     */
     protected $renderer;
+
+    /**
+     * @var ControllerPluginManager
+     */
+    protected $plugins;
 
     public function setUp()
     {
@@ -48,7 +62,7 @@ class ChildEntitiesIntegrationTest extends TestCase
 
     public function setupHelpers()
     {
-        if (!$this->router) {
+        if (! $this->router) {
             $this->setupRouter();
         }
 
@@ -79,7 +93,7 @@ class ChildEntitiesIntegrationTest extends TestCase
 
     public function setupRenderer()
     {
-        if (!$this->helpers) {
+        if (! $this->helpers) {
             $this->setupHelpers();
         }
         $this->renderer = $renderer = new HalJsonRenderer(new ApiProblemRenderer());
@@ -128,7 +142,7 @@ class ChildEntitiesIntegrationTest extends TestCase
 
         $link = new Link('self');
         $link->setRoute('parent');
-        $link->setRouteParams(['parent'=> 'anakin']);
+        $link->setRouteParams(['parent' => 'anakin']);
         $entity->getLinks()->add($link);
 
         return $entity;
@@ -144,7 +158,7 @@ class ChildEntitiesIntegrationTest extends TestCase
 
         $link = new Link('self');
         $link->setRoute('parent/child');
-        $link->setRouteParams(['child'=> $id]);
+        $link->setRouteParams(['child' => $id]);
         $entity->getLinks()->add($link);
 
         return $entity;
