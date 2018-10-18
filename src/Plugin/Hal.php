@@ -665,10 +665,14 @@ class Hal extends AbstractHelper implements
         $entityLinks = clone $halEntity->getLinks(); // Clone to prevent link duplication
 
         $metadataMap = $this->getMetadataMap();
+        $showLinks   = true;
 
         if (is_object($entity)) {
-            if ($maxDepth === null && $metadataMap->has($entity)) {
-                $maxDepth = $metadataMap->get($entity)->getMaxDepth();
+            if ($metadataMap->has($entity)){
+                $showLinks = $metadataMap->get($entity)->isForceShowLinks();
+                if ($maxDepth === null) {
+                    $maxDepth = $metadataMap->get($entity)->getMaxDepth();
+                }
             }
 
             if ($maxDepth === null) {
@@ -724,8 +728,11 @@ class Hal extends AbstractHelper implements
             }
         }
 
-        $halEntity->setLinks($entityLinks);
-        $entity['_links'] = $this->fromResource($halEntity);
+
+        if($showLinks){
+            $halEntity->setLinks($entityLinks);
+            $entity['_links'] = $this->fromResource($halEntity);
+        }
 
         $payload = new ArrayObject($entity);
         $this->getEventManager()->trigger(

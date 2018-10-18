@@ -118,6 +118,13 @@ class Metadata
     protected $maxDepth;
 
     /**
+     * change visibility of "_links" property for the entity.
+     *
+     * @var bool
+     */
+    protected $forceShowLinks = true;
+
+    /**
      * Constructor
      *
      * Sets the class, and passes any options provided to the appropriate
@@ -600,6 +607,25 @@ class Metadata
     public function setForceSelfLink($forceSelfLink)
     {
         $this->forceSelfLink = $forceSelfLink;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isForceShowLinks()
+    {
+        return $this->forceShowLinks;
+    }
+
+    /**
+     * @param bool $forceShowLinks
+     *
+     * @return \ZF\Hal\Metadata\Metadata
+     */
+    public function setForceShowLinks($forceShowLinks)
+    {
+        $this->forceShowLinks = $forceShowLinks;
         return $this;
     }
 }

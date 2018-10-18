@@ -104,6 +104,8 @@ Each class in the metadata map may contain one or more of the following configur
   references are detected, an exception will be thrown to avoid infinite loops.
 - `force_self_link` - boolean; set whether a self-referencing link should be automatically generated for the entity.
   Defaults to `true` (since its recommended).
+- `force_show_links` - boolean; change visibility of "_links" property for the entity.
+  Defaults to `true`
 
 The `links` property is an array of arrays, each with the following structure:
 
