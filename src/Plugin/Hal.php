@@ -668,7 +668,7 @@ class Hal extends AbstractHelper implements
         $showLinks   = true;
 
         if (is_object($entity)) {
-            if ($metadataMap->has($entity)){
+            if ($metadataMap->has($entity)) {
                 $showLinks = $metadataMap->get($entity)->isForceShowLinks();
                 if ($maxDepth === null) {
                     $maxDepth = $metadataMap->get($entity)->getMaxDepth();
@@ -729,7 +729,7 @@ class Hal extends AbstractHelper implements
         }
 
 
-        if($showLinks){
+        if ($showLinks) {
             $halEntity->setLinks($entityLinks);
             $entity['_links'] = $this->fromResource($halEntity);
         }
