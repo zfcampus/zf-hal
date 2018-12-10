@@ -10,7 +10,6 @@ use ArrayObject;
 use PHPUnit\Framework\TestCase;
 use ReflectionObject;
 use Zend\Hydrator;
-use Zend\Hydrator\ObjectProperty;
 use Zend\Mvc\Controller\AbstractRestfulController;
 use Zend\Mvc\MvcEvent;
 use Zend\Mvc\Router\Exception as V2RouterException;
@@ -45,6 +44,11 @@ use ZFTest\Hal\TestAsset as HalTestAsset;
 class HalTest extends TestCase
 {
     /**
+     * @var MvcEvent
+     */
+    protected $event;
+
+    /**
      * @var HalHelper
      */
     protected $plugin;
@@ -53,11 +57,6 @@ class HalTest extends TestCase
      * @var V2TreeRouteStack|TreeRouteStack
      */
     protected $router;
-
-    /**
-     * @var MvcEvent
-     */
-    protected $event;
 
     /**
      * @var ServerUrlHelper
@@ -150,6 +149,26 @@ class HalTest extends TestCase
         $linkExtractor = new LinkExtractor($linkUrlBuilder);
         $linkCollectionExtractor = new LinkCollectionExtractor($linkExtractor);
         $plugin->setLinkCollectionExtractor($linkCollectionExtractor);
+    }
+
+    /**
+     * @return string
+     */
+    public function getArraySerializableHydratorClass()
+    {
+        return class_exists(Hydrator\ArraySerializableHydrator::class)
+            ? Hydrator\ArraySerializableHydrator::class
+            : Hydrator\ArraySerializable::class;
+    }
+
+    /**
+     * @return string
+     */
+    public function getObjectPropertyHydratorClass()
+    {
+        return class_exists(Hydrator\ObjectPropertyHydrator::class)
+            ? Hydrator\ObjectPropertyHydrator::class
+            : Hydrator\ObjectProperty::class;
     }
 
     public function assertRelationalLinkContains($match, $relation, $entity)
@@ -258,19 +277,19 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap([
             TestAsset\Entity::class => [
-                'hydrator'   => ObjectProperty::class,
+                'hydrator'   => $this->getObjectPropertyHydratorClass(),
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
             ],
             TestAsset\EmbeddedEntity::class => [
-                'hydrator' => ObjectProperty::class,
+                'hydrator' => $this->getObjectPropertyHydratorClass(),
                 'route'    => 'hostname/embedded',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
             ],
             TestAsset\EmbeddedEntityWithCustomIdentifier::class => [
-                'hydrator'        => ObjectProperty::class,
+                'hydrator'        => $this->getObjectPropertyHydratorClass(),
                 'route'           => 'hostname/embedded_custom',
                 'route_identifier_name' => 'custom_id',
                 'entity_identifier_name' => 'custom_id',
@@ -311,19 +330,19 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap([
             TestAsset\Entity::class => [
-                'hydrator'   => ObjectProperty::class,
+                'hydrator'   => $this->getObjectPropertyHydratorClass(),
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
             ],
             TestAsset\EmbeddedEntity::class => [
-                'hydrator' => ObjectProperty::class,
+                'hydrator' => $this->getObjectPropertyHydratorClass(),
                 'route'    => 'hostname/embedded',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
             ],
             TestAsset\EmbeddedEntityWithCustomIdentifier::class => [
-                'hydrator'        => ObjectProperty::class,
+                'hydrator'        => $this->getObjectPropertyHydratorClass(),
                 'route'           => 'hostname/embedded_custom',
                 'route_identifier_name' => 'custom_id',
                 'entity_identifier_name' => 'custom_id',
@@ -434,7 +453,7 @@ class HalTest extends TestCase
                 'entity_identifier_name' => 'id',
             ],
             TestAsset\Entity::class => [
-                'hydrator'   => ObjectProperty::class,
+                'hydrator'   => $this->getObjectPropertyHydratorClass(),
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
@@ -485,11 +504,11 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap([
             TestAsset\EmbeddedEntity::class => [
-                'hydrator' => ObjectProperty::class,
+                'hydrator' => $this->getObjectPropertyHydratorClass(),
                 'route'    => 'hostname/embedded',
             ],
             TestAsset\EmbeddedEntityWithCustomIdentifier::class => [
-                'hydrator'        => ObjectProperty::class,
+                'hydrator'        => $this->getObjectPropertyHydratorClass(),
                 'route'           => 'hostname/embedded_custom',
                 'route_identifier_name' => 'custom_id',
                 'entity_identifier_name' => 'custom_id',
@@ -500,7 +519,7 @@ class HalTest extends TestCase
                 'entity_route'   => 'hostname/embedded',
             ],
             TestAsset\Entity::class => [
-                'hydrator'   => ObjectProperty::class,
+                'hydrator'   => $this->getObjectPropertyHydratorClass(),
                 'route_name' => 'hostname/resource',
             ],
         ]);
@@ -751,7 +770,7 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap([
             TestAsset\Entity::class => [
-                'hydrator'   => ObjectProperty::class,
+                'hydrator'   => $this->getObjectPropertyHydratorClass(),
                 'route_name' => 'hostname/resource',
                 'links'      => [
                     [
@@ -948,7 +967,7 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap([
             TestAsset\Entity::class => [
-                'hydrator'   => ObjectProperty::class,
+                'hydrator'   => $this->getObjectPropertyHydratorClass(),
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
@@ -1062,7 +1081,7 @@ class HalTest extends TestCase
     {
         $metadata = new MetadataMap([
             TestAsset\Entity::class => [
-                'hydrator'   => ObjectProperty::class,
+                'hydrator'   => $this->getObjectPropertyHydratorClass(),
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
@@ -1238,14 +1257,14 @@ class HalTest extends TestCase
     {
         return new MetadataMap([
             TestAsset\Entity::class => [
-                'hydrator'   => ObjectProperty::class,
+                'hydrator'   => $this->getObjectPropertyHydratorClass(),
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
                 'max_depth' => $maxDepth,
             ],
             TestAsset\EmbeddedEntityWithBackReference::class => [
-                'hydrator' => ObjectProperty::class,
+                'hydrator' => $this->getObjectPropertyHydratorClass(),
                 'route'    => 'hostname/embedded',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
@@ -1504,13 +1523,13 @@ class HalTest extends TestCase
                 'max_depth'           => $maxDepth,
             ],
             TestAsset\Entity::class => [
-                'hydrator'   => ObjectProperty::class,
+                'hydrator'   => $this->getObjectPropertyHydratorClass(),
                 'route_name' => 'hostname/resource',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
             ],
             TestAsset\EmbeddedEntityWithBackReference::class => [
-                'hydrator' => ObjectProperty::class,
+                'hydrator' => $this->getObjectPropertyHydratorClass(),
                 'route'    => 'hostname/embedded',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
@@ -1569,7 +1588,7 @@ class HalTest extends TestCase
         $object = new TestAsset\Entity('foo', 'Foo');
         $metadata = new MetadataMap([
             TestAsset\Entity::class => [
-                'hydrator'        => ObjectProperty::class,
+                'hydrator'        => $this->getObjectPropertyHydratorClass(),
                 'route_name'      => 'hostname/resource',
                 'links'           => [],
                 'force_self_link' => false,
@@ -1592,7 +1611,7 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap([
             TestAsset\Entity::class => [
-                'hydrator'        => ObjectProperty::class,
+                'hydrator'        => $this->getObjectPropertyHydratorClass(),
                 'route_name'      => 'hostname/resource',
                 'links'           => [],
                 'force_self_link' => false,
@@ -1749,9 +1768,10 @@ class HalTest extends TestCase
 
     public function testCanSerializeHydratableEntity()
     {
+        $hydratorClass = $this->getArraySerializableHydratorClass();
         $this->plugin->addHydrator(
             HalTestAsset\ArraySerializable::class,
-            new Hydrator\ArraySerializable()
+            new $hydratorClass()
         );
 
         $item  = new Entity(new HalTestAsset\ArraySerializable(), 'identifier');
@@ -1769,8 +1789,9 @@ class HalTest extends TestCase
 
     public function testUsesDefaultHydratorIfAvailable()
     {
+        $hydratorClass = $this->getArraySerializableHydratorClass();
         $this->plugin->setDefaultHydrator(
-            new Hydrator\ArraySerializable()
+            new $hydratorClass()
         );
 
         $item  = new Entity(new HalTestAsset\ArraySerializable(), 'identifier');
@@ -2233,7 +2254,7 @@ class HalTest extends TestCase
 
         $metadata = new MetadataMap([
             TestAsset\EmbeddedEntity::class => [
-                'hydrator' => ObjectProperty::class,
+                'hydrator' => $this->getObjectPropertyHydratorClass(),
                 'route'    => 'hostname/embedded',
                 'route_identifier_name' => 'id',
                 'entity_identifier_name' => 'id',
