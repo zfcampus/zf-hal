@@ -7,7 +7,9 @@
 namespace ZFTest\Hal;
 
 use PHPUnit\Framework\TestCase;
+use stdClass;
 use Zend\Hydrator\HydratorPluginManager;
+use Zend\Hydrator\HydratorPluginManagerInterface;
 use Zend\ServiceManager\ServiceManager;
 use ZF\Hal\EntityHydratorManager;
 use ZF\Hal\Metadata\MetadataMap;
@@ -18,10 +20,20 @@ use ZFTest\Hal\Plugin\TestAsset;
  */
 class EntityHydratorManagerTest extends TestCase
 {
+    /** @var string */
+    private $hydratorClass;
+
+    public function setUp()
+    {
+        $this->hydratorClass = interface_exists(HydratorPluginManagerInterface::class)
+            ? TestAsset\DummyV3Hydrator::class
+            : TestAsset\DummyHydrator::class;
+    }
+
     public function testAddHydratorGivenEntityClassAndHydratorInstanceShouldAssociateThem()
     {
         $entity        = new TestAsset\Entity('foo', 'Foo Bar');
-        $hydratorClass = TestAsset\DummyHydrator::class;
+        $hydratorClass = $this->hydratorClass;
         $hydrator      = new $hydratorClass();
 
         $metadataMap = new MetadataMap();
@@ -40,7 +52,7 @@ class EntityHydratorManagerTest extends TestCase
     public function testAddHydratorGivenEntityAndHydratorClassesShouldAssociateThem()
     {
         $entity        = new TestAsset\Entity('foo', 'Foo Bar');
-        $hydratorClass = TestAsset\DummyHydrator::class;
+        $hydratorClass = $this->hydratorClass;
 
         $metadataMap = new MetadataMap();
         $metadataMap->setHydratorManager(new HydratorPluginManager(new ServiceManager()));
@@ -58,24 +70,24 @@ class EntityHydratorManagerTest extends TestCase
 
     public function testAddHydratorDoesntFailWithAutoInvokables()
     {
-        $metadataMap           = new MetadataMap();
+        $metadataMap = new MetadataMap();
         $metadataMap->setHydratorManager(new HydratorPluginManager(new ServiceManager()));
 
         $hydratorPluginManager = new HydratorPluginManager(new ServiceManager());
         $entityHydratorManager = new EntityHydratorManager($hydratorPluginManager, $metadataMap);
 
-        $entityHydratorManager->addHydrator('stdClass', TestAsset\DummyHydrator::class);
+        $entityHydratorManager->addHydrator(stdClass::class, $this->hydratorClass);
 
         $this->assertInstanceOf(
-            TestAsset\DummyHydrator::class,
-            $entityHydratorManager->getHydratorForEntity(new \stdClass)
+            $this->hydratorClass,
+            $entityHydratorManager->getHydratorForEntity(new stdClass())
         );
     }
 
     public function testGetHydratorForEntityGivenEntityDefinedInMetadataMapShouldReturnDefaultHydrator()
     {
         $entity        = new TestAsset\Entity('foo', 'Foo Bar');
-        $hydratorClass = TestAsset\DummyHydrator::class;
+        $hydratorClass = $this->hydratorClass;
 
         $metadataMap = new MetadataMap([
             TestAsset\Entity::class => [
@@ -96,10 +108,11 @@ class EntityHydratorManagerTest extends TestCase
 
     public function testGetHydratorForEntityGivenUnkownEntityShouldReturnDefaultHydrator()
     {
-        $entity = new TestAsset\Entity('foo', 'Foo Bar');
-        $defaultHydrator = new TestAsset\DummyHydrator();
+        $entity          = new TestAsset\Entity('foo', 'Foo Bar');
+        $hydratorClass   = $this->hydratorClass;
+        $defaultHydrator = new $hydratorClass();
 
-        $metadataMap           = new MetadataMap();
+        $metadataMap = new MetadataMap();
         $metadataMap->setHydratorManager(new HydratorPluginManager(new ServiceManager()));
 
         $hydratorPluginManager = new HydratorPluginManager(new ServiceManager());

@@ -2,11 +2,11 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
-## 1.5.1 - TBD
+## 1.6.0 - 2018-12-11
 
 ### Added
 
-- Nothing.
+- [#172](https://github.com/zfcampus/zf-hal/pull/172) adds support for zend-hydrator v3 releases (while retaining support for v1 and v2).
 
 ### Changed
 

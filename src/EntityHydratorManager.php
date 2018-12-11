@@ -8,12 +8,13 @@ namespace ZF\Hal;
 
 use Zend\Hydrator\ExtractionInterface;
 use Zend\Hydrator\HydratorPluginManager;
+use Zend\Hydrator\HydratorPluginManagerInterface;
 use ZF\Hal\Metadata\MetadataMap;
 
 class EntityHydratorManager
 {
     /**
-     * @var HydratorPluginManager
+     * @var HydratorPluginManager|HydratorPluginManagerInterface
      */
     protected $hydrators;
 
@@ -37,17 +38,31 @@ class EntityHydratorManager
     protected $defaultHydrator;
 
     /**
-     * @param HydratorPluginManager $hydrators
+     * @param HydratorPluginManager|HydratorPluginManagerInterface $hydrators
      * @param MetadataMap $map
+     * @throws Exception\InvalidArgumentException if $hydrators is of invalid type.
      */
-    public function __construct(HydratorPluginManager $hydrators, MetadataMap $map)
+    public function __construct($hydrators, MetadataMap $map)
     {
+        if ($hydrators instanceof HydratorPluginManagerInterface) {
+            $this->hydrators = $hydrators;
+        } elseif ($hydrators instanceof HydratorPluginManager) {
+            $this->hydrators = $hydrators;
+        } else {
+            throw new Exception\InvalidArgumentException(sprintf(
+                '$hydrators argument to %s must be an instance of either %s or %s; received %s',
+                __CLASS__,
+                HydratorPluginManagerInterface::class,
+                HydratorPluginManager::class,
+                is_object($hydrators) ? get_class($hydrators) : gettype($hydrators)
+            ));
+        }
         $this->hydrators   = $hydrators;
         $this->metadataMap = $map;
     }
 
     /**
-     * @return HydratorPluginManager
+     * @return HydratorPluginManager|HydratorPluginManagerInterface
      */
     public function getHydratorManager()
     {

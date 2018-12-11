@@ -9,6 +9,7 @@ namespace ZF\Hal\Metadata;
 use Zend\Filter\FilterChain;
 use Zend\Hydrator\ExtractionInterface;
 use Zend\Hydrator\HydratorPluginManager;
+use Zend\Hydrator\HydratorPluginManagerInterface;
 use ZF\Hal\Exception;
 
 class Metadata
@@ -35,7 +36,7 @@ class Metadata
     protected $hydrator;
 
     /**
-     * @var HydratorPluginManager
+     * @var HydratorPluginManager|HydratorPluginManagerInterface
      */
     protected $hydrators;
 
@@ -128,10 +129,10 @@ class Metadata
      *
      * @param  string $class
      * @param  array $options
-     * @param  HydratorPluginManager $hydrators
+     * @param  null|HydratorPluginManager|HydratorPluginManagerInterface $hydrators
      * @throws Exception\InvalidArgumentException
      */
-    public function __construct($class, array $options = [], HydratorPluginManager $hydrators = null)
+    public function __construct($class, array $options = [], $hydrators = null)
     {
         $filter = new FilterChain();
         $filter->attachByName('WordUnderscoreToCamelCase')
@@ -147,7 +148,7 @@ class Metadata
         $this->class = $class;
 
         if (null !== $hydrators) {
-            $this->hydrators = $hydrators;
+            $this->setHydrators($hydrators);
         }
 
         $legacyIdentifierName = false;
@@ -601,5 +602,26 @@ class Metadata
     {
         $this->forceSelfLink = $forceSelfLink;
         return $this;
+    }
+
+    /**
+     * @param HydratorPluginManager|HydratorPluginManagerInterface $hydrators
+     * @throws Exception\InvalidArgumentException if $hydrators is an invaild type.
+     */
+    private function setHydrators($hydrators)
+    {
+        if ($hydrators instanceof HydratorPluginManagerInterface) {
+            $this->hydrators = $hydrators;
+        } elseif ($hydrators instanceof HydratorPluginManager) {
+            $this->hydrators = $hydrators;
+        } else {
+            throw new Exception\InvalidArgumentException(sprintf(
+                '$hydrators argument to %s must be an instance of either %s or %s; received %s',
+                __CLASS__,
+                HydratorPluginManagerInterface::class,
+                HydratorPluginManager::class,
+                is_object($hydrators) ? get_class($hydrators) : gettype($hydrators)
+            ));
+        }
     }
 }

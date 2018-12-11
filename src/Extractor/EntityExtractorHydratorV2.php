@@ -11,7 +11,13 @@ use SplObjectStorage;
 use Zend\Hydrator\ExtractionInterface;
 use ZF\Hal\EntityHydratorManager;
 
-class EntityExtractor implements ExtractionInterface
+/**
+ * Extract entities.
+ *
+ * This version targets zend-hydrator v1 and v2, and will be aliased to
+ * ZF\Hal\Extractor\EntityExtractor when one of those versions is in use.
+ */
+class EntityExtractorHydratorV2 implements ExtractionInterface
 {
     /**
      * @var EntityHydratorManager

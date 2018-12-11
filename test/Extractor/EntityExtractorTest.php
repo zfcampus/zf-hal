@@ -8,6 +8,7 @@ namespace ZFTest\Hal\Extractor;
 
 use PHPUnit\Framework\TestCase;
 use Zend\Hydrator\ObjectProperty;
+use Zend\Hydrator\ObjectPropertyHydrator;
 use ZF\Hal\EntityHydratorManager;
 use ZF\Hal\Extractor\EntityExtractor;
 use ZFTest\Hal\Plugin\TestAsset;
@@ -17,9 +18,19 @@ use ZFTest\Hal\Plugin\TestAsset;
  */
 class EntityExtractorTest extends TestCase
 {
+    /** @var string */
+    private $hydratorClass;
+
+    public function setUp()
+    {
+        $this->hydratorClass = class_exists(ObjectPropertyHydrator::class)
+            ? ObjectPropertyHydrator::class
+            : ObjectProperty::class;
+    }
+
     public function testExtractGivenEntityWithAssociateHydratorShouldExtractData()
     {
-        $hydrator = new ObjectProperty();
+        $hydrator = new $this->hydratorClass();
 
         $entity = new TestAsset\Entity('foo', 'Foo Bar');
         $entityHydratorManager = $this->prophesize(EntityHydratorManager::class);
