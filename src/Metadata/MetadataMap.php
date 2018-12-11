@@ -7,13 +7,14 @@
 namespace ZF\Hal\Metadata;
 
 use Zend\Hydrator\HydratorPluginManager;
+use Zend\Hydrator\HydratorPluginManagerInterface;
 use Zend\ServiceManager\ServiceManager;
 use ZF\Hal\Exception;
 
 class MetadataMap
 {
     /**
-     * @var HydratorPluginManager
+     * @var HydratorPluginManager|HydratorPluginManagerInterface
      */
     protected $hydrators;
 
@@ -29,9 +30,9 @@ class MetadataMap
      * If provided, will pass $hydrators to setHydratorManager().
      *
      * @param  null|array $map
-     * @param  null|HydratorPluginManager $hydrators
+     * @param  null|HydratorPluginManager|HydratorPluginManagerInterface $hydrators
      */
-    public function __construct(array $map = null, HydratorPluginManager $hydrators = null)
+    public function __construct(array $map = null, $hydrators = null)
     {
         if (null !== $hydrators) {
             $this->setHydratorManager($hydrators);
@@ -43,17 +44,30 @@ class MetadataMap
     }
 
     /**
-     * @param  HydratorPluginManager $hydrators
+     * @param  HydratorPluginManager|HydratorPluginManagerInterface $hydrators
      * @return self
      */
-    public function setHydratorManager(HydratorPluginManager $hydrators)
+    public function setHydratorManager($hydrators)
     {
-        $this->hydrators = $hydrators;
+        if ($hydrators instanceof HydratorPluginManagerInterface) {
+            $this->hydrators = $hydrators;
+        } elseif ($hydrators instanceof HydratorPluginManager) {
+            $this->hydrators = $hydrators;
+        } else {
+            throw new Exception\InvalidArgumentException(sprintf(
+                '$hydrators argument to %s must be an instance of either %s or %s; received %s',
+                __CLASS__,
+                HydratorPluginManagerInterface::class,
+                HydratorPluginManager::class,
+                is_object($hydrators) ? get_class($hydrators) : gettype($hydrators)
+            ));
+        }
+
         return $this;
     }
 
     /**
-     * @return HydratorPluginManager
+     * @return HydratorPluginManager|HydratorPluginManagerInterface
      */
     public function getHydratorManager()
     {

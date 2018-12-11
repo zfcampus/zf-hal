@@ -16,6 +16,7 @@ use Zend\EventManager\EventManagerAwareTrait;
 use Zend\EventManager\EventManagerInterface;
 use Zend\Hydrator\ExtractionInterface;
 use Zend\Hydrator\HydratorPluginManager;
+use Zend\Hydrator\HydratorPluginManagerInterface;
 use Zend\Mvc\Controller\Plugin\PluginInterface as ControllerPluginInterface;
 use Zend\Paginator\Paginator;
 use Zend\ServiceManager\ServiceManager;
@@ -122,14 +123,26 @@ class Hal extends AbstractHelper implements
     protected $entityHashStack = [];
 
     /**
-     * @param null|HydratorPluginManager $hydrators
+     * @param null|HydratorPluginManager|HydratorPluginManagerInterface $hydrators
+     * @throws Exception\InvalidArgumentException if $hydrators is of invalid type.
      */
-    public function __construct(HydratorPluginManager $hydrators = null)
+    public function __construct($hydrators = null)
     {
         if (null === $hydrators) {
-            $hydrators = new HydratorPluginManager(new ServiceManager());
+            $this->hydrators = new HydratorPluginManager(new ServiceManager());
+        } elseif ($hydrators instanceof HydratorPluginManagerInterface) {
+            $this->hydrators = $hydrators;
+        } elseif ($hydrators instanceof HydratorPluginManager) {
+            $this->hydrators = $hydrators;
+        } else {
+            throw new Exception\InvalidArgumentException(sprintf(
+                '$hydrators argument to %s must be an instance of either %s or %s; received %s',
+                __CLASS__,
+                HydratorPluginManagerInterface::class,
+                HydratorPluginManager::class,
+                is_object($hydrators) ? get_class($hydrators) : gettype($hydrators)
+            ));
         }
-        $this->hydrators = $hydrators;
     }
 
     /**
