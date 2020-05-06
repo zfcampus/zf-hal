@@ -618,6 +618,14 @@ class Hal extends AbstractHelper implements
             $payload['page'] = ($payload['page_count'] > 0)
                 ? $halCollection->getPage()
                 : 0;
+            $payload['start_index'] = $payload['page'] > 0
+                ? ($payload['page_size'] * ($payload['page'] - 1)?:1)
+                : 0;
+            $payload['end_index'] = $payload['page'] > 0
+                ? ($payload['page'] < $payload['page_count']
+                    ? (($payload['page_size'] * $payload['page']) - 1)
+                    : $payload['total_items'])
+                : 0;
         } elseif (is_array($collection) || $collection instanceof Countable) {
             $payload['total_items'] = isset($payload['total_items']) ? $payload['total_items'] : count($collection);
         }

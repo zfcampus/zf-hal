@@ -1029,12 +1029,16 @@ class HalTest extends TestCase
             'page_size',
             'total_items',
             'page',
+            'start_index',
+            'end_index',
         ];
         $this->assertEquals($expected, array_keys($rendered));
         $this->assertEquals(100, $rendered['total_items']);
         $this->assertEquals(3, $rendered['page']);
         $this->assertEquals(10, $rendered['page_count']);
         $this->assertEquals(10, $rendered['page_size']);
+        $this->assertEquals(20, $rendered['start_index']);
+        $this->assertEquals(29, $rendered['end_index']);
         return $rendered;
     }
 
